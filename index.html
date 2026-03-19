@@ -78,7 +78,7 @@
         };
 
         // ==========================================
-        // 3. MASTER DATA
+        // 3. MASTER DATA (FALLBACK)
         // ==========================================
         const RH_ZONES = {
             'RH1': ['จตุจักร', 'ธนบุรี', 'บางกะปิ', 'สาทร', 'สุขุมวิท'],
@@ -89,6 +89,25 @@
         };
         const POSITIONS = ['IS', 'IA', 'Other'];
 
+        const DEFAULT_USERS = [
+            { id: 'cand_001', employee_id: 'cand_001', first_name_en: 'Somchai', last_name_en: 'Candidate', role: 'Candidate', position: 'IS', rh: 'RH1', zone: 'จตุจักร' },
+            { id: 'ttb_yj', employee_id: 'ttb_yj', first_name_en: 'Yannapat', last_name_en: 'Jaruwongpaiboon', role: 'Trainer', position: 'Training Specialist', rh: 'RH1', zone: 'จตุจักร' },
+            { id: 'admin_001', employee_id: 'admin_001', first_name_en: 'System', last_name_en: 'Admin', role: 'Admin', position: 'Administrator', rh: 'HQ', zone: 'Central' }
+        ];
+
+        const FALLBACK_QUESTIONS = [
+            { id: 1, question: "ในสภาวะที่เกิดวิกฤตเศรษฐกิจแบบ 'Stagflation' ดัชนี VT8 มีกลไกใดรับมือ?", options: ["ทำ Short Position", "ถือเงินสด 100%", "ใช้ Dynamic Asset Allocation ไปสินค้าโภคภัณฑ์", "กู้เงินถัวเฉลี่ย"], answer: "ใช้ Dynamic Asset Allocation ไปสินค้าโภคภัณฑ์" },
+            { id: 2, question: "เวนคืนกรมธรรม์ 15/5 ในปีที่ 5 จะเป็นอย่างไร?", options: ["ได้เงินต้น 100%", "ได้มูลค่าเวนคืนซึ่งอาจน้อยกว่าเบี้ยที่จ่ายไป", "ไม่ได้เงินคืน", "จ่ายค่าปรับ"], answer: "ได้มูลค่าเวนคืนซึ่งอาจน้อยกว่าเบี้ยที่จ่ายไป" }
+        ];
+
+        const FALLBACK_SCENARIOS = [
+            { id: 'C-01', target: 'ลูกค้าเงินฝาก', context: 'อธิบายความต่างของเงินต้นที่คุ้มครอง กับ ผลตอบแทนส่วนเพิ่ม' }
+        ];
+
+        const FALLBACK_RUBRICS = [
+            { question: "ถ้าลูกค้ายกเลิกกรมธรรม์ในปีที่ 5 จะได้เงินเท่าไหร่?", rule: "ต้องอธิบายได้ว่า 'ได้เป็นมูลค่าเวนคืน'" }
+        ];
+
         // ==========================================
         // 4. MAIN APP
         // ==========================================
@@ -96,6 +115,7 @@
             const [db, setDb] = useState({ users: [], sessions: {}, questions: [], scenarios: [], rubrics: [] });
             const [currentUser, setCurrentUser] = useState(null);
             const [isLoading, setIsLoading] = useState(true);
+            const [isDbConnected, setIsDbConnected] = useState(false);
 
             useEffect(() => {
                 const fetchDatabase = async () => {
@@ -111,14 +131,23 @@
                         const sessMap = {};
                         if(resS.data) resS.data.forEach(s => sessMap[s.user_id] = s);
 
-                        setDb({
-                            users: resU.data || [],
-                            sessions: sessMap,
-                            questions: resQ.data || [],
-                            scenarios: resSc.data || [],
-                            rubrics: resR.data || []
-                        });
-                    } catch (err) { console.error("DB Fetch Error:", err); }
+                        if(resU.data && resU.data.length > 0) {
+                            setDb({
+                                users: resU.data,
+                                sessions: sessMap,
+                                questions: resQ.data || FALLBACK_QUESTIONS,
+                                scenarios: resSc.data || FALLBACK_SCENARIOS,
+                                rubrics: resR.data || FALLBACK_RUBRICS
+                            });
+                            setIsDbConnected(true);
+                        } else {
+                            // Fallback
+                            setDb({ users: DEFAULT_USERS, sessions: {}, questions: FALLBACK_QUESTIONS, scenarios: FALLBACK_SCENARIOS, rubrics: FALLBACK_RUBRICS });
+                        }
+                    } catch (err) { 
+                        console.error("DB Error:", err); 
+                        setDb({ users: DEFAULT_USERS, sessions: {}, questions: FALLBACK_QUESTIONS, scenarios: FALLBACK_SCENARIOS, rubrics: FALLBACK_RUBRICS });
+                    }
                     setIsLoading(false);
                 };
                 fetchDatabase();
@@ -137,15 +166,17 @@
 
             const updateSession = async (userId, data) => {
                 setDb(prev => ({ ...prev, sessions: { ...prev.sessions, [userId]: { ...prev.sessions[userId], ...data } } }));
-                await supabase.from('exam_sessions').upsert({ user_id: userId, ...data });
+                if(isDbConnected) {
+                    await supabase.from('exam_sessions').upsert({ user_id: userId, ...data });
+                }
             };
 
-            if (isLoading) return <div className="flex-grow flex items-center justify-center text-ttbNavy font-bold"><Icon path={Icons.Refresh} className="w-8 h-8 animate-spin mr-3"/> กำลังเชื่อมต่อระบบฐานข้อมูล...</div>;
+            if (isLoading) return <div className="flex-grow flex items-center justify-center text-ttbNavy font-bold"><Icon path={Icons.Refresh} className="w-8 h-8 animate-spin mr-3"/> กำลังตรวจสอบระบบ...</div>;
 
             return (
                 <div className="flex-grow flex flex-col">
                     {!currentUser ? (
-                        <AuthScreen onLogin={handleLogin} db={db} setDb={setDb} />
+                        <AuthScreen onLogin={handleLogin} db={db} setDb={setDb} isDbConnected={isDbConnected} />
                     ) : (
                         <div className="flex-grow flex flex-col">
                             {/* Navbar */}
@@ -180,7 +211,7 @@
 
                                 {currentUser.role === 'Candidate' && <CandidateApp user={currentUser} db={db} updateSession={(data) => updateSession(currentUser.id, data)} />}
                                 {currentUser.role === 'Trainer' && <TrainerApp trainer={currentUser} db={db} updateSession={updateSession} />}
-                                {currentUser.role === 'Admin' && <AdminApp db={db} setDb={setDb} />}
+                                {currentUser.role === 'Admin' && <AdminApp db={db} setDb={setDb} isDbConnected={isDbConnected} />}
                             </main>
 
                             {/* Footer */}
@@ -198,7 +229,7 @@
         // ==========================================
         // 5. AUTH SCREEN
         // ==========================================
-        function AuthScreen({ onLogin, db, setDb }) {
+        function AuthScreen({ onLogin, db, setDb, isDbConnected }) {
             const [isReg, setIsReg] = useState(false);
             const [form, setForm] = useState({ empId: '', firstName: '', lastName: '', position: 'IS', rh: '', zone: '' });
             const [err, setErr] = useState('');
@@ -212,8 +243,10 @@
                     if (db.users.find(x => x.employee_id === form.empId)) return setErr('Employee ID นี้ถูกใช้งานแล้ว');
                     if (!form.rh || !form.zone) return setErr('กรุณาเลือก Region และ Zone ให้ครบถ้วน');
                     const newUser = { id: form.empId, employee_id: form.empId, first_name_en: form.firstName, last_name_en: form.lastName, role: 'Candidate', position: form.position, rh: form.rh, zone: form.zone };
+                    
                     setDb(prev => ({ ...prev, users: [...prev.users, newUser] }));
-                    await supabase.from('users').insert([newUser]);
+                    if(isDbConnected) await supabase.from('users').insert([newUser]);
+                    
                     alert('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ'); setIsReg(false); setErr('');
                 }
             };
@@ -374,6 +407,15 @@
             );
 
             const q = questions[qIdx];
+            
+            // --- FIX FOR THE WHITE SCREEN: SAFE PARSING ---
+            let optionsList = [];
+            try {
+                optionsList = typeof q.options === 'string' ? JSON.parse(q.options) : q.options;
+            } catch (e) {
+                optionsList = ["Option A", "Option B", "Option C", "Option D"]; // Fallback if parse fails
+            }
+
             const submit = () => {
                 const correct = questions.filter((q, i) => answers[i] === q.answer).length;
                 const score = Math.round((correct / questions.length) * 100);
@@ -388,7 +430,7 @@
                     </div>
                     <p className="text-2xl font-bold text-gray-800 mb-8 leading-relaxed">{q.question}</p>
                     <div className="space-y-4 mb-10">
-                        {JSON.parse(q.options).map((opt, i) => (
+                        {optionsList.map((opt, i) => (
                             <button key={i} onClick={() => setAnswers({...answers, [qIdx]: opt})} className={`w-full text-left p-5 rounded-2xl border-2 transition-all duration-200 flex items-center ${answers[qIdx] === opt ? 'border-ttbBlue bg-blue-50 shadow-md transform scale-[1.01]' : 'border-gray-200 bg-white hover:border-blue-300'}`}>
                                 <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-4 font-black text-sm ${answers[qIdx] === opt ? 'bg-ttbBlue text-white' : 'bg-gray-100 text-gray-400'}`}>{['A','B','C','D'][i]}</span>
                                 <span className={`text-lg ${answers[qIdx] === opt ? 'font-bold text-ttbNavy' : 'font-medium text-gray-700'}`}>{opt}</span>
@@ -419,7 +461,7 @@
             const evaluateVideo = async (e) => {
                 e.preventDefault(); setEvaluating(true);
                 try {
-                    const prompt = `ประเมินการนำเสนอผลิตภัณฑ์ 15/5 จากโจทย์: "${session.roleplay_assigned.target}" บริบท: "${session.roleplay_assigned.context}". ส่งผลลัพธ์เป็น JSON เท่านั้น: { "score": 85, "passed": true, "strengths": "อธิบายเงินต้น 100% ได้ดี", "improvements": "เพิ่มเปรียบเทียบเงินฝาก" }`;
+                    const prompt = `ประเมินการนำเสนอผลิตภัณฑ์ 15/5 จากโจทย์: "${session.roleplay_assigned?.target}" บริบท: "${session.roleplay_assigned?.context}". ส่งผลลัพธ์เป็น JSON เท่านั้น: { "score": 85, "passed": true, "strengths": "อธิบายเงินต้น 100% ได้ดี", "improvements": "เพิ่มเปรียบเทียบเงินฝาก" }`;
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`, {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } })
@@ -464,9 +506,9 @@
                             <div className="absolute right-0 top-0 opacity-10 transform scale-150 -translate-y-8"><Icon path={Icons.Users} className="w-40 h-40"/></div>
                             <div className="relative z-10">
                                 <p className="text-ttbOrange text-sm font-black uppercase mb-3 flex items-center tracking-widest"><Icon path={Icons.CheckCircle} className="w-5 h-5 mr-2"/> โจทย์ Roleplay ถูกล็อกแล้ว</p>
-                                <h3 className="text-3xl font-extrabold mb-4">{session.roleplay_assigned.target}</h3>
+                                <h3 className="text-3xl font-extrabold mb-4">{session.roleplay_assigned?.target}</h3>
                                 <div className="bg-white/10 p-4 rounded-xl border border-white/20 mt-4">
-                                    <p className="text-blue-50 text-lg leading-relaxed font-medium">{session.roleplay_assigned.context}</p>
+                                    <p className="text-blue-50 text-lg leading-relaxed font-medium">{session.roleplay_assigned?.context}</p>
                                 </div>
                             </div>
                         </div>
@@ -622,9 +664,7 @@
                             <div className="flex-grow overflow-y-auto pr-2 space-y-2 mb-6">
                                 {rubrics && rubrics.length > 0 ? rubrics.map((t, i) => (
                                     <div key={i} className="bg-gray-50 p-6 rounded-2xl border border-gray-200 mb-6 shadow-sm"><p className="font-bold text-ttbNavy text-lg mb-4 leading-relaxed">ข้อ {i+1}. {t.question}</p><div className="bg-yellow-50 p-4 rounded-xl border-l-8 border-yellow-400 text-sm"><p className="font-extrabold text-yellow-800 mb-2 uppercase tracking-wide">แนวทางการให้คะแนน (Rule):</p><p className="text-yellow-900 font-medium leading-relaxed">{t.rule}</p></div></div>
-                                )) : TRAINER_QUESTIONS.map((t, i) => (
-                                    <div key={i} className="bg-gray-50 p-6 rounded-2xl border border-gray-200 mb-6 shadow-sm"><p className="font-bold text-ttbNavy text-lg mb-4 leading-relaxed">ข้อ {i+1}. {t.q}</p><div className="bg-yellow-50 p-4 rounded-xl border-l-8 border-yellow-400 text-sm"><p className="font-extrabold text-yellow-800 mb-2 uppercase tracking-wide">แนวทางการให้คะแนน (Rule):</p><p className="text-yellow-900 font-medium leading-relaxed">{t.rule}</p></div></div>
-                                ))}
+                                )) : <div className="text-gray-500">ไม่มีข้อมูลเกณฑ์การให้คะแนน</div>}
                             </div>
                             
                             <div className="mt-auto pt-8 border-t border-gray-200">
@@ -646,7 +686,7 @@
         // ==========================================
         // 8. ADMIN APP
         // ==========================================
-        function AdminApp({ db, setDb }) {
+        function AdminApp({ db, setDb, isDbConnected }) {
             const exportData = () => {
                 const data = db.users.map(u => ({ 
                     "Employee ID": u.employee_id, "ชื่อ": u.first_name_en, "นามสกุล": u.last_name_en, 
@@ -662,7 +702,7 @@
             const resetUser = async (id, name) => {
                 if(confirm(`รีเซ็ตระบบ: คุณต้องการลบข้อมูลผลการสอบของ ${name} ทั้งหมดและให้เริ่มใหม่ใช่หรือไม่?`)) {
                     setDb(prev => { const s = {...prev.sessions}; delete s[id]; return {...prev, sessions: s}; });
-                    await supabase.from('exam_sessions').delete().eq('user_id', id);
+                    if(isDbConnected) await supabase.from('exam_sessions').delete().eq('user_id', id);
                     alert('รีเซ็ตข้อมูลการสอบเรียบร้อยแล้ว');
                 }
             };
@@ -670,7 +710,7 @@
             const delUser = async (id, name) => {
                 if(confirm(`ลบบัญชี: ยืนยันการลบบัญชีของ ${name}?`)) {
                     setDb(prev => { const s = {...prev.sessions}; delete s[id]; return {...prev, users: prev.users.filter(x => x.id !== id), sessions: s}; });
-                    await supabase.from('users').delete().eq('id', id);
+                    if(isDbConnected) await supabase.from('users').delete().eq('id', id);
                 }
             };
 
@@ -691,7 +731,7 @@
                     </div>
 
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="p-6 border-b border-gray-200 bg-gray-50"><h3 className="font-extrabold text-ttbNavy text-xl">User & Data Management</h3></div>
+                        <div className="p-6 border-b border-gray-200 bg-gray-50 flex justify-between items-center"><h3 className="font-extrabold text-ttbNavy text-xl">User & Data Management</h3></div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left text-sm"><thead className="bg-white border-b-2 border-gray-200"><tr><th className="p-5 font-extrabold text-gray-600 uppercase tracking-wide">Employee Info</th><th className="p-5 font-extrabold text-gray-600 text-center uppercase tracking-wide">Role / Position</th><th className="p-5 font-extrabold text-gray-600 text-center uppercase tracking-wide">Status</th><th className="p-5 font-extrabold text-gray-600 text-center uppercase tracking-wide">Actions</th></tr></thead>
                             <tbody className="font-medium">
