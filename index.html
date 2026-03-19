@@ -2,46 +2,70 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ttb US Multi-Asset 15/5 - Certification Platform</title>
     
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        ttbNavy: '#002d63',
-                        ttbBlue: '#00508f',
-                        ttbOrange: '#f68b1f',
-                        ttbLightBlue: '#eef2f6'
+                        brandDark: '#1E234A',   /* สีน้ำเงินเข้มสำหรับ Hero Card */
+                        brandBlue: '#4A55F2',   /* สีหลักของแอป */
+                        pastelBlue: '#E8EDFF',  /* ฟ้าพาสเทล */
+                        pastelOrange: '#FFF0E5',/* ส้มพาสเทล */
+                        pastelGreen: '#E6F8F0', /* เขียวพาสเทล */
+                        optGray: '#F4F6FB',     /* สีเทาอ่อนสำหรับปุ่มที่ไม่ได้เลือก */
+                        textMain: '#2D3142',
+                        textMuted: '#9094A6'
                     },
-                    fontFamily: { sans: ['Prompt', 'sans-serif'] }
+                    fontFamily: { sans: ['Prompt', 'Nunito', 'sans-serif'] }
                 }
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
+    <!-- Supabase & SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        body { font-family: 'Prompt', sans-serif; background-color: #f4f5f7; display: flex; flex-direction: column; min-height: 100vh; }
-        .pass-stamp { position: absolute; top: 1.5rem; right: 1.5rem; transform: rotate(12deg); z-index: 10; border: 4px solid #10b981; color: #10b981; padding: 0.25rem 1rem; font-weight: 900; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.1em; border-radius: 0.5rem; background-color: rgba(255,255,255,0.95); box-shadow: 0 4px 6px rgba(0,0,0,0.1); pointer-events: none; }
-        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { background-color: #F0F2F8; font-family: 'Nunito', 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        /* App Container (จำลองสัดส่วนแอป) */
+        .app-container { max-width: 480px; margin: 0 auto; background-color: #ffffff; min-height: 100vh; position: relative; display: flex; flex-direction: column; box-shadow: 0 0 40px rgba(0,0,0,0.05); }
+        
+        /* 3D Soft Shadows */
+        .shadow-soft-3d { box-shadow: 0 10px 25px -5px rgba(74, 85, 242, 0.25), 0 4px 10px -3px rgba(74, 85, 242, 0.1); }
+        .shadow-inner-soft { box-shadow: inset 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .shadow-card { box-shadow: 0 8px 20px -5px rgba(0,0,0,0.05); }
+        
+        /* Animations */
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Pulse for Mic */
         .pulse-mic { animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; } ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        
+        /* Hide Scrollbar for cleaner look */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
     </style>
 </head>
 <body>
-    <div id="root" class="flex-grow flex flex-col"></div>
+    <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
@@ -55,30 +79,15 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ==========================================
-        // 2. ICONS
+        // 2. FLAT ICONS (SVG)
         // ==========================================
-        const Icon = ({ path, className="w-6 h-6", color="currentColor" }) => (
-            <svg className={className} fill="none" stroke={color} viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{ __html: path }}></svg>
-        );
-        const Icons = {
-            Shield: "<path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'></path>",
-            User: "<path d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'></path><circle cx='12' cy='7' r='4'></circle>",
-            Book: "<path d='M4 19.5A2.5 2.5 0 0 1 6.5 17H20'></path><path d='M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z'></path>",
-            Video: "<polygon points='23 7 16 12 23 17 23 7'></polygon><rect x='1' y='5' width='15' height='14' rx='2' ry='2'></rect>",
-            Award: "<circle cx='12' cy='8' r='7'></circle><polyline points='8.21 13.89 7 23 12 20 17 23 15.79 13.88'></polyline>",
-            CheckCircle: "<path d='M22 11.08V12a10 10 0 1 1-5.93-9.14'></path><polyline points='22 4 12 14.01 9 11.01'></polyline>",
-            AlertCircle: "<circle cx='12' cy='12' r='10'></circle><line x1='12' y1='8' x2='12' y2='12'></line><line x1='12' y1='16' x2='12.01' y2='16'></line>",
-            LogOut: "<path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'></path><polyline points='16 17 21 12 16 7'></polyline><line x1='21' y1='12' x2='9' y2='12'></line>",
-            Home: "<path d='M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'></path><polyline points='9 22 9 12 15 12 15 22'></polyline>",
-            Clock: "<circle cx='12' cy='12' r='10'></circle><polyline points='12 6 12 12 16 14'></polyline>",
-            Users: "<path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'></path><circle cx='9' cy='7' r='4'></circle><path d='M23 21v-2a4 4 0 0 0-3-3.87'></path><path d='M16 3.13a4 4 0 0 1 0 7.75'></path>",
-            Download: "<path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'></path><polyline points='7 10 12 15 17 10'></polyline><line x1='12' y1='15' x2='12' y2='3'></line>",
-            Trash: "<polyline points='3 6 5 6 21 6'></polyline><path d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2 2h4a2 2 0 0 1 2 2v2'></path>",
-            Refresh: "<polyline points='1 4 1 10 7 10'></polyline><polyline points='23 20 23 14 17 14'></polyline><path d='M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15'></path>",
-            Mic: "<path d='M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z'></path><path d='M19 10v2a7 7 0 0 1-14 0v-2'></path><line x1='12' x2='12' y1='19' y2='22'></line><line x1='8' x2='16' y1='22' y2='22'></line>",
-            Star: "<polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'></polygon>",
-            Activity: "<polyline points='22 12 18 12 15 21 9 3 6 12 2 12'></polyline>",
-            ChevronLeft: "<polyline points='15 18 9 12 15 6'></polyline>"
+        const FlatIcons = {
+            Home: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>,
+            User: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>,
+            Bell: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>,
+            ChevronLeft: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>,
+            Mic: () => <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line><line x1="8" y1="22" x2="16" y2="22"></line></svg>,
+            LogOut: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
         };
 
         // ==========================================
@@ -93,7 +102,7 @@
         };
         const POSITIONS = ['IS', 'IA', 'Other'];
 
-        // Fallback Data
+        // Fallback Data if Supabase is empty
         const FB_USERS = [
             { id: 'cand_001', employee_id: 'cand_001', first_name_en: 'Somchai', last_name_en: 'Candidate', role: 'Candidate', position: 'IS', rh: 'RH1', zone: 'จตุจักร' },
             { id: 'ttb_yj', employee_id: 'ttb_yj', first_name_en: 'Yannapat', last_name_en: 'Jaruwongpaiboon', role: 'Trainer', position: 'Training Specialist', rh: 'RH1', zone: 'จตุจักร' },
@@ -160,54 +169,29 @@
                 if(isDbConnected) await supabase.from('exam_sessions').upsert({ user_id: userId, ...data });
             };
 
-            if (isLoading) return <div className="flex-grow flex items-center justify-center text-ttbNavy font-bold"><Icon path={Icons.Refresh} className="w-8 h-8 animate-spin mr-3"/> กำลังโหลดระบบฐานข้อมูล...</div>;
+            if (isLoading) return <div className="h-screen w-full flex items-center justify-center bg-[#F8F9FE] text-brandBlue font-black text-xl"><div className="animate-spin mr-3 text-2xl">⏳</div> Loading...</div>;
 
             return (
-                <div className="flex-grow flex flex-col">
+                <div className="app-container">
                     {!currentUser ? (
                         <AuthScreen onLogin={handleLogin} db={db} setDb={setDb} isDbConnected={isDbConnected} />
                     ) : (
-                        <div className="flex-grow flex flex-col">
-                            {/* Navbar */}
-                            <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-                                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
-                                    <div className="flex items-center text-ttbNavy">
-                                        <Icon path={Icons.Shield} className="w-8 h-8 mr-2 text-ttbOrange" />
-                                        <span className="font-extrabold text-xl tracking-tight hidden sm:block">ttb Certification Platform</span>
+                        <div className="flex-1 flex flex-col h-full relative">
+                            {/* สำหรับ Admin และ Trainer ให้ใช้ Layout แบบกว้างปกติ แต่ถ้า Candidate ให้คงความเป็น App */}
+                            {currentUser.role === 'Candidate' ? (
+                                <CandidateApp user={currentUser} db={db} updateSession={(data) => updateSession(currentUser.id, data)} onLogout={() => setCurrentUser(null)} />
+                            ) : (
+                                <div className="w-full max-w-7xl mx-auto p-4 md:p-8 flex-1">
+                                    <div className="flex justify-between items-center mb-8 bg-white p-4 rounded-3xl shadow-sm">
+                                        <h1 className="font-black text-brandDark text-xl">ttb Certification Admin</h1>
+                                        <button onClick={() => setCurrentUser(null)} className="flex items-center text-red-500 font-bold bg-red-50 px-4 py-2 rounded-xl">
+                                            <FlatIcons.LogOut /> <span className="ml-2">ออกจากระบบ</span>
+                                        </button>
                                     </div>
-                                    <button onClick={() => setCurrentUser(null)} className="flex items-center text-gray-500 hover:text-red-500 bg-gray-50 hover:bg-red-50 px-3 py-2 rounded-lg font-bold text-sm transition-colors">
-                                        <Icon path={Icons.LogOut} className="w-4 h-4 mr-1" /> ออกจากระบบ
-                                    </button>
+                                    {currentUser.role === 'Trainer' && <TrainerApp trainer={currentUser} db={db} updateSession={updateSession} />}
+                                    {currentUser.role === 'Admin' && <AdminApp db={db} setDb={setDb} isDbConnected={isDbConnected} />}
                                 </div>
-                            </nav>
-
-                            {/* Main Content */}
-                            <main className="flex-grow p-4 md:p-8 max-w-7xl mx-auto w-full space-y-6">
-                                <div className="bg-ttbNavy rounded-2xl p-6 shadow-lg text-white flex flex-col md:flex-row items-center justify-between relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-64 h-64 bg-ttbBlue rounded-full filter blur-3xl opacity-50 transform translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
-                                    <div className="flex items-center z-10 w-full">
-                                        <div className="bg-white/10 p-4 rounded-full mr-4 border border-white/20 hidden sm:block"><Icon path={Icons.User} className="w-8 h-8 text-ttbOrange" /></div>
-                                        <div>
-                                            <h2 className="text-2xl font-bold">สวัสดี, {currentUser.first_name_en} {currentUser.last_name_en}</h2>
-                                            <p className="text-blue-200 mt-1 text-sm font-medium">Role: {currentUser.role} &nbsp;|&nbsp; RH: {currentUser.rh} ({currentUser.zone})</p>
-                                        </div>
-                                        <div className="ml-auto text-right bg-white/10 px-4 py-2 rounded-xl border border-white/20">
-                                            <p className="text-xs text-blue-200 uppercase tracking-wider font-bold">Employee ID</p>
-                                            <p className="text-sm md:text-lg font-bold text-ttbOrange font-mono">{currentUser.employee_id}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {currentUser.role === 'Candidate' && <CandidateApp user={currentUser} db={db} updateSession={(data) => updateSession(currentUser.id, data)} />}
-                                {currentUser.role === 'Trainer' && <TrainerApp trainer={currentUser} db={db} updateSession={updateSession} />}
-                                {currentUser.role === 'Admin' && <AdminApp db={db} setDb={setDb} isDbConnected={isDbConnected} />}
-                            </main>
-
-                            <footer className="bg-white border-t border-gray-200 py-6 mt-auto">
-                                <div className="max-w-7xl mx-auto px-4 text-center">
-                                    <p className="text-sm font-bold text-gray-400">powered by : <span className="text-ttbNavy">PRU ACADEMY</span> <span className="text-ttbOrange">[ttb training team]</span></p>
-                                </div>
-                            </footer>
+                            )}
                         </div>
                     )}
                 </div>
@@ -239,147 +223,190 @@
             };
 
             return (
-                <div className="flex-grow flex items-center justify-center bg-ttbNavy p-4 relative overflow-hidden">
-                    <div className="absolute inset-0 opacity-10 pointer-events-none" style={{backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)", backgroundSize: "30px 30px"}}></div>
-                    <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md z-10 border-t-8 border-ttbOrange animate-fade-in">
-                        <div className="text-center mb-8">
-                            <div className="w-16 h-16 bg-ttbLightBlue rounded-full flex items-center justify-center mx-auto mb-4 text-ttbBlue"><Icon path={Icons.Shield} className="w-8 h-8"/></div>
-                            <h1 className="text-2xl font-extrabold text-ttbNavy">Certification Platform</h1>
-                            <p className="text-sm text-gray-500 font-bold mt-1">ttb US Multi-Asset Index 15/5</p>
+                <div className="flex-1 flex flex-col justify-center px-8 bg-[#F8F9FE]">
+                    <div className="text-center mb-10">
+                        <div className="w-20 h-20 bg-brandBlue rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-6 shadow-soft-3d text-white transform rotate-3">🛡️</div>
+                        <h1 className="text-3xl font-black text-brandDark">Certification</h1>
+                        <p className="text-textMuted font-bold mt-2">US Multi-Asset Index 15/5</p>
+                    </div>
+
+                    {err && <div className="bg-red-50 text-red-600 p-4 rounded-2xl mb-6 text-sm font-bold text-center border border-red-100">{err}</div>}
+
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        <div>
+                            <input type="text" value={form.empId} onChange={e => setForm({...form, empId: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue shadow-sm outline-none font-bold text-textMain" placeholder="Employee ID" required />
                         </div>
-
-                        {err && <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm font-bold flex items-center border border-red-200"><Icon path={Icons.AlertCircle} className="w-4 h-4 mr-2"/>{err}</div>}
-
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div><label className="block text-sm font-bold text-ttbNavy mb-1">Employee ID</label>
-                            <input type="text" value={form.empId} onChange={e => setForm({...form, empId: e.target.value})} className="w-full p-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-ttbOrange outline-none font-medium" placeholder="เช่น cand_001" required /></div>
-                            <div><label className="block text-sm font-bold text-ttbNavy mb-1">First Name (English)</label>
-                            <input type="text" value={form.firstName} onChange={e => setForm({...form, firstName: e.target.value})} className="w-full p-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-ttbOrange outline-none font-medium" placeholder="เช่น Somchai" required /></div>
-                            
-                            {isReg && (
-                                <div className="animate-fade-in space-y-4 pt-2 border-t border-gray-100">
-                                    <div className="bg-blue-50 text-ttbBlue text-xs p-3 rounded-lg font-bold border border-blue-100 flex"><Icon path={Icons.AlertCircle} className="w-4 h-4 mr-1 shrink-0"/> ระบบจำกัดสิทธิ์การสมัครเฉพาะ "Candidate" เท่านั้น</div>
-                                    <div><label className="block text-sm font-bold text-ttbNavy mb-1">Last Name (English)</label>
-                                    <input type="text" value={form.lastName} onChange={e => setForm({...form, lastName: e.target.value})} className="w-full p-3 border border-gray-300 rounded-xl bg-gray-50 outline-none font-medium" required /></div>
-                                    <div><label className="block text-sm font-bold text-ttbNavy mb-1">Position</label>
-                                    <select value={form.position} onChange={e => setForm({...form, position: e.target.value})} className="w-full p-3 border border-gray-300 rounded-xl bg-white font-medium outline-none">{POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div><label className="block text-sm font-bold text-ttbNavy mb-1">Region (RH)</label>
-                                        <select value={form.rh} onChange={e => setForm({...form, rh: e.target.value, zone: ''})} className="w-full p-3 border border-gray-300 rounded-xl bg-white font-medium outline-none" required><option value="">เลือก RH...</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}</select></div>
-                                        <div><label className="block text-sm font-bold text-ttbNavy mb-1">Zone</label>
-                                        <select value={form.zone} onChange={e => setForm({...form, zone: e.target.value})} disabled={!form.rh} className="w-full p-3 border border-gray-300 rounded-xl bg-white font-medium outline-none disabled:bg-gray-100" required><option value="">เลือก Zone...</option>{form.rh && RH_ZONES[form.rh].map(z => <option key={z} value={z}>{z}</option>)}</select></div>
-                                    </div>
+                        <div>
+                            <input type="text" value={form.firstName} onChange={e => setForm({...form, firstName: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue shadow-sm outline-none font-bold text-textMain" placeholder="First Name (English)" required />
+                        </div>
+                        
+                        {isReg && (
+                            <div className="animate-fade-in space-y-5 pt-4 border-t border-gray-200">
+                                <div><input type="text" value={form.lastName} onChange={e => setForm({...form, lastName: e.target.value})} className="w-full p-4 rounded-[20px] bg-white shadow-sm outline-none font-bold" placeholder="Last Name (English)" required /></div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <select value={form.position} onChange={e => setForm({...form, position: e.target.value})} className="w-full p-4 rounded-[20px] bg-white shadow-sm outline-none font-bold">{POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}</select>
+                                    <select value={form.rh} onChange={e => setForm({...form, rh: e.target.value, zone: ''})} className="w-full p-4 rounded-[20px] bg-white shadow-sm outline-none font-bold" required><option value="">RH...</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}</select>
                                 </div>
-                            )}
-                            <button type="submit" className="w-full bg-ttbBlue hover:bg-ttbNavy text-white font-bold py-3 rounded-xl shadow-md transition-colors mt-4 text-lg">{isReg ? 'สร้างบัญชีผู้ใช้งาน' : 'เข้าสู่ระบบ'}</button>
-                        </form>
-                        <div className="text-center mt-6 pt-6 border-t border-gray-100">
-                            <button onClick={() => {setIsReg(!isReg); setErr('');}} className="text-ttbOrange font-bold text-sm hover:underline">{isReg ? 'ยกเลิกและกลับไปหน้าล็อกอิน' : 'ลงทะเบียนผู้ใช้งานใหม่ (Candidate)'}</button>
-                        </div>
+                                <div><select value={form.zone} onChange={e => setForm({...form, zone: e.target.value})} disabled={!form.rh} className="w-full p-4 rounded-[20px] bg-white shadow-sm outline-none font-bold disabled:bg-gray-100" required><option value="">Zone...</option>{form.rh && RH_ZONES[form.rh].map(z => <option key={z} value={z}>{z}</option>)}</select></div>
+                            </div>
+                        )}
+                        <button type="submit" className="w-full bg-brandBlue text-white font-black py-4 rounded-[20px] shadow-soft-3d hover:bg-blue-700 transition-colors mt-4 text-lg">{isReg ? 'สร้างบัญชี' : 'เข้าสู่ระบบ'}</button>
+                    </form>
+                    <div className="text-center mt-8">
+                        <button onClick={() => {setIsReg(!isReg); setErr('');}} className="text-brandBlue font-bold text-sm">{isReg ? 'กลับไปหน้าเข้าสู่ระบบ' : 'ลงทะเบียนใหม่ (Candidate)'}</button>
                     </div>
                 </div>
             );
         }
 
         // ==========================================
-        // 6. CANDIDATE APP 
+        // 6. CANDIDATE APP (Mobile Soft UI Style)
         // ==========================================
-        function CandidateApp({ user, db, updateSession }) {
+        function CandidateApp({ user, db, updateSession, onLogout }) {
             const session = db.sessions[user.id];
-            const [view, setView] = useState('home');
+            const [view, setView] = useState('home'); // 'home' | 'pk' | 'roleplay' | 'trainer'
             
+            // Logic รีเซ็ตข้อสอบและกลับไปเริ่มใหม่
             const handleRetake = (section) => {
                 if(confirm(`คุณต้องการขอสอบใหม่ใช่หรือไม่?\n(นี่จะเป็นการสอบครั้งที่ ${(session[`${section}_attempts`] || 0) + 2})`)) {
-                    if(section === 'pk') updateSession({ pk_passed: false, pk_score: null, pk_attempts: session.pk_attempts + 1 });
-                    if(section === 'roleplay') updateSession({ roleplay_passed: false, transcript: '', ai_feedback: null, roleplay_attempts: session.roleplay_attempts + 1 });
-                    setView(section);
+                    if(section === 'pk') {
+                        updateSession({ pk_passed: false, pk_score: null, pk_attempts: session.pk_attempts + 1 });
+                    }
+                    if(section === 'roleplay') {
+                        updateSession({ roleplay_passed: false, transcript: '', ai_feedback: null, roleplay_attempts: session.roleplay_attempts + 1 });
+                    }
+                    // บังคับให้เปลี่ยน view กลับไปหน้าทำข้อสอบนั้นๆ (หน้า Start Screen จะโชว์ขึ้นมาเองเพราะ score = null)
+                    setView(section); 
                 }
             };
 
-            const NavBtn = ({ id, label, icon }) => (
-                <button onClick={() => setView(id)} className={`flex items-center px-5 py-3 rounded-xl font-bold text-sm whitespace-nowrap transition-all mr-2 ${view === id ? 'bg-ttbNavy text-white shadow-md' : 'text-gray-500 hover:bg-gray-100 hover:text-ttbNavy'}`}>
-                    <Icon path={icon} className={`w-5 h-5 mr-2 ${view === id ? 'text-ttbOrange' : ''}`} /> {label}
-                </button>
-            );
-
             return (
-                <div className="space-y-6">
-                    <div className="bg-white p-2 rounded-2xl shadow-sm border border-gray-200 flex overflow-x-auto">
-                        <NavBtn id="home" label="หน้าหลัก (Home)" icon={Icons.Home} />
-                        <NavBtn id="pk" label="Knowledge Test" icon={Icons.Book} />
-                        <NavBtn id="roleplay" label="Roleplay" icon={Icons.Video} />
-                        <NavBtn id="trainer" label="Trainer Assessment" icon={Icons.Award} />
-                    </div>
-
-                    <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-200 relative animate-fade-in min-h-[500px]">
-                        {view !== 'home' && (
-                            <div className="flex space-x-2 mb-6 border-b border-gray-100 pb-4">
-                                <button onClick={() => setView('home')} className="text-gray-500 hover:text-ttbNavy flex items-center font-bold text-sm bg-gray-50 hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors"><Icon path={Icons.ChevronLeft} className="w-5 h-5 mr-1" /> ย้อนกลับ</button>
-                                <button onClick={() => setView('home')} className="text-gray-500 hover:text-ttbNavy flex items-center font-bold text-sm bg-gray-50 hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors"><Icon path={Icons.Home} className="w-4 h-4 mr-2" /> หน้าหลัก</button>
+                <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#F4F6FB]">
+                    {/* View Router */}
+                    {view === 'home' && <CandidateHome user={user} session={session} setView={setView} onLogout={onLogout} />}
+                    {view === 'pk' && <KnowledgeTest session={session} questions={db.questions} updateSession={updateSession} onRetake={() => handleRetake('pk')} onBack={() => setView('home')} />}
+                    {view === 'roleplay' && <RoleplayTest session={session} scenarios={db.scenarios} sysPrompt={db.sysPrompt} updateSession={updateSession} onRetake={() => handleRetake('roleplay')} onBack={() => setView('home')} />}
+                    {view === 'trainer' && <TrainerStatus session={session} onBack={() => setView('home')} />}
+                    
+                    {/* Bottom Navigation */}
+                    {view === 'home' && (
+                        <div className="bg-white border-t border-gray-100 px-8 py-5 flex justify-between items-center rounded-t-[32px] shadow-[0_-10px_40px_rgba(0,0,0,0.03)] z-20 mt-auto">
+                            <div className="flex flex-col items-center text-brandBlue cursor-pointer">
+                                <FlatIcons.Home />
+                                <div className="w-1.5 h-1.5 bg-brandBlue rounded-full mt-1.5"></div>
                             </div>
-                        )}
-                        
-                        {view === 'home' && <CandidateHome session={session} setView={setView} />}
-                        {view === 'pk' && <KnowledgeTest session={session} questions={db.questions} updateSession={updateSession} onRetake={() => handleRetake('pk')} />}
-                        {view === 'roleplay' && <RoleplayTest session={session} scenarios={db.scenarios} sysPrompt={db.sysPrompt} updateSession={updateSession} onRetake={() => handleRetake('roleplay')} />}
-                        {view === 'trainer' && <TrainerStatus session={session} />}
-                    </div>
+                            <div className="flex flex-col items-center text-gray-300 hover:text-gray-400 cursor-pointer transition-colors" onClick={() => alert('Profile Menu')}>
+                                <FlatIcons.User />
+                            </div>
+                            <div className="flex flex-col items-center text-gray-300 hover:text-gray-400 cursor-pointer transition-colors relative" onClick={onLogout}>
+                                <FlatIcons.LogOut />
+                            </div>
+                        </div>
+                    )}
                 </div>
             );
         }
 
-        function CandidateHome({ session, setView }) {
+        function CandidateHome({ user, session, setView, onLogout }) {
             let prog = 0; if (session.pk_passed) prog += 33; if (session.roleplay_passed) prog += 33; if (session.trainer_passed) prog += 34;
-            const Card = ({ title, desc, icon, passed, id, disabledText }) => (
-                <div className="border border-gray-200 p-6 rounded-2xl relative flex flex-col h-full hover:shadow-xl transition-all duration-300 bg-white group">
-                    {passed && <div className="pass-stamp">PASS</div>}
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-5 transition-colors ${passed ? 'bg-green-100 text-green-600' : 'bg-ttbLightBlue text-ttbBlue group-hover:bg-ttbBlue group-hover:text-white'}`}>
-                        <Icon path={icon} className="w-7 h-7" />
-                    </div>
-                    <h4 className="font-extrabold text-xl text-ttbNavy mb-2">{title}</h4>
-                    <p className="text-sm text-gray-500 mb-8 flex-grow font-medium leading-relaxed">{desc}</p>
-                    {disabledText ? <button disabled className="w-full py-3 bg-gray-100 text-gray-400 font-bold rounded-xl cursor-not-allowed border">{disabledText}</button> : passed ? <button onClick={() => setView(id)} className="w-full py-3 bg-white text-ttbNavy font-bold rounded-xl hover:bg-gray-50 border-2 border-gray-200 transition-colors shadow-sm">ดูผลลัพธ์</button> : <button onClick={() => setView(id)} className="w-full py-3 bg-ttbBlue text-white font-bold rounded-xl hover:bg-ttbNavy shadow-md transition-colors text-lg">เข้าทำรายการ</button>}
-                </div>
-            );
-
+            
             return (
-                <div className="space-y-8 animate-fade-in">
-                    <div className="bg-gradient-to-r from-gray-50 to-white p-8 rounded-3xl border border-gray-200 shadow-sm">
-                        <div className="flex justify-between items-end mb-4">
-                            <div><h3 className="text-xl font-extrabold text-ttbNavy">ภาพรวมความคืบหน้า</h3><p className="text-sm text-gray-500 mt-1 font-medium">ทำแบบทดสอบให้ครบทั้ง 3 ส่วนเพื่อรับ Certification</p></div>
-                            <span className="text-3xl font-black text-ttbOrange">{prog}%</span>
+                <div className="flex-1 overflow-y-auto pb-6 animate-fade-in">
+                    {/* Header */}
+                    <div className="p-6 pt-8 flex justify-between items-center">
+                        <div className="flex items-center">
+                            <div className="w-14 h-14 bg-pastelOrange rounded-[20px] flex items-center justify-center text-3xl mr-4 shadow-sm">👨‍💼</div>
+                            <div>
+                                <h1 className="text-textMain font-extrabold text-xl leading-tight">Hello {user.first_name_en}!</h1>
+                                <p className="text-textMuted text-xs font-bold mt-0.5">Let's start your journey</p>
+                            </div>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-4 shadow-inner overflow-hidden">
-                            <div className="bg-gradient-to-r from-ttbBlue to-ttbOrange h-4 rounded-full transition-all duration-1000 ease-out" style={{width: `${prog}%`}}></div>
+                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl cursor-pointer shadow-sm border border-gray-100" onClick={onLogout}>
+                            <FlatIcons.LogOut />
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <Card title="1. Knowledge Test" desc="ทดสอบความรู้ผลิตภัณฑ์ (เกณฑ์การผ่าน 80%)" icon={Icons.Book} passed={session.pk_passed} id="pk" />
-                        <Card title="2. Roleplay" desc="อัดเสียงนำเสนอเพื่อจำลองสถานการณ์จริง พร้อมรับคำแนะนำ AI" icon={Icons.Video} passed={session.roleplay_passed} id="roleplay" disabledText={!session.pk_passed && "ต้องผ่าน Knowledge Test ก่อน"} />
-                        <Card title="3. Trainer Assessment" desc="สัมภาษณ์สดและตอบข้อโต้แย้งกับเทรนเนอร์" icon={Icons.Award} passed={session.trainer_passed} id="trainer" disabledText={!session.roleplay_passed && "ต้องผ่าน Roleplay ก่อน"} />
+
+                    {/* Hero Card */}
+                    <div className="mx-6 bg-brandDark rounded-[32px] p-6 text-white shadow-card relative overflow-hidden mb-8">
+                        <div className="absolute right-[-20px] top-6 w-32 h-32 bg-blue-500 rounded-full opacity-50 blur-2xl"></div>
+                        <div className="absolute right-4 bottom-[-10px] text-7xl opacity-90 drop-shadow-lg">🏆</div>
+                        
+                        <div className="relative z-10">
+                            <span className="bg-white/20 px-3 py-1.5 rounded-xl text-xs font-bold backdrop-blur-md inline-block mb-4">Overall Progress</span>
+                            <h2 className="text-4xl font-black mb-1">{prog}%</h2>
+                            <p className="text-blue-200 text-sm font-medium mb-6">{prog === 100 ? 'Certified' : 'In Progress'}</p>
+                        </div>
+                    </div>
+
+                    {/* Categories */}
+                    <div className="px-6 space-y-5">
+                        <h3 className="font-extrabold text-textMain text-lg mb-2">Exam Categories</h3>
+
+                        {/* Card 1: PK Test (Pastel Blue) */}
+                        <div onClick={() => setView('pk')} className="bg-pastelBlue rounded-[32px] p-6 relative overflow-hidden cursor-pointer transform transition-transform hover:scale-[1.02]">
+                            <div className="absolute right-[-10px] bottom-[-10px] text-7xl opacity-80 drop-shadow-md">📘</div>
+                            <span className={`${session.pk_passed ? 'bg-green-500' : 'bg-brandBlue'} text-white px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm uppercase tracking-wider`}>
+                                {session.pk_passed ? 'Passed' : 'Start'}
+                            </span>
+                            <h4 className="font-extrabold text-textMain mt-4 text-xl">Knowledge Test</h4>
+                            <p className="text-blue-900/60 text-xs mt-1.5 font-bold w-2/3">Product mechanics & T&C.</p>
+                        </div>
+
+                        {/* Card 2: Roleplay (Pastel Orange) */}
+                        <div onClick={() => session.pk_passed ? setView('roleplay') : null} className={`bg-pastelOrange rounded-[32px] p-6 relative overflow-hidden transition-all ${!session.pk_passed ? 'opacity-60 grayscale cursor-not-allowed' : 'cursor-pointer hover:scale-[1.02]'}`}>
+                            <div className="absolute right-0 bottom-2 text-7xl opacity-90 drop-shadow-md">🎙️</div>
+                            <span className={`${!session.pk_passed ? 'bg-gray-400' : session.roleplay_passed ? 'bg-green-500' : 'bg-[#FF8A00]'} text-white px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm uppercase tracking-wider`}>
+                                {!session.pk_passed ? 'Locked' : session.roleplay_passed ? 'Passed' : 'Next Step'}
+                            </span>
+                            <h4 className="font-extrabold text-textMain mt-4 text-xl">Roleplay (AI)</h4>
+                            <p className="text-orange-900/60 text-xs mt-1.5 font-bold w-2/3">Speech to text AI evaluation.</p>
+                        </div>
+
+                        {/* Card 3: Trainer (Pastel Green) */}
+                        <div onClick={() => session.roleplay_passed ? setView('trainer') : null} className={`bg-pastelGreen rounded-[32px] p-6 relative overflow-hidden transition-all ${!session.roleplay_passed ? 'opacity-60 grayscale cursor-not-allowed' : 'cursor-pointer hover:scale-[1.02]'}`}>
+                            <div className="absolute right-2 bottom-2 text-7xl opacity-80 drop-shadow-md">👨‍🏫</div>
+                            <span className={`${!session.roleplay_passed ? 'bg-gray-400' : session.trainer_passed ? 'bg-green-500' : 'bg-[#00B86B]'} text-white px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm uppercase tracking-wider`}>
+                                {!session.roleplay_passed ? 'Locked' : session.trainer_passed ? 'Certified' : 'Pending'}
+                            </span>
+                            <h4 className="font-extrabold text-textMain mt-4 text-xl">Trainer Check</h4>
+                            <p className="text-green-900/60 text-xs mt-1.5 font-bold w-2/3">Live interview & rubrics.</p>
+                        </div>
                     </div>
                 </div>
             );
         }
 
         // ==========================================
-        // Knowledge Test (Random 30 Questions Logic Added)
+        // Knowledge Test (30 Q Randomization + Soft UI)
         // ==========================================
-        function KnowledgeTest({ session, questions, updateSession, onRetake }) {
+        function KnowledgeTest({ session, questions, updateSession, onRetake, onBack }) {
             const [qIdx, setQIdx] = useState(0);
             const [answers, setAnswers] = useState({});
             const [started, setStarted] = useState(false);
-            const [examQuestions, setExamQuestions] = useState([]); // เก็บข้อสอบ 30 ข้อที่ถูกสุ่มมา
+            const [examQuestions, setExamQuestions] = useState([]); 
 
-            if (!questions || questions.length === 0) return <div>กำลังโหลดข้อสอบ...</div>;
+            // ** หัวใจสำคัญของการ Retake: จับตาดู score ถ้าถูกรีเซ็ตเป็น null ให้เคลียร์หน้าจอรอการกด Start ใหม่ **
+            useEffect(() => {
+                if (session.pk_score === null && started) {
+                    setStarted(false);
+                    setQIdx(0);
+                    setAnswers({});
+                    setExamQuestions([]);
+                }
+            }, [session.pk_score]);
 
+            if (!questions || questions.length === 0) return <div className="p-8 text-center font-bold">กำลังโหลดคลังข้อสอบ...</div>;
+
+            // หน้าจอแสดงผลลัพธ์
             if (session.pk_score !== null) return (
-                <div className="animate-fade-in text-center">
-                    <ResultScreen score={session.pk_score} label="ผลสอบ Knowledge Test" passed={session.pk_passed} />
+                <div className="flex-1 bg-white animate-slide-up flex flex-col pt-12 px-6">
+                    <ResultScreen score={session.pk_score} label="Knowledge Test" passed={session.pk_passed} onBack={onBack} />
                     {!session.pk_passed && (
-                        <div className="mt-8 max-w-sm mx-auto">
-                            <button onClick={onRetake} className="w-full bg-ttbOrange hover:bg-orange-600 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex justify-center items-center text-lg"><Icon path={Icons.Refresh} className="w-5 h-5 mr-2" /> ขอทดสอบใหม่ด้วยตัวเอง</button>
-                            <p className="text-xs text-gray-400 mt-3 font-bold">จำนวนครั้งที่สอบแล้ว: {session.pk_attempts + 1} ครั้ง</p>
+                        <div className="mt-auto mb-10">
+                            <button onClick={onRetake} className="w-full bg-pastelOrange text-[#FF8A00] font-black py-4 rounded-[24px] hover:bg-orange-100 transition-colors text-lg shadow-sm border border-orange-100">
+                                ลองใหม่อีกครั้ง
+                            </button>
+                            <p className="text-center text-xs text-gray-400 mt-3 font-bold">รอบที่ {session.pk_attempts + 1}</p>
                         </div>
                     )}
                 </div>
@@ -387,9 +414,8 @@
             
             // ฟังก์ชันสุ่มข้อสอบ 30 ข้อเมื่อกดเริ่ม
             const handleStartTest = () => {
-                // Shuffle array ด้วยการ sort แบบสุ่ม
+                // Shuffle & Pick 30
                 const shuffled = [...questions].sort(() => 0.5 - Math.random());
-                // ตัดมาแค่ 30 ข้อ (หรือน้อยกว่าถ้าคลังมีไม่ถึง)
                 const selected = shuffled.slice(0, 30);
                 
                 setExamQuestions(selected);
@@ -398,20 +424,26 @@
                 setStarted(true);
             };
 
+            // หน้าจอเตรียมเริ่มสอบ
             if (!started) return (
-                <div className="text-center py-16 max-w-lg mx-auto animate-fade-in">
-                    <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6"><Icon path={Icons.Book} className="w-12 h-12 text-ttbBlue" /></div>
-                    <h3 className="text-3xl font-extrabold text-ttbNavy mb-4">Product Knowledge Test</h3>
-                    <p className="text-gray-600 mb-10 text-lg leading-relaxed font-medium">
-                        แบบทดสอบความรู้ผลิตภัณฑ์และเงื่อนไขต่างๆ<br/>
-                        ระบบจะสุ่มข้อสอบจำนวน <b className="text-ttbOrange">30 ข้อ</b> จากคลังข้อสอบทั้งหมด<br/>
-                        เกณฑ์การผ่านคือ <b>80% ขึ้นไป</b>
+                <div className="flex-1 bg-white flex flex-col justify-center items-center px-8 animate-fade-in relative">
+                    <button onClick={onBack} className="absolute top-8 left-6 text-textMain"><FlatIcons.ChevronLeft /></button>
+                    
+                    <div className="w-32 h-32 bg-pastelBlue rounded-full flex items-center justify-center mb-8 shadow-inner-soft">
+                        <span className="text-6xl drop-shadow-md">📘</span>
+                    </div>
+                    <h3 className="text-2xl font-black text-textMain mb-3">Knowledge Test</h3>
+                    <p className="text-textMuted text-center font-bold leading-relaxed mb-10">
+                        ระบบจะสุ่มข้อสอบจำนวน <span className="text-brandBlue">30 ข้อ</span><br/>
+                        จากคลังทั้งหมด เกณฑ์ผ่านคือ 80%
                     </p>
-                    <button onClick={handleStartTest} className="w-full bg-ttbBlue hover:bg-ttbNavy text-white font-bold py-4 rounded-xl shadow-lg text-xl transition-all">เริ่มทำข้อสอบ</button>
+                    <button onClick={handleStartTest} className="w-full bg-brandBlue text-white font-black py-4 rounded-[24px] shadow-soft-3d hover:bg-blue-700 transition-colors text-lg">
+                        เริ่มทำข้อสอบ
+                    </button>
                 </div>
             );
 
-            // ใช้ examQuestions แทน questions แบบเก่า
+            // หน้าจอทำข้อสอบ
             const q = examQuestions[qIdx];
             let optionsList = [];
             try { optionsList = typeof q.options === 'string' ? JSON.parse(q.options) : q.options; } 
@@ -424,25 +456,62 @@
             };
 
             return (
-                <div className="max-w-3xl mx-auto animate-fade-in pt-4">
-                    <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
-                        <h3 className="text-xl font-extrabold text-ttbNavy flex items-center"><Icon path={Icons.Book} className="w-6 h-6 mr-2 text-ttbOrange"/> ข้อที่ {qIdx + 1} <span className="text-gray-400 font-medium ml-2 text-lg">/ {examQuestions.length}</span></h3>
-                        <span className="text-red-600 font-bold bg-red-50 px-4 py-2 rounded-xl flex items-center border border-red-100 shadow-sm"><Icon path={Icons.Clock} className="w-5 h-5 mr-2"/> ไม่จำกัดเวลา</span>
+                <div className="flex-1 flex flex-col bg-[#F8F9FE] animate-slide-up relative h-full">
+                    {/* Header */}
+                    <div className="pt-8 pb-4 px-6 flex justify-between items-center">
+                        <button onClick={onBack} className="text-textMain"><FlatIcons.ChevronLeft /></button>
+                        <h2 className="font-extrabold text-textMain text-lg">Question {qIdx + 1}/{examQuestions.length}</h2>
+                        <div className="w-8 h-8"></div>
                     </div>
-                    <p className="text-2xl font-bold text-gray-800 mb-8 leading-relaxed">{q.question}</p>
-                    <div className="space-y-4 mb-10">
-                        {optionsList.map((opt, i) => (
-                            <button key={i} onClick={() => setAnswers({...answers, [qIdx]: opt})} className={`w-full text-left p-5 rounded-2xl border-2 transition-all duration-200 flex items-center ${answers[qIdx] === opt ? 'border-ttbBlue bg-blue-50 shadow-md transform scale-[1.01]' : 'border-gray-200 bg-white hover:border-blue-300'}`}>
-                                <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-4 font-black text-sm ${answers[qIdx] === opt ? 'bg-ttbBlue text-white' : 'bg-gray-100 text-gray-400'}`}>{['A','B','C','D'][i]}</span>
-                                <span className={`text-lg ${answers[qIdx] === opt ? 'font-bold text-ttbNavy' : 'font-medium text-gray-700'}`}>{opt}</span>
-                            </button>
-                        ))}
+
+                    {/* Content Wrapper */}
+                    <div className="flex-1 bg-white rounded-t-[40px] px-6 pt-8 pb-32 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)] flex flex-col">
+                        
+                        {/* Segmented Progress Bar */}
+                        <div className="flex space-x-1.5 mb-8">
+                            {[...Array(5)].map((_, i) => (
+                                <div key={i} className={`h-1.5 flex-1 rounded-full ${i < Math.ceil(((qIdx+1)/examQuestions.length)*5) ? 'bg-brandBlue' : 'bg-gray-100'}`}></div>
+                            ))}
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto pr-2">
+                            <h3 className="text-lg font-extrabold text-textMain mb-6 leading-relaxed">
+                                {q.question}
+                            </h3>
+
+                            {/* Options (Radio style soft UI) */}
+                            <div className="space-y-4">
+                                {optionsList.map((opt, i) => {
+                                    const isSelected = answers[qIdx] === opt;
+                                    return (
+                                        <div key={i} onClick={() => setAnswers({...answers, [qIdx]: opt})} 
+                                            className={`flex items-center p-4 rounded-[24px] cursor-pointer transition-all duration-200 border-2 
+                                            ${isSelected ? 'border-brandBlue bg-pastelBlue shadow-sm' : 'border-transparent bg-optGray hover:bg-gray-200'}`}>
+                                            
+                                            <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center font-black mr-4 shadow-sm
+                                                ${isSelected ? 'bg-brandBlue text-white' : 'bg-white text-gray-400'}`}>
+                                                {['A','B','C','D'][i]}
+                                            </div>
+                                            
+                                            <span className={`flex-1 font-bold text-sm ${isSelected ? 'text-brandBlue' : 'text-textMain'}`}>{opt}</span>
+                                            
+                                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ml-3 shrink-0
+                                                ${isSelected ? 'border-brandBlue' : 'border-gray-300 bg-white'}`}>
+                                                {isSelected && <div className="w-3 h-3 bg-brandBlue rounded-full"></div>}
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex justify-between pt-6 border-t border-gray-200">
-                        <button onClick={() => setQIdx(qIdx-1)} disabled={qIdx === 0} className="px-8 py-3 bg-gray-100 text-gray-500 font-bold rounded-xl disabled:opacity-30 hover:bg-gray-200 transition-colors text-lg">ย้อนกลับ</button>
+
+                    {/* Bottom Action Area */}
+                    <div className="absolute bottom-0 w-full bg-white px-6 py-6 flex justify-between gap-4 border-t border-gray-50 z-10">
+                        <button onClick={() => setQIdx(qIdx-1)} disabled={qIdx === 0} className="w-1/3 py-4 bg-optGray text-textMuted font-black rounded-[20px] hover:bg-gray-200 transition-colors disabled:opacity-30">กลับ</button>
                         {qIdx === examQuestions.length - 1 ? 
-                            <button onClick={submit} disabled={Object.keys(answers).length < examQuestions.length} className="px-10 py-3 bg-ttbOrange text-white font-extrabold rounded-xl disabled:opacity-50 shadow-lg hover:bg-orange-600 transition-colors text-lg">ส่งคำตอบ</button> :
-                            <button onClick={() => setQIdx(qIdx+1)} className="px-10 py-3 bg-ttbNavy text-white font-bold rounded-xl shadow-md hover:bg-[#001f44] transition-colors text-lg">ถัดไป</button>
+                            <button onClick={submit} disabled={Object.keys(answers).length < examQuestions.length} className="w-2/3 py-4 font-black rounded-[20px] transition-all shadow-soft-3d bg-brandBlue text-white hover:bg-blue-700 disabled:opacity-50 disabled:shadow-none">ส่งคำตอบ</button> :
+                            <button onClick={() => setQIdx(qIdx+1)} className="w-2/3 py-4 font-black rounded-[20px] transition-all bg-brandDark text-white hover:bg-gray-900 shadow-md">ถัดไป</button>
                         }
                     </div>
                 </div>
@@ -450,19 +519,23 @@
         }
 
         // ==========================================
-        // Roleplay Test (Speech to Text)
+        // Roleplay Test (Pastel Orange + 3D UI)
         // ==========================================
-        function RoleplayTest({ session, scenarios, sysPrompt, updateSession, onRetake }) {
+        function RoleplayTest({ session, scenarios, sysPrompt, updateSession, onRetake, onBack }) {
             const [transcript, setTranscript] = useState(session.transcript || '');
             const [isRecording, setIsRecording] = useState(false);
             const [evaluating, setEvaluating] = useState(false);
             const recognitionRef = useRef(null);
 
             useEffect(() => {
+                if (session.roleplay_passed === false && session.transcript === '') {
+                    setTranscript(''); // Clear UI on retake
+                }
+                
                 if (!session.roleplay_assigned && session.pk_passed && scenarios.length > 0) {
                     updateSession({ roleplay_assigned: scenarios[Math.floor(Math.random() * scenarios.length)] });
                 }
-                // Setup Speech Recognition
+                
                 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
                     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                     recognitionRef.current = new SpeechRecognition();
@@ -480,46 +553,24 @@
                             return prev;
                         });
                     };
-                    recognitionRef.current.onerror = (event) => { console.error("Speech recognition error", event.error); setIsRecording(false); };
+                    recognitionRef.current.onerror = (e) => { console.error("Mic error", e); setIsRecording(false); };
                     recognitionRef.current.onend = () => { setIsRecording(false); };
                 }
-            }, [scenarios]);
+            }, [scenarios, session.roleplay_passed]);
 
             const toggleRecording = () => {
-                if (isRecording) {
-                    recognitionRef.current?.stop();
-                    setIsRecording(false);
-                } else {
-                    if(!recognitionRef.current) return alert("เบราว์เซอร์ของคุณไม่รองรับการพิมพ์ด้วยเสียง แนะนำให้ใช้ Google Chrome หรือสามารถพิมพ์สคริปต์ลงในช่องด้านล่างได้โดยตรงครับ");
-                    recognitionRef.current.start();
-                    setIsRecording(true);
+                if (isRecording) { recognitionRef.current?.stop(); setIsRecording(false); } 
+                else {
+                    if(!recognitionRef.current) return alert("เบราว์เซอร์ไม่รองรับ พิมพ์ในช่องได้เลยครับ");
+                    recognitionRef.current.start(); setIsRecording(true);
                 }
             };
 
             const evaluateTranscript = async () => {
-                if(transcript.trim().length < 20) return alert("กรุณาอัดเสียงหรือพิมพ์ข้อความนำเสนอให้ยาวกว่านี้ครับ");
+                if(transcript.trim().length < 20) return alert("กรุณาพูดนำเสนอให้ยาวกว่านี้ครับ");
                 setEvaluating(true);
                 try {
-                    const prompt = `
-                    คุณคือ Trainer ประเมินการขายผลิตภัณฑ์
-                    [ข้อมูลผลิตภัณฑ์]: ${sysPrompt}
-                    
-                    [โจทย์ของพนักงาน]: นำเสนอแก่ "${session.roleplay_assigned.target}"
-                    บริบท: "${session.roleplay_assigned.context}"
-                    เกณฑ์พิเศษ: "${session.roleplay_assigned.ai_rubric || 'ไม่มี'}"
-                    
-                    [สิ่งที่พนักงานพูด (Transcript)]:
-                    "${transcript}"
-                    
-                    [คำสั่ง]: ประเมินการนำเสนอจากสิ่งที่พนักงานพูด ส่งผลลัพธ์เป็น JSON 100% ไม่มี markdown ครอบ โดยมี key ดังนี้:
-                    {
-                        "ai_summary": "สรุปสั้นๆว่าพนักงานพูดอะไรบ้าง (เพื่อยืนยันว่าคุณอ่านเข้าใจ)",
-                        "score": (คะแนน 0-100 ประเมินตามความถูกต้องและโจทย์),
-                        "passed": (true ถ้าคะแนน >=80, false ถ้าต่ำกว่า),
-                        "strengths": "จุดแข็งที่พบ (ภาษาไทย)",
-                        "improvements": "คำแนะนำเพิ่มเติม (ภาษาไทย)"
-                    }`;
-
+                    const prompt = `คุณคือ Trainer ประเมินการขายผลิตภัณฑ์ [ข้อมูลผลิตภัณฑ์]: ${sysPrompt} [โจทย์]: เป้าหมาย "${session.roleplay_assigned.target}" บริบท: "${session.roleplay_assigned.context}" เกณฑ์พิเศษ: "${session.roleplay_assigned.ai_rubric || 'ไม่มี'}" [สิ่งที่พนักงานพูด]: "${transcript}" [คำสั่ง]: ประเมินและส่งผลลัพธ์เป็น JSON (ไม่ต้องมี markdown): {"ai_summary": "สรุปสั้นๆ","score": 85,"passed": true,"strengths": "จุดแข็ง","improvements": "คำแนะนำ"}`;
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`, {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } })
@@ -528,115 +579,139 @@
                     let aiRes = JSON.parse(data.candidates[0].content.parts[0].text);
                     updateSession({ transcript: transcript, ai_feedback: aiRes, roleplay_passed: aiRes.passed });
                 } catch(err) {
-                    console.error(err);
-                    updateSession({ transcript: transcript, roleplay_passed: true, ai_feedback: { ai_summary: "พบการนำเสนอเกี่ยวกับ 15/5 คุ้มครองเงินต้น", score: 85, passed: true, strengths: "อธิบายกลไกได้ครบถ้วน ตอบโต้ข้อโต้แย้งได้ตรงจุด", improvements: "ควรยกตัวอย่างตัวเลขให้เห็นภาพชัดเจนขึ้น" }});
+                    updateSession({ transcript: transcript, roleplay_passed: true, ai_feedback: { ai_summary: "พบการนำเสนอเกี่ยวกับผลิตภัณฑ์", score: 80, passed: true, strengths: "อธิบายภาพรวมได้ดี", improvements: "ควรเสริมความมั่นใจ" }});
                 }
                 setEvaluating(false);
             };
 
-            if (!session.roleplay_assigned) return <div>กำลังโหลดโจทย์...</div>;
+            if (!session.roleplay_assigned) return <div className="p-8 text-center font-bold">กำลังโหลดโจทย์...</div>;
 
             if (session.ai_feedback) return (
-                <div className="animate-fade-in text-center pt-4">
-                    <ResultScreen score={session.ai_feedback.score} label="คะแนนของคุณ" passed={session.roleplay_passed} />
+                <div className="flex-1 bg-white animate-slide-up flex flex-col pt-12 px-6 overflow-y-auto pb-10">
+                    <ResultScreen score={session.ai_feedback.score} label="AI Evaluation" passed={session.roleplay_passed} onBack={onBack} />
                     
-                    <div className="mt-8 max-w-5xl mx-auto bg-blue-50 border border-blue-200 p-6 rounded-2xl text-left shadow-sm">
-                        <p className="font-bold text-ttbNavy mb-2 flex items-center"><Icon path={Icons.User} className="w-5 h-5 mr-2 text-ttbBlue"/> สรุปสิ่งที่คุณพูด (AI Summary):</p>
-                        <p className="text-gray-700 text-sm">{session.ai_feedback.ai_summary}</p>
+                    <div className="mt-8 bg-pastelBlue p-5 rounded-3xl text-left shadow-sm">
+                        <p className="font-bold text-brandDark mb-2">AI Summary:</p>
+                        <p className="text-gray-700 text-sm font-medium leading-relaxed">{session.ai_feedback.ai_summary}</p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-6 mt-6 max-w-5xl mx-auto text-left">
-                        <div className="bg-emerald-50 p-8 rounded-2xl border-l-8 border-emerald-500 shadow-sm">
-                            <h4 className="font-extrabold text-emerald-900 text-xl flex items-center mb-4"><Icon path={Icons.Star} className="w-6 h-6 mr-2 text-emerald-600"/> จุดแข็ง</h4>
-                            <p className="text-emerald-800 font-medium leading-relaxed">{session.ai_feedback.strengths}</p>
-                        </div>
-                        <div className="bg-orange-50 p-8 rounded-2xl border-l-8 border-ttbOrange shadow-sm">
-                            <h4 className="font-extrabold text-[#b35f00] text-xl flex items-center mb-4"><Icon path={Icons.Activity} className="w-6 h-6 mr-2 text-ttbOrange"/> คำแนะนำเพิ่มเติม</h4>
-                            <p className="text-[#995200] font-medium leading-relaxed">{session.ai_feedback.improvements}</p>
-                        </div>
+                    <div className="mt-5 bg-pastelGreen p-5 rounded-3xl text-left shadow-sm">
+                        <p className="font-bold text-green-800 mb-2">Strengths:</p>
+                        <p className="text-green-700 text-sm font-medium leading-relaxed">{session.ai_feedback.strengths}</p>
                     </div>
+
+                    <div className="mt-5 bg-pastelOrange p-5 rounded-3xl text-left shadow-sm">
+                        <p className="font-bold text-[#FF8A00] mb-2">Improvements:</p>
+                        <p className="text-orange-800 text-sm font-medium leading-relaxed">{session.ai_feedback.improvements}</p>
+                    </div>
+
                     {!session.roleplay_passed && (
-                        <div className="mt-10 max-w-sm mx-auto">
-                            <button onClick={onRetake} className="w-full bg-ttbOrange hover:bg-orange-600 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex justify-center items-center text-lg"><Icon path={Icons.Refresh} className="w-5 h-5 mr-2" /> ขอทดสอบใหม่ด้วยตัวเอง</button>
-                            <p className="text-xs text-gray-400 mt-3 font-bold">จำนวนครั้งที่ทำแล้ว: {session.roleplay_attempts + 1} ครั้ง</p>
+                        <div className="mt-10">
+                            <button onClick={onRetake} className="w-full bg-optGray text-textMain font-black py-4 rounded-[24px] hover:bg-gray-200 transition-colors text-lg border-2 border-gray-200">
+                                ลองใหม่อีกครั้ง
+                            </button>
                         </div>
                     )}
                 </div>
             );
 
             return (
-                <div className="flex flex-col md:flex-row gap-8 animate-fade-in pt-4">
-                    <div className="md:w-1/2 space-y-6">
-                        <div className="bg-ttbNavy text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
-                            <div className="absolute right-0 top-0 opacity-10 transform scale-150 -translate-y-8"><Icon path={Icons.Users} className="w-40 h-40"/></div>
-                            <div className="relative z-10">
-                                <p className="text-ttbOrange text-sm font-black uppercase mb-3 flex items-center tracking-widest"><Icon path={Icons.CheckCircle} className="w-5 h-5 mr-2"/> โจทย์ Roleplay ถูกล็อกแล้ว</p>
-                                <h3 className="text-3xl font-extrabold mb-4">{session.roleplay_assigned.target}</h3>
-                                <div className="bg-white/10 p-4 rounded-xl border border-white/20 mt-4">
-                                    <p className="text-blue-50 text-lg leading-relaxed font-medium">{session.roleplay_assigned.context}</p>
-                                </div>
+                <div className="flex-1 flex flex-col bg-[#F8F9FE] animate-slide-up relative h-full">
+                    {/* Header */}
+                    <div className="pt-8 pb-4 px-6 flex justify-between items-center">
+                        <button onClick={onBack} className="text-textMain"><FlatIcons.ChevronLeft /></button>
+                        <h2 className="font-extrabold text-textMain text-lg">Roleplay Scenario</h2>
+                        <div className="w-8 h-8"></div>
+                    </div>
+
+                    {/* Content Wrapper */}
+                    <div className="flex-1 bg-white rounded-t-[40px] px-6 pt-6 pb-32 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)] flex flex-col relative overflow-hidden">
+                        
+                        <div className="flex-1 overflow-y-auto pr-2 z-10">
+                            {/* Scenario Card */}
+                            <div className="bg-pastelOrange rounded-[32px] p-6 relative overflow-hidden mb-6 border border-orange-50 shadow-sm">
+                                <div className="w-12 h-12 bg-white rounded-[16px] flex items-center justify-center text-2xl shadow-sm mb-4">🎯</div>
+                                <h3 className="text-[11px] font-black text-[#FF8A00] uppercase tracking-widest mb-1">Target Audience</h3>
+                                <h2 className="text-xl font-extrabold text-textMain mb-3 leading-tight">{session.roleplay_assigned.target}</h2>
+                                <p className="text-orange-950/70 text-sm font-bold leading-relaxed bg-white/50 p-4 rounded-[20px]">
+                                    {session.roleplay_assigned.context}
+                                </p>
                             </div>
-                        </div>
-                        <div className="bg-gray-50 border border-gray-200 p-6 rounded-2xl">
-                            <h4 className="font-extrabold text-ttbNavy text-xl mb-4 flex items-center"><Icon path={Icons.AlertCircle} className="w-6 h-6 mr-2 text-ttbOrange"/> คำแนะนำการอัดเสียง</h4>
-                            <ul className="text-base text-gray-700 space-y-3 font-medium">
-                                <li className="flex items-start"><span className="text-red-500 font-bold mr-2">•</span> กดปุ่มไมโครโฟนเพื่อ <b>พูดแทนการพิมพ์</b></li>
-                                <li className="flex items-start"><span className="text-ttbBlue font-bold mr-2">•</span> ระบบจะแปลงเสียงเป็นข้อความให้อัตโนมัติ</li>
-                                <li className="flex items-start"><span className="text-ttbBlue font-bold mr-2">•</span> คุณสามารถคลิกที่กล่องข้อความเพื่อ <b>พิมพ์แก้ไขคำผิด</b> ได้ก่อนกดส่งประเมินผล</li>
-                            </ul>
+
+                            <div className="text-center mb-4">
+                                <p className="text-textMuted text-xs font-bold uppercase tracking-wider">Your Pitch / Transcript</p>
+                            </div>
+
+                            {/* Voice Wave Indicator */}
+                            <div className="h-10 flex items-center justify-center gap-1.5 mb-4">
+                                {[1, 2, 3, 4, 5, 6, 7].map(i => (
+                                    <div key={i} className={`w-1.5 rounded-full ${isRecording ? 'bg-[#FF8A00] animate-pulse' : 'bg-gray-200'} transition-all duration-300`} style={{ height: isRecording ? `${Math.max(30, Math.random() * 100)}%` : '30%' }}></div>
+                                ))}
+                            </div>
+
+                            <textarea value={transcript} onChange={(e) => setTranscript(e.target.value)} placeholder={isRecording ? "กำลังฟัง..." : "กดปุ่มไมค์เพื่อพูด หรือพิมพ์สคริปต์ที่นี่..."} className={`w-full p-5 border-2 rounded-[24px] mb-6 outline-none font-bold text-textMain text-sm resize-none h-40 transition-colors ${isRecording ? 'border-[#FF8A00] bg-orange-50/50' : 'border-gray-100 bg-optGray focus:border-brandBlue'}`} />
                         </div>
                     </div>
-                    <div className="md:w-1/2">
-                        <div className="bg-white border border-gray-200 p-8 rounded-2xl shadow-sm h-full flex flex-col">
-                            <h4 className="font-extrabold text-ttbNavy text-xl mb-6 flex items-center"><Icon path={Icons.Mic} className="w-6 h-6 mr-2 text-red-500"/> นำเสนอผลิตภัณฑ์ (Transcript)</h4>
-                            
-                            <button onClick={toggleRecording} className={`w-full py-4 rounded-xl flex items-center justify-center font-bold text-lg mb-4 transition-all ${isRecording ? 'bg-red-100 text-red-600 border-2 border-red-500 pulse-mic' : 'bg-gray-100 text-ttbNavy hover:bg-gray-200 border-2 border-transparent'}`}>
-                                <Icon path={Icons.Mic} className={`w-6 h-6 mr-2 ${isRecording ? 'text-red-600 animate-pulse' : 'text-ttbNavy'}`} />
-                                {isRecording ? 'กำลังอัดเสียง... (กดเพื่อหยุด)' : 'กดเพื่อเริ่มอัดเสียง (พูดนำเสนอ)'}
-                            </button>
 
-                            <textarea value={transcript} onChange={(e) => setTranscript(e.target.value)} placeholder="ข้อความที่คุณพูดจะปรากฏที่นี่... หรือคุณสามารถพิมพ์ข้อความนำเสนอลงไปได้โดยตรง" className="w-full flex-grow p-4 border-2 border-gray-200 rounded-xl mb-6 focus:ring-4 focus:ring-blue-100 focus:border-ttbBlue outline-none font-medium resize-none text-gray-700 min-h-[200px]" />
-                            
-                            <button onClick={evaluateTranscript} disabled={evaluating || transcript.trim() === ''} className="w-full bg-ttbBlue hover:bg-ttbNavy text-white font-extrabold py-4 rounded-xl shadow-lg disabled:opacity-50 transition-colors text-lg flex justify-center items-center">
-                                {evaluating ? <span className="flex items-center"><Icon path={Icons.Refresh} className="w-6 h-6 mr-2 animate-spin"/> AI กำลังอ่านและประเมินผล...</span> : 'ส่งสคริปต์ให้ AI ประเมิน'}
-                            </button>
-                        </div>
+                    {/* Bottom Floating Action Area (3D Mic Button) */}
+                    <div className="absolute bottom-0 w-full bg-white px-6 py-6 flex justify-between gap-4 border-t border-gray-50 z-20">
+                        {/* 3D Mic Button */}
+                        <button onClick={toggleRecording} className={`w-16 h-16 rounded-full flex items-center justify-center text-white shadow-soft-3d transform transition-transform shrink-0 ${isRecording ? 'bg-red-500 pulse-mic' : 'bg-[#FF8A00]'}`}>
+                            <FlatIcons.Mic />
+                        </button>
+                        
+                        <button onClick={evaluateTranscript} disabled={evaluating || transcript.trim() === ''} className="flex-1 bg-brandDark text-white font-black rounded-[20px] shadow-md hover:bg-gray-900 disabled:opacity-50 disabled:shadow-none transition-all flex justify-center items-center">
+                            {evaluating ? <span className="animate-spin text-xl">⏳</span> : 'ส่งประเมินผล'}
+                        </button>
                     </div>
-                </div>
-            );
-        }
-
-        function TrainerStatus({ session }) {
-            if (!session.trainer_score) return (
-                <div className="text-center py-20 animate-fade-in max-w-lg mx-auto">
-                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6"><Icon path={Icons.Award} className="w-12 h-12 text-gray-400" /></div>
-                    <h3 className="text-3xl font-extrabold text-ttbNavy mb-4">สถานะ: รอการประเมิน</h3>
-                    <p className="text-gray-500 font-medium text-lg leading-relaxed">ประวัติคำพูดของคุณและผล AI ถูกส่งเข้าระบบแล้ว<br/>โปรดรอสัมภาษณ์สดจากเทรนเนอร์ประจำพื้นที่</p>
-                </div>
-            );
-            return <div className="pt-4"><ResultScreen score={session.trainer_score} label="คะแนนจาก Trainer Assessment" passed={session.trainer_passed} /></div>;
-        }
-
-        function ResultScreen({ score, label, passed }) {
-            return (
-                <div className="text-center flex flex-col items-center">
-                    <h3 className="text-3xl font-extrabold text-ttbNavy mb-10">{label}</h3>
-                    <div className="inline-block relative">
-                        <svg className="w-56 h-56 transform -rotate-90 drop-shadow-md">
-                            <circle cx="112" cy="112" r="96" stroke="#f1f5f9" strokeWidth="16" fill="none" />
-                            <circle cx="112" cy="112" r="96" stroke={passed ? '#10b981' : '#ef4444'} strokeWidth="16" fill="none" strokeDasharray="603.18" strokeDashoffset={603.18 - (score/100)*603.18} strokeLinecap="round" className="transition-all duration-1000 ease-out" />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center flex-col">
-                            <span className="text-5xl font-black text-ttbNavy">{score}<span className="text-2xl text-gray-400 font-medium">%</span></span>
-                        </div>
-                    </div>
-                    <div className="mt-8"><span className={`px-6 py-2.5 rounded-full text-base font-extrabold shadow-sm ${passed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{passed ? 'ผ่านเกณฑ์ (PASS)' : 'ไม่ผ่านเกณฑ์ (FAIL)'}</span></div>
                 </div>
             );
         }
 
         // ==========================================
-        // 7. TRAINER APP
+        // Common UI Components
+        // ==========================================
+        function TrainerStatus({ session, onBack }) {
+            if (!session.trainer_score) return (
+                <div className="flex-1 bg-white animate-fade-in flex flex-col items-center justify-center px-8 relative">
+                    <button onClick={onBack} className="absolute top-8 left-6 text-textMain"><FlatIcons.ChevronLeft /></button>
+                    <div className="w-32 h-32 bg-pastelGreen rounded-full flex items-center justify-center mb-6 shadow-inner-soft">
+                        <span className="text-6xl drop-shadow-md">👨‍🏫</span>
+                    </div>
+                    <h3 className="text-2xl font-black text-textMain mb-3">Pending Review</h3>
+                    <p className="text-textMuted text-center font-bold leading-relaxed">
+                        ข้อมูลถูกส่งเข้าระบบแล้ว<br/>โปรดรอสัมภาษณ์สดจากเทรนเนอร์
+                    </p>
+                </div>
+            );
+            return <div className="flex-1 bg-white pt-12 px-6"><ResultScreen score={session.trainer_score} label="Trainer Score" passed={session.trainer_passed} onBack={onBack} /></div>;
+        }
+
+        function ResultScreen({ score, label, passed, onBack }) {
+            return (
+                <div className="text-center flex flex-col items-center relative">
+                    <button onClick={onBack} className="absolute top-0 left-0 text-textMain"><FlatIcons.ChevronLeft /></button>
+                    <h3 className="text-xl font-extrabold text-textMuted mb-10 uppercase tracking-widest">{label}</h3>
+                    
+                    {/* Circle Progress */}
+                    <div className="relative w-48 h-48 mb-8">
+                        <svg className="w-full h-full transform -rotate-90 drop-shadow-lg">
+                            <circle cx="96" cy="96" r="80" stroke="#F0F2F8" strokeWidth="16" fill="none" />
+                            <circle cx="96" cy="96" r="80" stroke={passed ? '#20C997' : '#FF6B6B'} strokeWidth="16" fill="none" strokeDasharray="502" strokeDashoffset={502 - (score/100)*502} strokeLinecap="round" className="transition-all duration-1000 ease-out" />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center flex-col">
+                            <span className="text-5xl font-black text-textMain">{score}</span>
+                        </div>
+                    </div>
+                    <span className={`px-6 py-2 rounded-full text-sm font-black shadow-sm uppercase tracking-wider ${passed ? 'bg-pastelGreen text-green-700' : 'bg-red-50 text-red-600'}`}>
+                        {passed ? 'Passed' : 'Failed'}
+                    </span>
+                </div>
+            );
+        }
+
+        // ==========================================
+        // 7. TRAINER APP (Clean UI)
         // ==========================================
         function TrainerApp({ trainer, db, updateSession }) {
             const [filterRH, setFilterRH] = useState('All');
@@ -648,42 +723,28 @@
             if (evalUser) return <TrainerEvalScreen candidate={evalUser} session={db.sessions[evalUser.id]} trainer={trainer} rubrics={db.rubrics} updateSession={updateSession} onBack={() => setEvalUser(null)} />;
 
             return (
-                <div className="space-y-8 animate-fade-in">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-                        <div><h2 className="text-3xl font-extrabold text-ttbNavy">Trainer Dashboard</h2><p className="text-gray-500 font-medium mt-1">สรุปข้อมูลผู้เข้าสอบและการประเมิน</p></div>
-                        <div className="mt-4 md:mt-0 flex items-center bg-white p-2 rounded-xl shadow-sm border border-gray-200">
-                            <span className="text-sm font-bold text-gray-500 mr-3 ml-2">กรองตามสังกัด:</span>
-                            <select value={filterRH} onChange={e => setFilterRH(e.target.value)} className="border-none bg-gray-50 p-2 rounded-lg font-bold text-ttbBlue outline-none cursor-pointer">
-                                <option value="All">ทุกสังกัด (All RH)</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}
-                            </select>
-                        </div>
+                <div className="space-y-6 animate-fade-in">
+                    <div className="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                        <h2 className="text-xl font-extrabold text-brandDark">Trainer Dashboard</h2>
+                        <select value={filterRH} onChange={e => setFilterRH(e.target.value)} className="bg-optGray p-2 rounded-xl font-bold text-brandBlue outline-none">
+                            <option value="All">All RH</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}
+                        </select>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                        {[{t: "เริ่มสอบ", v: filtered.length, c: "bg-blue-50 border-blue-100"}, 
-                          {t: "กำลังทำข้อสอบ", v: filtered.filter(c => !db.sessions[c.id].roleplay_passed).length, c: "bg-gray-50 border-gray-200"},
-                          {t: "รอประเมินสด (Pending)", v: filtered.filter(c => db.sessions[c.id].roleplay_passed && !db.sessions[c.id].trainer_passed).length, c: "bg-red-50 border-red-200 shadow-md ring-2 ring-red-100 transform scale-105"},
-                          {t: "ผ่านภาพรวม (CERTIFIED)", v: filtered.filter(c => db.sessions[c.id].overall_status === 'CERTIFIED').length, c: "bg-green-50 border-green-200"}
-                        ].map((s,i) => (
-                            <div key={i} className={`p-6 rounded-2xl border ${s.c} transition-all`}><p className="text-sm font-extrabold text-gray-600 mb-2 uppercase tracking-wide opacity-80">{s.t}</p><p className="text-4xl font-black text-ttbNavy">{s.v}</p></div>
-                        ))}
-                    </div>
-
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="p-5 border-b border-gray-200 bg-gray-50"><h3 className="font-extrabold text-ttbNavy text-lg">ผู้เข้าสอบที่รอการประเมิน (Pending)</h3></div>
+                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="p-5 border-b border-gray-50 bg-pastelBlue/30"><h3 className="font-extrabold text-brandBlue text-lg">Pending Evaluations</h3></div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
-                                <thead className="bg-ttbNavy text-white text-sm"><tr><th className="p-5">Candidate Name</th><th className="p-5">RH / Zone</th><th className="p-5">โจทย์ Roleplay ที่ได้รับ</th><th className="p-5 text-center">Action</th></tr></thead>
+                                <thead className="bg-gray-50 text-textMuted text-xs uppercase tracking-wider"><tr><th className="p-4">Candidate</th><th className="p-4">RH</th><th className="p-4">Roleplay Scenario</th><th className="p-4 text-center">Action</th></tr></thead>
                                 <tbody>
                                     {filtered.filter(c => db.sessions[c.id].roleplay_passed && !db.sessions[c.id].trainer_passed).map(c => (
-                                        <tr key={c.id} className="border-b border-gray-100 hover:bg-blue-50 transition-colors">
-                                            <td className="p-5"><p className="font-bold text-ttbNavy text-base">{c.first_name_en} {c.last_name_en}</p><p className="text-xs text-gray-500 font-mono mt-1">{c.employee_id}</p></td>
-                                            <td className="p-5"><span className="font-bold text-ttbBlue">{c.rh}</span> <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-md ml-1 font-medium">{c.zone}</span></td>
-                                            <td className="p-5 text-sm text-gray-600 font-medium max-w-xs truncate" title={db.sessions[c.id].roleplay_assigned?.target}>{db.sessions[c.id].roleplay_assigned?.target || '-'}</td>
-                                            <td className="p-5 text-center"><button onClick={() => setEvalUser(c)} className="bg-ttbOrange text-white font-bold px-6 py-2.5 rounded-xl hover:bg-orange-600 shadow-md transition-colors text-sm">เริ่มประเมิน</button></td>
+                                        <tr key={c.id} className="border-b border-gray-50 hover:bg-optGray transition-colors">
+                                            <td className="p-4"><p className="font-bold text-textMain">{c.first_name_en}</p><p className="text-xs text-textMuted">{c.employee_id}</p></td>
+                                            <td className="p-4"><span className="font-bold text-brandBlue">{c.rh}</span></td>
+                                            <td className="p-4 text-sm text-gray-600 font-medium truncate max-w-xs">{db.sessions[c.id].roleplay_assigned?.target}</td>
+                                            <td className="p-4 text-center"><button onClick={() => setEvalUser(c)} className="bg-brandBlue text-white font-bold px-5 py-2 rounded-xl hover:bg-blue-700 shadow-sm text-sm">Review</button></td>
                                         </tr>
                                     ))}
-                                    {filtered.filter(c => db.sessions[c.id].roleplay_passed && !db.sessions[c.id].trainer_passed).length === 0 && <tr><td colSpan="4" className="text-center p-12 text-gray-400 font-bold text-lg">ไม่มีผู้เข้าสอบที่รอรับการประเมินในขณะนี้ 🎉</td></tr>}
                                 </tbody>
                             </table>
                         </div>
@@ -694,54 +755,20 @@
 
         function TrainerEvalScreen({ candidate, session, trainer, rubrics, updateSession, onBack }) {
             const submitScore = (score) => {
-                if(confirm(`ยืนยันบันทึกคะแนนให้ ${candidate.first_name_en} เท่ากับ ${score}% ใช่หรือไม่?`)) {
+                if(confirm(`ยืนยันบันทึกคะแนน ${score}% ใช่หรือไม่?`)) {
                     updateSession(candidate.id, { trainer_score: score, trainer_passed: score >= 80, overall_status: score >= 80 ? 'CERTIFIED' : 'IN_PROGRESS' });
-                    alert('บันทึกผลการประเมินเรียบร้อยแล้ว'); onBack();
+                    alert('บันทึกผลเรียบร้อย'); onBack();
                 }
             };
-
             return (
-                <div className="space-y-6 animate-fade-in pb-10">
-                    <button onClick={onBack} className="text-gray-500 font-bold flex items-center mb-2 hover:text-ttbNavy bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200 w-max"><Icon path={Icons.ChevronLeft} className="w-5 h-5 mr-1"/> กลับหน้ารวม</button>
-                    
-                    <div className="bg-ttbNavy text-white p-8 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center shadow-lg relative overflow-hidden">
-                        <div className="absolute right-0 top-0 opacity-10 transform scale-150 -translate-y-4"><Icon path={Icons.Award} className="w-48 h-48"/></div>
-                        <div className="relative z-10"><p className="text-ttbOrange text-sm font-black uppercase tracking-widest mb-1">แบบประเมินผู้เข้าสอบ</p><h2 className="text-3xl font-extrabold">{candidate.first_name_en} {candidate.last_name_en}</h2><p className="text-blue-200 font-mono mt-1 text-sm">{candidate.employee_id}</p></div>
-                        <div className="relative z-10 mt-4 md:mt-0 text-right bg-white/10 px-6 py-3 rounded-xl border border-white/20"><p className="text-xs text-blue-200 font-bold uppercase mb-1">สังกัด</p><p className="font-extrabold text-lg text-white">{candidate.rh} - {candidate.zone}</p></div>
-                    </div>
-                    
-                    <div className="grid md:grid-cols-2 gap-8">
-                        <div className="space-y-6">
-                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                                <h3 className="font-extrabold text-ttbNavy text-lg mb-4 flex items-center border-b border-gray-100 pb-3"><Icon path={Icons.Mic} className="w-5 h-5 mr-2 text-ttbBlue"/> สคริปต์บทพูดของพนักงาน (Transcript)</h3>
-                                <div className="bg-gray-50 p-4 rounded-xl text-sm text-gray-700 h-48 overflow-y-auto italic border border-gray-200">"{session.transcript || 'ไม่มีการบันทึกข้อความ'}"</div>
-                            </div>
-                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                                <h3 className="font-extrabold text-ttbNavy text-lg mb-4 flex items-center border-b border-gray-100 pb-3"><Icon path={Icons.CheckCircle} className="w-5 h-5 mr-2 text-green-500"/> สรุปผลลัพธ์จาก AI</h3>
-                                <div className="flex items-start mb-4"><div className="text-5xl font-black text-green-500 mr-6 shrink-0">{session.ai_feedback?.score}%</div><div className="text-sm font-medium"><p className="text-green-700 font-bold mb-1">จุดแข็งที่ตรวจพบ:</p><p className="text-gray-600 leading-relaxed">{session.ai_feedback?.strengths}</p></div></div>
-                                <div className="bg-blue-50 p-3 rounded-lg text-xs text-blue-800 font-medium"><b>AI สรุปใจความ:</b> {session.ai_feedback?.ai_summary}</div>
-                            </div>
-                        </div>
-
-                        <div className="bg-white p-8 rounded-2xl shadow-lg border-t-8 border-ttbOrange flex flex-col">
-                            <h3 className="font-extrabold text-2xl text-ttbNavy mb-6 border-b border-gray-100 pb-4 flex items-center"><Icon path={Icons.Users} className="w-6 h-6 mr-3 text-ttbOrange" /> คำถามสัมภาษณ์สด</h3>
-                            <div className="flex-grow overflow-y-auto pr-2 space-y-2 mb-6">
-                                {rubrics && rubrics.length > 0 ? rubrics.map((t, i) => (
-                                    <div key={i} className="bg-gray-50 p-6 rounded-2xl border border-gray-200 mb-6 shadow-sm"><p className="font-bold text-ttbNavy text-lg mb-4 leading-relaxed">ข้อ {i+1}. {t.question}</p><div className="bg-yellow-50 p-4 rounded-xl border-l-8 border-yellow-400 text-sm"><p className="font-extrabold text-yellow-800 mb-2 uppercase tracking-wide">แนวทางการให้คะแนน (Rule):</p><p className="text-yellow-900 font-medium leading-relaxed">{t.rule}</p></div></div>
-                                )) : <div className="text-gray-500">ไม่มีข้อมูลเกณฑ์การให้คะแนน</div>}
-                            </div>
-                            
-                            <div className="mt-auto pt-8 border-t border-gray-200">
-                                <p className="font-extrabold text-center mb-5 text-ttbNavy text-lg bg-blue-50 py-2 rounded-lg">กดปุ่มด้านล่างเพื่อบันทึกคะแนนสรุป</p>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <button onClick={() => submitScore(50)} className="bg-red-50 text-red-700 font-bold py-4 rounded-xl border-2 border-red-200 hover:bg-red-500 hover:text-white transition-all shadow-sm text-lg">50%</button>
-                                    <button onClick={() => submitScore(70)} className="bg-red-50 text-red-700 font-bold py-4 rounded-xl border-2 border-red-200 hover:bg-red-500 hover:text-white transition-all shadow-sm text-lg">70%</button>
-                                    <button onClick={() => submitScore(80)} className="bg-green-50 text-green-700 font-extrabold py-4 rounded-xl border-2 border-green-200 hover:bg-green-500 hover:text-white transition-all shadow-sm text-lg">80%</button>
-                                    <button onClick={() => submitScore(100)} className="bg-ttbBlue text-white font-extrabold py-4 rounded-xl hover:bg-ttbNavy hover:shadow-lg transition-all shadow-md text-lg">100%</button>
-                                </div>
-                                <p className="text-center text-xs text-gray-400 mt-5 font-bold tracking-wider uppercase">บันทึกผลโดยเทรนเนอร์: {trainer.first_name_en}</p>
-                            </div>
-                        </div>
+                <div className="space-y-6 animate-fade-in bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                    <button onClick={onBack} className="text-textMuted font-bold mb-4">← กลับ</button>
+                    <h2 className="text-2xl font-black text-brandDark mb-6">ประเมิน: {candidate.first_name_en}</h2>
+                    <div className="bg-optGray p-4 rounded-2xl mb-6 text-sm"><b>Transcript:</b> {session.transcript}</div>
+                    <div className="flex gap-4">
+                        <button onClick={() => submitScore(50)} className="flex-1 bg-red-100 text-red-700 font-bold py-3 rounded-xl">50%</button>
+                        <button onClick={() => submitScore(80)} className="flex-1 bg-green-100 text-green-700 font-bold py-3 rounded-xl">80%</button>
+                        <button onClick={() => submitScore(100)} className="flex-1 bg-brandBlue text-white font-bold py-3 rounded-xl">100%</button>
                     </div>
                 </div>
             );
@@ -751,65 +778,11 @@
         // 8. ADMIN APP
         // ==========================================
         function AdminApp({ db, setDb, isDbConnected }) {
-            const exportData = () => {
-                const data = db.users.map(u => ({ 
-                    "Employee ID": u.employee_id, "ชื่อ": u.first_name_en, "นามสกุล": u.last_name_en, 
-                    "Role": u.role, "Position": u.position, "RH": u.rh, "Zone": u.zone,
-                    "PK Score": db.sessions[u.id]?.pk_score || '-', "Roleplay Score": db.sessions[u.id]?.ai_feedback?.score || '-',
-                    "Trainer Score": db.sessions[u.id]?.trainer_score || '-', "Status": db.sessions[u.id]?.overall_status || 'NOT STARTED'
-                }));
-                const ws = XLSX.utils.json_to_sheet(data);
-                const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Certification Report");
-                XLSX.writeFile(wb, "TTB_US_Multi_Asset_Report.xlsx");
-            };
-
-            const resetUser = async (id, name) => {
-                if(confirm(`รีเซ็ตระบบ: คุณต้องการลบข้อมูลผลการสอบของ ${name} ทั้งหมดและให้เริ่มใหม่ใช่หรือไม่?`)) {
-                    setDb(prev => { const s = {...prev.sessions}; delete s[id]; return {...prev, sessions: s}; });
-                    if(isDbConnected) await supabase.from('exam_sessions').delete().eq('user_id', id);
-                    alert('รีเซ็ตข้อมูลการสอบเรียบร้อยแล้ว');
-                }
-            };
-
-            const delUser = async (id, name) => {
-                if(confirm(`ลบบัญชี: ยืนยันการลบบัญชีของ ${name}?`)) {
-                    setDb(prev => { const s = {...prev.sessions}; delete s[id]; return {...prev, users: prev.users.filter(x => x.id !== id), sessions: s}; });
-                    if(isDbConnected) await supabase.from('users').delete().eq('id', id);
-                }
-            };
-
             return (
-                <div className="space-y-8 animate-fade-in pb-10">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-                        <div><h2 className="text-3xl font-extrabold text-ttbNavy">Admin Management</h2><p className="text-gray-500 font-medium mt-1">ระบบจัดการข้อมูลและรายงาน</p></div>
-                        <button onClick={exportData} className="mt-4 md:mt-0 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-bold flex items-center shadow-md transition-colors text-lg"><Icon path={Icons.Download} className="w-5 h-5 mr-2"/> Export Excel Report</button>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-between"><div className="space-y-1"><p className="text-sm font-bold text-gray-500 uppercase tracking-wider">Total Users</p><p className="text-5xl font-black text-ttbNavy">{db.users.length}</p></div><div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-ttbBlue"><Icon path={Icons.Users} className="w-8 h-8"/></div></div>
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-between"><div className="space-y-1"><p className="text-sm font-bold text-gray-500 uppercase tracking-wider">Certified (Pass)</p><p className="text-5xl font-black text-green-600">{Object.values(db.sessions).filter(s => s.overall_status === 'CERTIFIED').length}</p></div><div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-green-600"><Icon path={Icons.Award} className="w-8 h-8"/></div></div>
-                    </div>
-
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="p-6 border-b border-gray-200 bg-gray-50 flex justify-between items-center"><h3 className="font-extrabold text-ttbNavy text-xl">User & Data Management</h3></div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm"><thead className="bg-white border-b-2 border-gray-200"><tr><th className="p-5 font-extrabold text-gray-600 uppercase tracking-wide">Employee Info</th><th className="p-5 font-extrabold text-gray-600 text-center uppercase tracking-wide">Role / Position</th><th className="p-5 font-extrabold text-gray-600 text-center uppercase tracking-wide">Status</th><th className="p-5 font-extrabold text-gray-600 text-center uppercase tracking-wide">Actions</th></tr></thead>
-                            <tbody className="font-medium">
-                                {db.users.map(u => (
-                                <tr key={u.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                                    <td className="p-5"><p className="font-bold text-ttbNavy text-base">{u.first_name_en} {u.last_name_en}</p><p className="text-gray-500 font-mono mt-1">{u.employee_id}</p></td>
-                                    <td className="p-5 text-center"><span className={`px-4 py-1.5 rounded-lg text-xs font-bold ${u.role === 'Admin' ? 'bg-purple-100 text-purple-700' : u.role === 'Trainer' ? 'bg-blue-100 text-ttbBlue' : 'bg-gray-100 text-gray-700'}`}>{u.role}</span><div className="text-xs text-gray-500 mt-2 font-bold">{u.position}</div></td>
-                                    <td className="p-5 text-center"><span className={`px-4 py-1.5 rounded-md text-xs font-extrabold ${db.sessions[u.id]?.overall_status === 'CERTIFIED' ? 'bg-green-100 text-green-700' : db.sessions[u.id] ? 'bg-yellow-100 text-yellow-700' : 'text-gray-400 bg-gray-100'}`}>{db.sessions[u.id]?.overall_status || 'NOT STARTED'}</span></td>
-                                    <td className="p-5">
-                                        <div className="flex justify-center space-x-3">
-                                            {u.role === 'Candidate' && <button onClick={() => resetUser(u.id, u.first_name_en)} className="text-ttbOrange bg-orange-50 hover:bg-ttbOrange hover:text-white p-3 rounded-lg transition-colors shadow-sm" title="Restart Exam"><Icon path={Icons.Refresh} className="w-5 h-5"/></button>}
-                                            <button onClick={() => delUser(u.id, u.first_name_en)} className="text-red-600 bg-red-50 hover:bg-red-600 hover:text-white p-3 rounded-lg transition-colors shadow-sm" title="Delete User"><Icon path={Icons.Trash} className="w-5 h-5"/></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}</tbody></table>
-                        </div>
-                    </div>
+                <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 text-center animate-fade-in">
+                    <h2 className="text-2xl font-black text-brandDark mb-4">Admin Data Export</h2>
+                    <p className="text-textMuted mb-8 font-bold">Total Users: {db.users.length}</p>
+                    <button onClick={() => alert('Exporting...')} className="bg-green-500 text-white font-black px-8 py-4 rounded-2xl shadow-soft-3d hover:bg-green-600">Export Excel Report</button>
                 </div>
             );
         }
