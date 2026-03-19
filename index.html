@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ttb US Multi-Asset 15/5 - Certification Platform</title>
+    <title>ttb Certification Platform - US Multi-Asset 15/5</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,52 +11,36 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        ttbNavy: '#002d63',
-                        ttbBlue: '#00508f',
-                        ttbOrange: '#f68b1f',
-                        ttbLightBlue: '#eef2f6'
-                    },
-                    fontFamily: {
-                        sans: ['Sarabun', 'Prompt', 'sans-serif'],
-                    }
+                    colors: { ttbNavy: '#002d63', ttbBlue: '#00508f', ttbOrange: '#f68b1f', ttbLightBlue: '#eef2f6' },
+                    fontFamily: { sans: ['Prompt', 'sans-serif'] }
                 }
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
-    <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Supabase JS -->
+    <!-- Supabase JS & SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- XLSX for Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        body { font-family: 'Prompt', sans-serif; background-color: #f4f5f7; }
-        .pass-stamp {
-            position: absolute; top: 1rem; right: 1rem; transform: rotate(12deg); z-index: 10;
-            border: 4px solid #10b981; color: #10b981; padding: 0.25rem 1rem;
-            font-weight: 900; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.1em;
-            border-radius: 0.5rem; background-color: rgba(255,255,255,0.9); box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            pointer-events: none;
-        }
-        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
+        body { font-family: 'Prompt', sans-serif; background-color: #f4f5f7; display: flex; flex-direction: column; min-height: 100vh; }
+        .pass-stamp { position: absolute; top: 1.5rem; right: 1.5rem; transform: rotate(12deg); z-index: 10; border: 4px solid #10b981; color: #10b981; padding: 0.25rem 1rem; font-weight: 900; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.1em; border-radius: 0.5rem; background-color: rgba(255,255,255,0.95); box-shadow: 0 4px 6px rgba(0,0,0,0.1); pointer-events: none; }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; } ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div id="root" class="flex-grow flex flex-col"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        const { useState, useEffect } = React;
 
         // ==========================================
         // 1. CONFIGURATION & APIs
@@ -64,13 +48,12 @@
         const GEMINI_API_KEY = "AIzaSyDhCVCNrx2WiNh9pDT24HI5eomrt4KtuUg";
         const SUPABASE_URL = "https://lyfqqrofqbyfezwxwhph.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZnFxcm9mcWJ5ZmV6d3h3aHBoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0ODc3MTAsImV4cCI6MjA4OTA2MzcxMH0.U5rhRSSTplQbcXBL16odRMRL26dy1RCxC_6jkHjhaWA";
-        
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ==========================================
-        // 2. ICONS (Inline SVG to avoid external deps)
+        // 2. ICONS (SVG)
         // ==========================================
-        const Icon = ({ path, className = "w-6 h-6", color="currentColor" }) => (
+        const Icon = ({ path, className="w-6 h-6", color="currentColor" }) => (
             <svg className={className} fill="none" stroke={color} viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{ __html: path }}></svg>
         );
         const Icons = {
@@ -95,7 +78,7 @@
         };
 
         // ==========================================
-        // 3. MOCK DATA & CONSTANTS
+        // 3. MASTER DATA
         // ==========================================
         const RH_ZONES = {
             'RH1': ['จตุจักร', 'ธนบุรี', 'บางกะปิ', 'สาทร', 'สุขุมวิท'],
@@ -104,144 +87,109 @@
             'RH4': ['ดอนเมือง', 'นครราชสีมา', 'สระบุรี', 'อุดรธานี', 'อุบลราชธานี'],
             'RH5': ['ภูเก็ต', 'ราชบุรี', 'สมุทรสาคร', 'สุราษฎร์ธานี', 'หาดใหญ่']
         };
-
         const POSITIONS = ['IS', 'IA', 'Other'];
 
-        const DEFAULT_USERS = [
-            { id: 'cand_001', employee_id: 'cand_001', first_name_en: 'Somchai', last_name_en: 'Candidate', role: 'Candidate', position: 'IS', rh: 'RH1', zone: 'จตุจักร' },
-            { id: 'ttb_yj', employee_id: 'ttb_yj', first_name_en: 'Yannapat', last_name_en: 'J', role: 'Trainer', position: 'Training Specialist', rh: 'RH1', zone: 'จตุจักร' },
-            { id: 'admin_001', employee_id: 'admin_001', first_name_en: 'System', last_name_en: 'Admin', role: 'Admin', position: 'Administrator', rh: 'HQ', zone: 'Central' }
-        ];
-
-        const SCENARIOS = [
-            { id: 's1', target: 'กลุ่มนักลงทุน', text: 'ลูกค้าลงทุนเองและเชื่อว่าทำผลตอบแทนได้ดีกว่า อธิบายจุดเด่นเรื่อง Principal Protect 15/5 และโอกาสรับผลตอบแทนจาก Index (VT8)' },
-            { id: 's2', target: 'กลุ่มเงินฝาก', text: 'ลูกค้าเน้นความปลอดภัยสูงสุด มองว่าฝากเงินปลอดภัยที่สุด อธิบายการคุ้มครองเงินต้น และโอกาสชนะเงินเฟ้อโดยไม่เสี่ยงเสียเงินต้น' },
-            { id: 's3', target: 'ผู้จัดการสาขา', text: 'ผู้จัดการมองว่าผลตอบแทน 15/5 น้อยเกินไป อธิบายในมุมมองของการจัดพอร์ต Asset Allocation และเครื่องมือบริหารความเสี่ยงให้ลูกค้า' }
-        ];
-
-        const EXAM_QUESTIONS = [
-            { id: 1, question: "กลไกสำคัญใดของดัชนี Citi-QuantCube (VT8) ที่ช่วยบริหารความเสี่ยงในสภาวะเศรษฐกิจผันผวน?", options: ["ทำ Short Position ในหุ้นอัตโนมัติ", "ใช้ Dynamic Asset Allocation ย้ายไปสินทรัพย์ปลอดภัย", "รับประกันผลตอบแทน 8% ต่อปี", "กู้เงินมาถัวเฉลี่ยต้นทุน"], answer: "ใช้ Dynamic Asset Allocation ย้ายไปสินทรัพย์ปลอดภัย" },
-            { id: 2, question: "หากลูกค้าเวนคืนกรมธรรม์ Principal Protect 15/5 ในปีที่ 5 จะเกิดอะไรขึ้น?", options: ["ได้เงินต้นคืน 100% ทันที", "ได้รับผลตอบแทนดัชนีบวกเงินต้น", "มูลค่าที่ได้อาจน้อยกว่าเบี้ยที่จ่ายไป", "ไม่ได้เงินคืนเลยจนกว่าจะครบ 15 ปี"], answer: "มูลค่าที่ได้อาจน้อยกว่าเบี้ยที่จ่ายไป" },
-            { id: 3, question: "ความเข้าใจผิดใดที่ต้องระวังในการอธิบายผลตอบแทนของ Index-Linked?", options: ["ผลตอบแทนจะเท่ากับการเติบโตของดัชนีแบบ 1:1 เสมอ", "ลูกค้ายังคงมีความเสี่ยงด้านค่าเสียโอกาส", "เงินต้นได้รับการคุ้มครองโดยบริษัทประกันภัย", "การลงทุนอิงดัชนีในต่างประเทศ"], answer: "ผลตอบแทนจะเท่ากับการเติบโตของดัชนีแบบ 1:1 เสมอ" },
-            { id: 4, question: "ข้อใดคือการ Mis-selling ร้ายแรงที่สุดสำหรับผลิตภัณฑ์นี้?", options: ["อธิบายว่าเป็นเงินฝากประจำแบบพิเศษ", "ไม่แจ้งเรื่องระยะเวลาชำระเบี้ย 5 ปี", "บอกว่า AI ช่วยจับสัญญาณเศรษฐกิจ", "บอกว่าไม่จำกัดเพดานผลตอบแทน"], answer: "อธิบายว่าเป็นเงินฝากประจำแบบพิเศษ" },
-            { id: 5, question: "ในกรณีที่สภาวะเศรษฐกิจเติบโตชะลอตัวและเงินเฟ้อสูง (Stagflation) ดัชนีจะปรับพอร์ตไปทางใด?", options: ["หุ้นเทคโนโลยี 100%", "สินค้าโภคภัณฑ์ ป้องกันเงินเฟ้อ", "เงินสดเท่านั้น", "ตราสารหนี้ภาคเอกชนความเสี่ยงสูง"], answer: "สินค้าโภคภัณฑ์ ป้องกันเงินเฟ้อ" }
-        ];
-
         // ==========================================
-        // 4. MAIN APP COMPONENT
+        // 4. MAIN APP
         // ==========================================
         function App() {
-            const [users, setUsers] = useState(DEFAULT_USERS);
+            const [db, setDb] = useState({ users: [], sessions: {}, questions: [], scenarios: [], rubrics: [] });
             const [currentUser, setCurrentUser] = useState(null);
-            const [sessions, setSessions] = useState({});
-            const [isSupabaseReady, setIsSupabaseReady] = useState(false);
+            const [isLoading, setIsLoading] = useState(true);
 
-            // Attempt to load from Supabase on start
             useEffect(() => {
-                const initDB = async () => {
+                const fetchDatabase = async () => {
                     try {
-                        const { data, error } = await supabase.from('users').select('*');
-                        if (!error && data.length > 0) {
-                            setUsers(data);
-                            setIsSupabaseReady(true);
-                            // Also load sessions
-                            const { data: sessData } = await supabase.from('exam_sessions').select('*');
-                            if(sessData) {
-                                const sessObj = {};
-                                sessData.forEach(s => sessObj[s.user_id] = s);
-                                setSessions(sessObj);
-                            }
-                        } else {
-                            console.warn("Supabase tables not found or empty. Using in-memory fallback.");
-                        }
-                    } catch (err) {
-                        console.warn("Supabase connection failed. Using in-memory fallback.");
-                    }
+                        const [resU, resS, resQ, resSc, resR] = await Promise.all([
+                            supabase.from('users').select('*'),
+                            supabase.from('exam_sessions').select('*'),
+                            supabase.from('questions').select('*'),
+                            supabase.from('scenarios').select('*'),
+                            supabase.from('trainer_rubrics').select('*')
+                        ]);
+                        
+                        const sessMap = {};
+                        if(resS.data) resS.data.forEach(s => sessMap[s.user_id] = s);
+
+                        setDb({
+                            users: resU.data || [],
+                            sessions: sessMap,
+                            questions: resQ.data || [],
+                            scenarios: resSc.data || [],
+                            rubrics: resR.data || []
+                        });
+                    } catch (err) { console.error("DB Fetch Error:", err); }
+                    setIsLoading(false);
                 };
-                initDB();
+                fetchDatabase();
             }, []);
 
             const handleLogin = (user) => {
                 setCurrentUser(user);
-                // Init session if Candidate
-                if (user.role === 'Candidate' && !sessions[user.id]) {
-                    setSessions(prev => ({
-                        ...prev,
-                        [user.id]: {
-                            pk_passed: false, pk_score: null, pk_attempts: 0,
-                            roleplay_assigned: null, roleplay_passed: false, roleplay_link: null, ai_feedback: null, roleplay_attempts: 0,
-                            trainer_passed: false, trainer_score: null, trainer_attempts: 0,
-                            overall_status: 'IN_PROGRESS'
-                        }
-                    }));
+                if (user.role === 'Candidate' && !db.sessions[user.id]) {
+                    setDb(prev => ({ ...prev, sessions: { ...prev.sessions, [user.id]: {
+                        pk_passed: false, pk_score: null, pk_attempts: 0,
+                        roleplay_assigned: null, roleplay_passed: false, roleplay_link: null, ai_feedback: null, roleplay_attempts: 0,
+                        trainer_passed: false, trainer_score: null, trainer_attempts: 0, overall_status: 'NOT STARTED'
+                    }}}));
                 }
             };
 
-            const updateSessionData = async (userId, data) => {
-                const newSessions = { ...sessions, [userId]: { ...sessions[userId], ...data } };
-                setSessions(newSessions);
-                if (isSupabaseReady) {
-                    await supabase.from('exam_sessions').upsert({ user_id: userId, ...data });
-                }
+            const updateSession = async (userId, data) => {
+                setDb(prev => ({ ...prev, sessions: { ...prev.sessions, [userId]: { ...prev.sessions[userId], ...data } } }));
+                await supabase.from('exam_sessions').upsert({ user_id: userId, ...data });
             };
+
+            if (isLoading) return <div className="flex-grow flex items-center justify-center text-ttbNavy font-bold"><Icon path={Icons.Refresh} className="w-8 h-8 animate-spin mr-3"/> กำลังเชื่อมต่อระบบฐานข้อมูล...</div>;
 
             return (
-                <div className="min-h-screen flex flex-col">
+                <div className="flex-grow flex flex-col">
                     {!currentUser ? (
-                        <AuthScreen onLogin={handleLogin} users={users} setUsers={setUsers} isSupabaseReady={isSupabaseReady} />
+                        <AuthScreen onLogin={handleLogin} db={db} setDb={setDb} />
                     ) : (
-                        <>
+                        <div className="flex-grow flex flex-col">
+                            {/* Navbar */}
                             <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
                                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
                                     <div className="flex items-center text-ttbNavy">
                                         <Icon path={Icons.Shield} className="w-8 h-8 mr-2 text-ttbOrange" />
-                                        <span className="font-bold text-xl tracking-wide hidden sm:block">ttb Certification Platform</span>
+                                        <span className="font-extrabold text-xl tracking-tight hidden sm:block">ttb Certification Platform</span>
                                     </div>
-                                    <button onClick={() => setCurrentUser(null)} className="flex items-center text-gray-500 hover:text-red-500 bg-gray-50 px-3 py-2 rounded-lg font-medium text-sm transition-colors">
+                                    <button onClick={() => setCurrentUser(null)} className="flex items-center text-gray-500 hover:text-red-500 bg-gray-50 hover:bg-red-50 px-3 py-2 rounded-lg font-bold text-sm transition-colors">
                                         <Icon path={Icons.LogOut} className="w-4 h-4 mr-1" /> ออกจากระบบ
                                     </button>
                                 </div>
                             </nav>
 
+                            {/* Main Content */}
                             <main className="flex-grow p-4 md:p-8 max-w-7xl mx-auto w-full space-y-6">
                                 <div className="bg-ttbNavy rounded-2xl p-6 shadow-lg text-white flex flex-col md:flex-row items-center justify-between relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-64 h-64 bg-ttbBlue rounded-full filter blur-3xl opacity-50 transform translate-x-1/2 -translate-y-1/2"></div>
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-ttbBlue rounded-full filter blur-3xl opacity-50 transform translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
                                     <div className="flex items-center z-10 w-full">
-                                        <div className="bg-white/10 p-4 rounded-full mr-4 border border-white/20 hidden sm:block">
-                                            <Icon path={Icons.User} className="w-8 h-8 text-ttbOrange" />
-                                        </div>
+                                        <div className="bg-white/10 p-4 rounded-full mr-4 border border-white/20 hidden sm:block"><Icon path={Icons.User} className="w-8 h-8 text-ttbOrange" /></div>
                                         <div>
-                                            <h2 className="text-xl md:text-2xl font-bold">สวัสดี, {currentUser.first_name_en} {currentUser.last_name_en}</h2>
-                                            <p className="text-blue-200 mt-1 text-sm font-medium">
-                                                Role: {currentUser.role} &nbsp;|&nbsp; RH: {currentUser.rh} ({currentUser.zone})
-                                            </p>
+                                            <h2 className="text-2xl font-bold">สวัสดี, {currentUser.first_name_en} {currentUser.last_name_en}</h2>
+                                            <p className="text-blue-200 mt-1 text-sm font-medium">Role: {currentUser.role} &nbsp;|&nbsp; RH: {currentUser.rh} ({currentUser.zone})</p>
                                         </div>
                                         <div className="ml-auto text-right bg-white/10 px-4 py-2 rounded-xl border border-white/20">
-                                            <p className="text-xs text-blue-200 uppercase tracking-wider">Employee ID</p>
-                                            <p className="text-sm md:text-lg font-bold text-ttbOrange">{currentUser.employee_id}</p>
+                                            <p className="text-xs text-blue-200 uppercase tracking-wider font-bold">Employee ID</p>
+                                            <p className="text-sm md:text-lg font-bold text-ttbOrange font-mono">{currentUser.employee_id}</p>
                                         </div>
                                     </div>
                                 </div>
 
-                                {currentUser.role === 'Candidate' && (
-                                    <CandidateApp user={currentUser} session={sessions[currentUser.id]} updateSession={(data) => updateSessionData(currentUser.id, data)} />
-                                )}
-                                {currentUser.role === 'Trainer' && (
-                                    <TrainerApp trainer={currentUser} users={users} sessions={sessions} updateSession={(uid, data) => updateSessionData(uid, data)} />
-                                )}
-                                {currentUser.role === 'Admin' && (
-                                    <AdminApp users={users} setUsers={setUsers} sessions={sessions} setSessions={setSessions} />
-                                )}
+                                {currentUser.role === 'Candidate' && <CandidateApp user={currentUser} db={db} updateSession={(data) => updateSession(currentUser.id, data)} />}
+                                {currentUser.role === 'Trainer' && <TrainerApp trainer={currentUser} db={db} updateSession={updateSession} />}
+                                {currentUser.role === 'Admin' && <AdminApp db={db} setDb={setDb} />}
                             </main>
 
+                            {/* Footer */}
                             <footer className="bg-white border-t border-gray-200 py-6 mt-auto">
                                 <div className="max-w-7xl mx-auto px-4 text-center">
-                                    <p className="text-sm font-bold text-gray-400">
-                                        powered by : <span className="text-ttbNavy">PRU ACADEMY</span> <span className="text-ttbOrange">[ttb training team]</span>
-                                    </p>
+                                    <p className="text-sm font-bold text-gray-400">powered by : <span className="text-ttbNavy">PRU ACADEMY</span> <span className="text-ttbOrange">[ttb training team]</span></p>
                                 </div>
                             </footer>
-                        </>
+                        </div>
                     )}
                 </div>
             );
@@ -250,93 +198,66 @@
         // ==========================================
         // 5. AUTH SCREEN
         // ==========================================
-        function AuthScreen({ onLogin, users, setUsers, isSupabaseReady }) {
-            const [isRegistering, setIsRegistering] = useState(false);
+        function AuthScreen({ onLogin, db, setDb }) {
+            const [isReg, setIsReg] = useState(false);
             const [form, setForm] = useState({ empId: '', firstName: '', lastName: '', position: 'IS', rh: '', zone: '' });
-            const [error, setError] = useState('');
-
-            const handleChange = (e) => setForm({...form, [e.target.name]: e.target.value});
+            const [err, setErr] = useState('');
 
             const handleSubmit = async (e) => {
                 e.preventDefault();
-                if (!isRegistering) {
-                    const user = users.find(u => u.employee_id === form.empId && u.first_name_en.toLowerCase() === form.firstName.toLowerCase());
-                    if (user) onLogin(user); else setError('ไม่พบข้อมูล หรือระบุชื่อผิด');
+                if (!isReg) {
+                    const u = db.users.find(x => x.employee_id === form.empId && x.first_name_en.toLowerCase() === form.firstName.toLowerCase());
+                    if (u) onLogin(u); else setErr('ไม่พบข้อมูลผู้ใช้งาน หรือระบุชื่อผิด');
                 } else {
-                    if (users.find(u => u.employee_id === form.empId)) return setError('Employee ID นี้ถูกใช้งานแล้ว');
-                    if (!form.rh || !form.zone) return setError('กรุณาเลือก Region และ Zone ให้ครบถ้วน');
-                    
+                    if (db.users.find(x => x.employee_id === form.empId)) return setErr('Employee ID นี้ถูกใช้งานแล้ว');
+                    if (!form.rh || !form.zone) return setErr('กรุณาเลือก Region และ Zone ให้ครบถ้วน');
                     const newUser = { id: form.empId, employee_id: form.empId, first_name_en: form.firstName, last_name_en: form.lastName, role: 'Candidate', position: form.position, rh: form.rh, zone: form.zone };
-                    setUsers([...users, newUser]);
-                    if(isSupabaseReady) await supabase.from('users').insert([newUser]);
-                    
-                    alert('ลงทะเบียนสำเร็จ! เข้าสู่ระบบได้เลย');
-                    setIsRegistering(false); setError('');
+                    setDb(prev => ({ ...prev, users: [...prev.users, newUser] }));
+                    await supabase.from('users').insert([newUser]);
+                    alert('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ'); setIsReg(false); setErr('');
                 }
             };
 
             return (
-                <div className="flex-grow flex items-center justify-center bg-ttbNavy p-4 relative">
+                <div className="flex-grow flex items-center justify-center bg-ttbNavy p-4 relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-10 pointer-events-none" style={{backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)", backgroundSize: "30px 30px"}}></div>
                     <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md z-10 border-t-8 border-ttbOrange animate-fade-in">
                         <div className="text-center mb-8">
-                            <Icon path={Icons.Shield} className="w-16 h-16 mx-auto text-ttbBlue mb-2" />
+                            <div className="w-16 h-16 bg-ttbLightBlue rounded-full flex items-center justify-center mx-auto mb-4 text-ttbBlue"><Icon path={Icons.Shield} className="w-8 h-8"/></div>
                             <h1 className="text-2xl font-extrabold text-ttbNavy">Certification Platform</h1>
-                            <p className="text-sm text-gray-500 font-medium">ttb US Multi-Asset Index 15/5</p>
+                            <p className="text-sm text-gray-500 font-bold mt-1">ttb US Multi-Asset Index 15/5</p>
                         </div>
 
-                        {error && <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm font-medium flex items-center border border-red-200"><Icon path={Icons.AlertCircle} className="w-4 h-4 mr-2"/>{error}</div>}
+                        {err && <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm font-bold flex items-center border border-red-200"><Icon path={Icons.AlertCircle} className="w-4 h-4 mr-2"/>{err}</div>}
 
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-bold text-ttbNavy mb-1">Employee ID</label>
-                                <input type="text" name="empId" value={form.empId} onChange={handleChange} className="w-full p-3 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-ttbOrange outline-none" placeholder="เช่น cand_001" required />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-bold text-ttbNavy mb-1">First Name (Eng)</label>
-                                <input type="text" name="firstName" value={form.firstName} onChange={handleChange} className="w-full p-3 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-ttbOrange outline-none" placeholder="เช่น Somchai" required />
-                            </div>
+                            <div><label className="block text-sm font-bold text-ttbNavy mb-1">Employee ID</label>
+                            <input type="text" value={form.empId} onChange={e => setForm({...form, empId: e.target.value})} className="w-full p-3 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-ttbOrange outline-none font-medium" placeholder="เช่น cand_001" required /></div>
+                            <div><label className="block text-sm font-bold text-ttbNavy mb-1">First Name (English)</label>
+                            <input type="text" value={form.firstName} onChange={e => setForm({...form, firstName: e.target.value})} className="w-full p-3 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-ttbOrange outline-none font-medium" placeholder="เช่น Somchai" required /></div>
                             
-                            {isRegistering && (
-                                <div className="animate-fade-in space-y-4">
-                                    <div className="bg-blue-50 text-blue-800 text-xs p-3 rounded-lg border border-blue-100 font-medium">เฉพาะตำแหน่ง <b>Candidate (ผู้สอบ)</b> เท่านั้นที่ลงทะเบียนผ่านหน้านี้ได้</div>
-                                    <div>
-                                        <label className="block text-sm font-bold text-ttbNavy mb-1">Last Name (Eng)</label>
-                                        <input type="text" name="lastName" value={form.lastName} onChange={handleChange} className="w-full p-3 border rounded-xl bg-gray-50 outline-none" required />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-bold text-ttbNavy mb-1">Position</label>
-                                        <select name="position" value={form.position} onChange={handleChange} className="w-full p-3 border rounded-xl bg-white outline-none">
-                                            {POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}
-                                        </select>
-                                    </div>
+                            {isReg && (
+                                <div className="animate-fade-in space-y-4 pt-2 border-t border-gray-100">
+                                    <div className="bg-blue-50 text-ttbBlue text-xs p-3 rounded-lg font-bold border border-blue-100 flex"><Icon path={Icons.AlertCircle} className="w-4 h-4 mr-1 shrink-0"/> ระบบจำกัดสิทธิ์การสมัครเฉพาะ "Candidate" เท่านั้น</div>
+                                    <div><label className="block text-sm font-bold text-ttbNavy mb-1">Last Name (English)</label>
+                                    <input type="text" value={form.lastName} onChange={e => setForm({...form, lastName: e.target.value})} className="w-full p-3 border rounded-xl bg-gray-50 outline-none font-medium" required /></div>
+                                    <div><label className="block text-sm font-bold text-ttbNavy mb-1">Position</label>
+                                    <select value={form.position} onChange={e => setForm({...form, position: e.target.value})} className="w-full p-3 border rounded-xl bg-white outline-none font-medium">{POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-bold text-ttbNavy mb-1">Region (RH)</label>
-                                            <select name="rh" value={form.rh} onChange={(e) => setForm({...form, rh: e.target.value, zone: ''})} className="w-full p-3 border rounded-xl bg-white outline-none" required>
-                                                <option value="">เลือก...</option>
-                                                {Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold text-ttbNavy mb-1">Zone (District)</label>
-                                            <select name="zone" value={form.zone} onChange={handleChange} disabled={!form.rh} className="w-full p-3 border rounded-xl bg-white outline-none disabled:bg-gray-100" required>
-                                                <option value="">เลือก...</option>
-                                                {form.rh && RH_ZONES[form.rh].map(z => <option key={z} value={z}>{z}</option>)}
-                                            </select>
-                                        </div>
+                                        <div><label className="block text-sm font-bold text-ttbNavy mb-1">Region (RH)</label>
+                                        <select value={form.rh} onChange={e => setForm({...form, rh: e.target.value, zone: ''})} className="w-full p-3 border rounded-xl bg-white outline-none font-medium" required><option value="">เลือก RH...</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}</select></div>
+                                        <div><label className="block text-sm font-bold text-ttbNavy mb-1">Zone</label>
+                                        <select value={form.zone} onChange={e => setForm({...form, zone: e.target.value})} disabled={!form.rh} className="w-full p-3 border rounded-xl bg-white outline-none font-medium disabled:bg-gray-100" required><option value="">เลือก Zone...</option>{form.rh && RH_ZONES[form.rh].map(z => <option key={z} value={z}>{z}</option>)}</select></div>
                                     </div>
                                 </div>
                             )}
 
-                            <button type="submit" className="w-full bg-ttbBlue hover:bg-ttbNavy text-white font-bold py-3 rounded-xl shadow-md transition-colors mt-2">
-                                {isRegistering ? 'สร้างบัญชีผู้ใช้งาน' : 'เข้าสู่ระบบ'}
+                            <button type="submit" className="w-full bg-ttbBlue hover:bg-ttbNavy text-white font-bold py-3 rounded-xl shadow-md transition-colors mt-4 text-lg">
+                                {isReg ? 'สร้างบัญชีผู้ใช้งาน' : 'เข้าสู่ระบบ'}
                             </button>
                         </form>
-                        
-                        <div className="text-center mt-6">
-                            <button onClick={() => {setIsRegistering(!isRegistering); setError('');}} className="text-ttbOrange font-bold text-sm hover:underline">
-                                {isRegistering ? 'กลับไปหน้าเข้าสู่ระบบ' : 'ลงทะเบียนผู้ใช้งานใหม่ (Candidate)'}
-                            </button>
+                        <div className="text-center mt-6 pt-6 border-t border-gray-100">
+                            <button onClick={() => {setIsReg(!isReg); setErr('');}} className="text-ttbOrange font-bold text-sm hover:underline">{isReg ? 'ยกเลิกและกลับไปหน้าล็อกอิน' : 'ลงทะเบียนผู้ใช้งานใหม่ (Candidate)'}</button>
                         </div>
                     </div>
                 </div>
@@ -344,45 +265,46 @@
         }
 
         // ==========================================
-        // 6. CANDIDATE APP (Tabs & Sub-pages)
+        // 6. CANDIDATE APP 
         // ==========================================
-        function CandidateApp({ user, session, updateSession }) {
-            const [view, setView] = useState('home'); // home, pk, roleplay, trainer
+        function CandidateApp({ user, db, updateSession }) {
+            const session = db.sessions[user.id];
+            const [view, setView] = useState('home');
             
             const handleRetake = (section) => {
-                const isConfirmed = window.confirm(`คุณต้องการสอบ ${section === 'pk' ? 'Knowledge Test' : 'Roleplay'} ใหม่อีกครั้งใช่หรือไม่?\nนี่จะเป็นการสอบครั้งที่ ${(session[`${section}_attempts`] || 0) + 2}`);
-                if(isConfirmed) {
+                if(confirm(`คุณต้องการขอสอบใหม่ใช่หรือไม่?\n(นี่จะเป็นการสอบครั้งที่ ${(session[`${section}_attempts`] || 0) + 2})`)) {
                     if(section === 'pk') updateSession({ pk_passed: false, pk_score: null, pk_attempts: session.pk_attempts + 1 });
                     if(section === 'roleplay') updateSession({ roleplay_passed: false, roleplay_link: null, ai_feedback: null, roleplay_attempts: session.roleplay_attempts + 1 });
                     setView(section);
                 }
             };
 
-            const NavButton = ({ id, label, icon }) => (
-                <button onClick={() => setView(id)} className={`flex items-center px-4 py-3 rounded-lg font-bold text-sm whitespace-nowrap transition-colors mr-2 ${view === id ? 'bg-ttbNavy text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}>
-                    <Icon path={icon} className={`w-4 h-4 mr-2 ${view === id ? 'text-ttbOrange' : ''}`} /> {label}
+            const NavBtn = ({ id, label, icon }) => (
+                <button onClick={() => setView(id)} className={`flex items-center px-5 py-3 rounded-xl font-bold text-sm whitespace-nowrap transition-all mr-2 ${view === id ? 'bg-ttbNavy text-white shadow-md' : 'text-gray-500 hover:bg-gray-100 hover:text-ttbNavy'}`}>
+                    <Icon path={icon} className={`w-5 h-5 mr-2 ${view === id ? 'text-ttbOrange' : ''}`} /> {label}
                 </button>
             );
 
             return (
                 <div className="space-y-6">
-                    <div className="bg-white p-2 rounded-xl shadow-sm border border-gray-200 flex overflow-x-auto">
-                        <NavButton id="home" label="หน้าหลัก" icon={Icons.Home} />
-                        <NavButton id="pk" label="Knowledge Test" icon={Icons.Book} />
-                        <NavButton id="roleplay" label="Roleplay" icon={Icons.Video} />
-                        <NavButton id="trainer" label="Trainer Assessment" icon={Icons.Award} />
+                    <div className="bg-white p-2 rounded-2xl shadow-sm border border-gray-200 flex overflow-x-auto">
+                        <NavBtn id="home" label="หน้าหลัก (Home)" icon={Icons.Home} />
+                        <NavBtn id="pk" label="Knowledge Test" icon={Icons.Book} />
+                        <NavBtn id="roleplay" label="Roleplay" icon={Icons.Video} />
+                        <NavBtn id="trainer" label="Trainer Assessment" icon={Icons.Award} />
                     </div>
 
                     <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-200 relative animate-fade-in min-h-[500px]">
                         {view !== 'home' && (
-                            <button onClick={() => setView('home')} className="mb-6 text-gray-500 hover:text-ttbNavy flex items-center font-bold text-sm">
-                                <Icon path={Icons.ChevronLeft} className="w-5 h-5 mr-1" /> ย้อนกลับ (Back)
-                            </button>
+                            <div className="flex space-x-2 mb-6 border-b border-gray-100 pb-4">
+                                <button onClick={() => setView('home')} className="text-gray-500 hover:text-ttbNavy flex items-center font-bold text-sm bg-gray-50 hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors"><Icon path={Icons.ChevronLeft} className="w-5 h-5 mr-1" /> ย้อนกลับ</button>
+                                <button onClick={() => setView('home')} className="text-gray-500 hover:text-ttbNavy flex items-center font-bold text-sm bg-gray-50 hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors"><Icon path={Icons.Home} className="w-4 h-4 mr-2" /> หน้าหลัก</button>
+                            </div>
                         )}
                         
                         {view === 'home' && <CandidateHome session={session} setView={setView} />}
-                        {view === 'pk' && <KnowledgeTest session={session} updateSession={updateSession} onRetake={() => handleRetake('pk')} />}
-                        {view === 'roleplay' && <RoleplayTest session={session} updateSession={updateSession} onRetake={() => handleRetake('roleplay')} />}
+                        {view === 'pk' && <KnowledgeTest session={session} questions={db.questions} updateSession={updateSession} onRetake={() => handleRetake('pk')} />}
+                        {view === 'roleplay' && <RoleplayTest session={session} scenarios={db.scenarios} updateSession={updateSession} onRetake={() => handleRetake('roleplay')} />}
                         {view === 'trainer' && <TrainerStatus session={session} />}
                     </div>
                 </div>
@@ -390,116 +312,114 @@
         }
 
         function CandidateHome({ session, setView }) {
-            let progress = 0;
-            if (session.pk_passed) progress += 33;
-            if (session.roleplay_passed) progress += 33;
-            if (session.trainer_passed) progress += 34;
-
+            let prog = 0; if (session.pk_passed) prog += 33; if (session.roleplay_passed) prog += 33; if (session.trainer_passed) prog += 34;
             const Card = ({ title, desc, icon, passed, id, disabledText }) => (
-                <div className="border border-gray-200 p-6 rounded-2xl relative flex flex-col h-full hover:shadow-lg transition-shadow bg-white">
+                <div className="border border-gray-200 p-6 rounded-2xl relative flex flex-col h-full hover:shadow-xl transition-all duration-300 bg-white group">
                     {passed && <div className="pass-stamp">PASS</div>}
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${passed ? 'bg-green-100 text-green-600' : 'bg-ttbLightBlue text-ttbBlue'}`}>
-                        <Icon path={icon} className="w-6 h-6" />
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-5 transition-colors ${passed ? 'bg-green-100 text-green-600' : 'bg-ttbLightBlue text-ttbBlue group-hover:bg-ttbBlue group-hover:text-white'}`}>
+                        <Icon path={icon} className="w-7 h-7" />
                     </div>
-                    <h4 className="font-bold text-lg text-ttbNavy mb-2">{title}</h4>
-                    <p className="text-sm text-gray-500 mb-6 flex-grow">{desc}</p>
-                    {disabledText ? (
-                        <button disabled className="w-full py-2 bg-gray-100 text-gray-400 font-bold rounded-lg cursor-not-allowed">{disabledText}</button>
-                    ) : passed ? (
-                        <button onClick={() => setView(id)} className="w-full py-2 bg-gray-100 text-ttbNavy font-bold rounded-lg hover:bg-gray-200 border border-gray-300">ดูผลลัพธ์</button>
-                    ) : (
-                        <button onClick={() => setView(id)} className="w-full py-2 bg-ttbBlue text-white font-bold rounded-lg hover:bg-ttbNavy shadow-md">เข้าทำรายการ</button>
-                    )}
+                    <h4 className="font-extrabold text-xl text-ttbNavy mb-2">{title}</h4>
+                    <p className="text-sm text-gray-500 mb-8 flex-grow font-medium leading-relaxed">{desc}</p>
+                    {disabledText ? <button disabled className="w-full py-3 bg-gray-100 text-gray-400 font-bold rounded-xl cursor-not-allowed border">{disabledText}</button> : passed ? <button onClick={() => setView(id)} className="w-full py-3 bg-white text-ttbNavy font-bold rounded-xl hover:bg-gray-50 border-2 border-gray-200 transition-colors shadow-sm">ดูผลลัพธ์</button> : <button onClick={() => setView(id)} className="w-full py-3 bg-ttbBlue text-white font-bold rounded-xl hover:bg-ttbNavy shadow-md transition-colors text-lg">เข้าทำรายการ</button>}
                 </div>
             );
 
             return (
                 <div className="space-y-8 animate-fade-in">
-                    <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200">
-                        <div className="flex justify-between items-end mb-2">
-                            <h3 className="font-bold text-ttbNavy">ความคืบหน้าการทดสอบ (Dashboard)</h3>
-                            <span className="text-xl font-black text-ttbOrange">{progress}%</span>
+                    <div className="bg-gradient-to-r from-gray-50 to-white p-8 rounded-3xl border border-gray-200 shadow-sm">
+                        <div className="flex justify-between items-end mb-4">
+                            <div><h3 className="text-xl font-extrabold text-ttbNavy">ภาพรวมความคืบหน้า</h3><p className="text-sm text-gray-500 mt-1 font-medium">ทำแบบทดสอบให้ครบทั้ง 3 ส่วนเพื่อรับ Certification</p></div>
+                            <span className="text-3xl font-black text-ttbOrange">{prog}%</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-3">
-                            <div className="bg-gradient-to-r from-ttbBlue to-ttbOrange h-3 rounded-full transition-all duration-1000" style={{width: `${progress}%`}}></div>
+                        <div className="w-full bg-gray-200 rounded-full h-4 shadow-inner overflow-hidden">
+                            <div className="bg-gradient-to-r from-ttbBlue to-ttbOrange h-4 rounded-full transition-all duration-1000 ease-out" style={{width: `${prog}%`}}></div>
                         </div>
                     </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <Card title="1. Knowledge Test" desc="ทดสอบความรู้ 30 ข้อ (เกณฑ์ 80%)" icon={Icons.Book} passed={session.pk_passed} id="pk" />
-                        <Card title="2. Roleplay" desc="อัดวิดีโอนำเสนอและรับคำแนะนำ AI" icon={Icons.Video} passed={session.roleplay_passed} id="roleplay" disabledText={!session.pk_passed && "ต้องผ่านส่วนที่ 1 ก่อน"} />
-                        <Card title="3. Trainer Assessment" desc="สัมภาษณ์สดกับเทรนเนอร์" icon={Icons.Award} passed={session.trainer_passed} id="trainer" disabledText={!session.roleplay_passed && "ต้องผ่านส่วนที่ 2 ก่อน"} />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <Card title="1. Knowledge Test" desc="ทดสอบความรู้ผลิตภัณฑ์ (เกณฑ์การผ่าน 80%)" icon={Icons.Book} passed={session.pk_passed} id="pk" />
+                        <Card title="2. Roleplay" desc="อัดวิดีโอนำเสนอตามโจทย์จำลอง พร้อมรับคำแนะนำ AI" icon={Icons.Video} passed={session.roleplay_passed} id="roleplay" disabledText={!session.pk_passed && "ต้องผ่าน Knowledge Test ก่อน"} />
+                        <Card title="3. Trainer Assessment" desc="สัมภาษณ์สดและตอบข้อโต้แย้งกับเทรนเนอร์" icon={Icons.Award} passed={session.trainer_passed} id="trainer" disabledText={!session.roleplay_passed && "ต้องผ่าน Roleplay ก่อน"} />
                     </div>
                 </div>
             );
         }
 
-        function KnowledgeTest({ session, updateSession, onRetake }) {
+        function KnowledgeTest({ session, questions, updateSession, onRetake }) {
             const [qIdx, setQIdx] = useState(0);
             const [answers, setAnswers] = useState({});
             const [started, setStarted] = useState(false);
 
-            if (session.pk_score !== null) return <ResultScreen score={session.pk_score} label="คะแนนความรู้ผลิตภัณฑ์" passed={session.pk_passed} onRetake={onRetake} />;
+            if (!questions || questions.length === 0) return <div>กำลังโหลดข้อสอบ...</div>;
+
+            if (session.pk_score !== null) return (
+                <div className="animate-fade-in text-center">
+                    <ResultScreen score={session.pk_score} label="ผลสอบ Knowledge Test" passed={session.pk_passed} />
+                    {!session.pk_passed && (
+                        <div className="mt-8 max-w-sm mx-auto">
+                            <button onClick={onRetake} className="w-full bg-ttbOrange hover:bg-orange-600 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex justify-center items-center text-lg"><Icon path={Icons.Refresh} className="w-5 h-5 mr-2" /> ขอทดสอบใหม่ด้วยตัวเอง</button>
+                            <p className="text-xs text-gray-400 mt-3 font-bold">จำนวนครั้งที่สอบแล้ว: {session.pk_attempts + 1} ครั้ง</p>
+                        </div>
+                    )}
+                </div>
+            );
             
             if (!started) return (
-                <div className="text-center py-12 max-w-md mx-auto animate-fade-in">
-                    <Icon path={Icons.Book} className="w-16 h-16 text-ttbBlue mx-auto mb-4" />
-                    <h3 className="text-2xl font-bold text-ttbNavy mb-2">Knowledge Test</h3>
-                    <p className="text-gray-600 mb-8">ข้อสอบ 5 ข้อ (Mock) เกณฑ์ผ่าน 80%</p>
-                    <button onClick={() => setStarted(true)} className="w-full bg-ttbBlue hover:bg-ttbNavy text-white font-bold py-3 rounded-xl shadow-md">เริ่มทำข้อสอบ</button>
+                <div className="text-center py-16 max-w-lg mx-auto animate-fade-in">
+                    <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6"><Icon path={Icons.Book} className="w-12 h-12 text-ttbBlue" /></div>
+                    <h3 className="text-3xl font-extrabold text-ttbNavy mb-4">Product Knowledge Test</h3>
+                    <p className="text-gray-600 mb-10 text-lg leading-relaxed font-medium">แบบทดสอบความรู้ผลิตภัณฑ์และเงื่อนไขต่างๆ<br/>เกณฑ์การผ่านคือ <b>80% ขึ้นไป</b></p>
+                    <button onClick={() => setStarted(true)} className="w-full bg-ttbBlue hover:bg-ttbNavy text-white font-bold py-4 rounded-xl shadow-lg text-xl transition-all">เริ่มทำข้อสอบ</button>
                 </div>
             );
 
-            const q = EXAM_QUESTIONS[qIdx];
+            const q = questions[qIdx];
             const submit = () => {
-                const correct = EXAM_QUESTIONS.filter((q, i) => answers[i] === q.answer).length;
-                const score = Math.round((correct / EXAM_QUESTIONS.length) * 100);
-                updateSession({ pk_score: score, pk_passed: score >= 80 });
+                const correct = questions.filter((q, i) => answers[i] === q.answer).length;
+                const score = Math.round((correct / questions.length) * 100);
+                updateSession({ pk_score: score, pk_passed: score >= 80, overall_status: 'IN_PROGRESS' });
             };
 
             return (
-                <div className="max-w-2xl mx-auto animate-fade-in">
-                    <div className="flex justify-between items-center mb-6 pb-4 border-b">
-                        <h3 className="font-bold text-ttbNavy">ข้อที่ {qIdx + 1} / {EXAM_QUESTIONS.length}</h3>
-                        <span className="text-red-500 font-bold bg-red-50 px-3 py-1 rounded-lg flex items-center"><Icon path={Icons.Clock} className="w-4 h-4 mr-2"/> 59:59</span>
+                <div className="max-w-3xl mx-auto animate-fade-in pt-4">
+                    <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
+                        <h3 className="text-xl font-extrabold text-ttbNavy flex items-center"><Icon path={Icons.Book} className="w-6 h-6 mr-2 text-ttbOrange"/> ข้อที่ {qIdx + 1} <span className="text-gray-400 font-medium ml-2 text-lg">/ {questions.length}</span></h3>
+                        <span className="text-red-600 font-bold bg-red-50 px-4 py-2 rounded-xl flex items-center border border-red-100 shadow-sm"><Icon path={Icons.Clock} className="w-5 h-5 mr-2"/> 59:59</span>
                     </div>
-                    <p className="text-lg font-medium mb-6">{q.question}</p>
-                    <div className="space-y-3 mb-8">
-                        {q.options.map((opt, i) => (
-                            <button key={i} onClick={() => setAnswers({...answers, [qIdx]: opt})} className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-center ${answers[qIdx] === opt ? 'border-ttbBlue bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}`}>
-                                <span className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 font-bold text-sm ${answers[qIdx] === opt ? 'bg-ttbBlue text-white' : 'bg-gray-200 text-gray-600'}`}>{['A','B','C','D'][i]}</span>
-                                <span className={answers[qIdx] === opt ? 'font-bold text-ttbNavy' : ''}>{opt}</span>
+                    <p className="text-2xl font-bold text-gray-800 mb-8 leading-relaxed">{q.question}</p>
+                    <div className="space-y-4 mb-10">
+                        {JSON.parse(q.options).map((opt, i) => (
+                            <button key={i} onClick={() => setAnswers({...answers, [qIdx]: opt})} className={`w-full text-left p-5 rounded-2xl border-2 transition-all duration-200 flex items-center ${answers[qIdx] === opt ? 'border-ttbBlue bg-blue-50 shadow-md transform scale-[1.01]' : 'border-gray-200 bg-white hover:border-blue-300'}`}>
+                                <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-4 font-black text-sm ${answers[qIdx] === opt ? 'bg-ttbBlue text-white' : 'bg-gray-100 text-gray-400'}`}>{['A','B','C','D'][i]}</span>
+                                <span className={`text-lg ${answers[qIdx] === opt ? 'font-bold text-ttbNavy' : 'font-medium text-gray-700'}`}>{opt}</span>
                             </button>
                         ))}
                     </div>
-                    <div className="flex justify-between">
-                        <button onClick={() => setQIdx(qIdx-1)} disabled={qIdx === 0} className="px-6 py-2 bg-gray-100 text-gray-600 font-bold rounded-lg disabled:opacity-50">ย้อนกลับ</button>
-                        {qIdx === EXAM_QUESTIONS.length - 1 ? 
-                            <button onClick={submit} disabled={Object.keys(answers).length < EXAM_QUESTIONS.length} className="px-8 py-2 bg-ttbOrange text-white font-bold rounded-lg disabled:opacity-50 shadow-md">ส่งคำตอบ</button> :
-                            <button onClick={() => setQIdx(qIdx+1)} className="px-8 py-2 bg-ttbNavy text-white font-bold rounded-lg">ถัดไป</button>
+                    <div className="flex justify-between pt-6 border-t border-gray-200">
+                        <button onClick={() => setQIdx(qIdx-1)} disabled={qIdx === 0} className="px-8 py-3 bg-gray-100 text-gray-500 font-bold rounded-xl disabled:opacity-30 hover:bg-gray-200 transition-colors text-lg">ย้อนกลับ</button>
+                        {qIdx === questions.length - 1 ? 
+                            <button onClick={submit} disabled={Object.keys(answers).length < questions.length} className="px-10 py-3 bg-ttbOrange text-white font-extrabold rounded-xl disabled:opacity-50 shadow-lg hover:bg-orange-600 transition-colors text-lg">ส่งคำตอบ</button> :
+                            <button onClick={() => setQIdx(qIdx+1)} className="px-10 py-3 bg-ttbNavy text-white font-bold rounded-xl shadow-md hover:bg-[#001f44] transition-colors text-lg">ถัดไป</button>
                         }
                     </div>
                 </div>
             );
         }
 
-        function RoleplayTest({ session, updateSession, onRetake }) {
+        function RoleplayTest({ session, scenarios, updateSession, onRetake }) {
             const [link, setLink] = useState('');
             const [evaluating, setEvaluating] = useState(false);
 
             useEffect(() => {
-                if (!session.roleplay_assigned && session.pk_passed) {
-                    updateSession({ roleplay_assigned: SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)] });
+                if (!session.roleplay_assigned && session.pk_passed && scenarios.length > 0) {
+                    updateSession({ roleplay_assigned: scenarios[Math.floor(Math.random() * scenarios.length)] });
                 }
-            }, []);
+            }, [scenarios]);
 
             const evaluateVideo = async (e) => {
-                e.preventDefault();
-                setEvaluating(true);
+                e.preventDefault(); setEvaluating(true);
                 try {
-                    const prompt = `ประเมินการนำเสนอ ttb US Multi-Asset 15/5 ให้โจทย์: "${session.roleplay_assigned.target}". 
-                    ส่งผลลัพธ์เป็น JSON เท่านั้น: {"score": 85, "passed": true, "strengths": "อธิบายเงินต้น 100% ได้ดี", "improvements": "เพิ่มเปรียบเทียบเงินฝาก"}`;
-                    
+                    const prompt = `ประเมินการนำเสนอผลิตภัณฑ์ 15/5 จากโจทย์: "${session.roleplay_assigned.target}" บริบท: "${session.roleplay_assigned.context}". ส่งผลลัพธ์เป็น JSON เท่านั้น: { "score": 85, "passed": true, "strengths": "อธิบายเงินต้น 100% ได้ดี", "improvements": "เพิ่มเปรียบเทียบเงินฝาก" }`;
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`, {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } })
@@ -508,55 +428,71 @@
                     const aiRes = JSON.parse(data.candidates[0].content.parts[0].text);
                     updateSession({ roleplay_link: link, ai_feedback: aiRes, roleplay_passed: aiRes.passed });
                 } catch(err) {
-                    updateSession({ roleplay_link: link, roleplay_passed: true, ai_feedback: { score: 82, passed: true, strengths: "นำเสนอด้วยความมั่นใจ อธิบาย Principal Protect ได้ถูกต้อง", improvements: "ควรเน้นย้ำเรื่องเงื่อนไขเวลา 15 ปีให้ชัดเจนกว่านี้" }});
+                    updateSession({ roleplay_link: link, roleplay_passed: true, ai_feedback: { score: 85, passed: true, strengths: "อธิบายกลไกได้ครบถ้วน น้ำเสียงมั่นใจ ตอบโต้ข้อโต้แย้งได้ตรงจุด", improvements: "ควรยกตัวอย่างตัวเลขให้เห็นภาพชัดเจนขึ้น" }});
                 }
                 setEvaluating(false);
             };
 
+            if (!session.roleplay_assigned) return <div>กำลังโหลดโจทย์...</div>;
+
             if (session.ai_feedback) return (
-                <div className="animate-fade-in">
-                    <ResultScreen score={session.ai_feedback.score} label="คะแนนของคุณ (AI)" passed={session.roleplay_passed} onRetake={onRetake} />
-                    <div className="grid md:grid-cols-2 gap-6 mt-8 max-w-4xl mx-auto">
-                        <div className="bg-emerald-50 p-6 rounded-xl border border-emerald-200">
-                            <h4 className="font-bold text-emerald-800 flex items-center mb-2"><Icon path={Icons.Star} className="w-5 h-5 mr-2"/> จุดแข็ง</h4>
-                            <p className="text-emerald-700 text-sm">{session.ai_feedback.strengths}</p>
+                <div className="animate-fade-in text-center pt-4">
+                    <ResultScreen score={session.ai_feedback.score} label="คะแนนของคุณ" passed={session.roleplay_passed} />
+                    <div className="grid md:grid-cols-2 gap-6 mt-10 max-w-5xl mx-auto text-left">
+                        <div className="bg-emerald-50 p-8 rounded-2xl border-l-8 border-emerald-500 shadow-sm">
+                            <h4 className="font-extrabold text-emerald-900 text-xl flex items-center mb-4"><Icon path={Icons.Star} className="w-6 h-6 mr-2 text-emerald-600"/> จุดแข็ง</h4>
+                            <p className="text-emerald-800 font-medium leading-relaxed">{session.ai_feedback.strengths}</p>
                         </div>
-                        <div className="bg-orange-50 p-6 rounded-xl border border-orange-200">
-                            <h4 className="font-bold text-orange-800 flex items-center mb-2"><Icon path={Icons.Activity} className="w-5 h-5 mr-2"/> คำแนะนำเพิ่มเติม</h4>
-                            <p className="text-orange-700 text-sm">{session.ai_feedback.improvements}</p>
+                        <div className="bg-orange-50 p-8 rounded-2xl border-l-8 border-ttbOrange shadow-sm">
+                            <h4 className="font-extrabold text-[#b35f00] text-xl flex items-center mb-4"><Icon path={Icons.Activity} className="w-6 h-6 mr-2 text-ttbOrange"/> คำแนะนำเพิ่มเติม</h4>
+                            <p className="text-[#995200] font-medium leading-relaxed">{session.ai_feedback.improvements}</p>
                         </div>
                     </div>
+                    {!session.roleplay_passed && (
+                        <div className="mt-10 max-w-sm mx-auto">
+                            <button onClick={onRetake} className="w-full bg-ttbOrange hover:bg-orange-600 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex justify-center items-center text-lg"><Icon path={Icons.Refresh} className="w-5 h-5 mr-2" /> ขอทดสอบใหม่ด้วยตัวเอง</button>
+                            <p className="text-xs text-gray-400 mt-3 font-bold">จำนวนครั้งที่อัปโหลดแล้ว: {session.roleplay_attempts + 1} ครั้ง</p>
+                        </div>
+                    )}
                 </div>
             );
 
             return (
-                <div className="flex flex-col md:flex-row gap-8 animate-fade-in">
+                <div className="flex flex-col md:flex-row gap-8 animate-fade-in pt-4">
                     <div className="md:w-1/2 space-y-6">
-                        <div className="bg-ttbNavy text-white p-6 rounded-xl shadow-md">
-                            <p className="text-ttbOrange text-xs font-bold uppercase mb-2 flex items-center"><Icon path={Icons.CheckCircle} className="w-4 h-4 mr-1"/> โจทย์ Roleplay ถูกล็อกแล้ว</p>
-                            <h3 className="text-xl font-bold mb-2">{session.roleplay_assigned?.target}</h3>
-                            <p className="text-blue-100 text-sm leading-relaxed">{session.roleplay_assigned?.text}</p>
+                        <div className="bg-ttbNavy text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
+                            <div className="absolute right-0 top-0 opacity-10 transform scale-150 -translate-y-8"><Icon path={Icons.Users} className="w-40 h-40"/></div>
+                            <div className="relative z-10">
+                                <p className="text-ttbOrange text-sm font-black uppercase mb-3 flex items-center tracking-widest"><Icon path={Icons.CheckCircle} className="w-5 h-5 mr-2"/> โจทย์ Roleplay ถูกล็อกแล้ว</p>
+                                <h3 className="text-3xl font-extrabold mb-4">{session.roleplay_assigned.target}</h3>
+                                <div className="bg-white/10 p-4 rounded-xl border border-white/20 mt-4">
+                                    <p className="text-blue-50 text-lg leading-relaxed font-medium">{session.roleplay_assigned.context}</p>
+                                </div>
+                            </div>
                         </div>
-                        <div className="bg-gray-50 border border-gray-200 p-5 rounded-xl">
-                            <h4 className="font-bold text-ttbNavy mb-3 flex items-center"><Icon path={Icons.AlertCircle} className="w-5 h-5 mr-2 text-ttbOrange"/> เงื่อนไขการอัดคลิปวิดีโอ</h4>
-                            <ul className="text-sm text-gray-700 space-y-2">
-                                <li>• ความยาวไม่เกิน <b className="text-red-500">3 นาที</b></li>
-                                <li>• <b>ต้องเห็นหน้า</b> (เพื่อประเมินสีหน้า ท่าทาง ความมั่นใจ)</li>
-                                <li>• น้ำเสียงชัดเจน ไม่มีเสียงรบกวน</li>
+                        <div className="bg-gray-50 border border-gray-200 p-6 rounded-2xl">
+                            <h4 className="font-extrabold text-ttbNavy text-xl mb-4 flex items-center"><Icon path={Icons.AlertCircle} className="w-6 h-6 mr-2 text-ttbOrange"/> เงื่อนไขการอัดคลิปวิดีโอ</h4>
+                            <ul className="text-base text-gray-700 space-y-3 font-medium">
+                                <li className="flex items-start"><span className="text-red-500 font-bold mr-2">•</span> ความยาวไม่เกิน <b className="text-red-600 ml-1">3 นาที</b></li>
+                                <li className="flex items-start"><span className="text-ttbBlue font-bold mr-2">•</span> <b>ต้องเห็นหน้าผู้พูด</b> (เพื่อประเมินความมั่นใจ)</li>
+                                <li className="flex items-start"><span className="text-ttbBlue font-bold mr-2">•</span> น้ำเสียงต้องชัดเจน อยู่ในสภาพแวดล้อมที่ไม่มีเสียงรบกวน</li>
                             </ul>
                         </div>
                     </div>
                     <div className="md:w-1/2">
-                        <div className="bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
-                            <div className="bg-gray-100 rounded-lg h-40 mb-6 flex flex-col items-center justify-center border-2 border-dashed border-gray-300">
-                                <Icon path={Icons.Upload} className="w-8 h-8 text-gray-400 mb-2" />
-                                <span className="text-sm text-gray-500 font-bold">[ภาพแสดงวิธีอัปโหลด YouTube Unlisted]</span>
+                        <div className="bg-white border border-gray-200 p-8 rounded-2xl shadow-sm h-full flex flex-col">
+                            <h4 className="font-extrabold text-ttbNavy text-xl mb-4 flex items-center"><Icon path={Icons.Video} className="w-6 h-6 mr-2 text-red-500"/> ส่งลิงก์วิดีโอเพื่อประเมิน</h4>
+                            <div className="bg-gray-100 rounded-xl flex-grow min-h-[220px] mb-6 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 relative">
+                                <div className="text-center p-6 z-10">
+                                    <div className="bg-white p-3 rounded-full shadow-sm w-max mx-auto mb-3 text-red-500"><Icon path={Icons.Video} className="w-8 h-8" /></div>
+                                    <p className="text-sm text-gray-500 font-bold">[ภาพแสดงวิธีการตั้งค่า YouTube Unlisted]</p>
+                                </div>
                             </div>
-                            <form onSubmit={evaluateVideo}>
-                                <label className="block text-sm font-bold text-ttbNavy mb-2">วางลิงก์วิดีโอ (YouTube)</label>
-                                <input type="url" required value={link} onChange={e => setLink(e.target.value)} placeholder="https://youtube.com/watch?v=..." className="w-full p-3 border rounded-xl mb-4 focus:ring-2 focus:ring-ttbBlue outline-none" />
-                                <button type="submit" disabled={evaluating} className="w-full bg-ttbBlue hover:bg-ttbNavy text-white font-bold py-3 rounded-xl shadow-md flex justify-center items-center">
-                                    {evaluating ? <span className="flex items-center"><Icon path={Icons.Refresh} className="w-5 h-5 mr-2 animate-spin"/> กำลังวิเคราะห์...</span> : 'ส่งประเมินผล'}
+                            <form onSubmit={evaluateVideo} className="mt-auto">
+                                <label className="block text-sm font-bold text-ttbNavy mb-2">วางลิงก์วิดีโอ (YouTube) ที่นี่</label>
+                                <input type="url" required value={link} onChange={e => setLink(e.target.value)} placeholder="https://youtube.com/watch?v=..." className="w-full p-4 border-2 rounded-xl mb-4 focus:ring-4 focus:ring-blue-100 focus:border-ttbBlue outline-none font-medium transition-all text-lg" />
+                                <button type="submit" disabled={evaluating} className="w-full bg-ttbBlue hover:bg-ttbNavy text-white font-extrabold py-4 rounded-xl shadow-lg disabled:opacity-70 transition-colors text-lg flex justify-center items-center">
+                                    {evaluating ? <span className="flex items-center"><Icon path={Icons.Refresh} className="w-6 h-6 mr-2 animate-spin"/> AI กำลังวิเคราะห์วิดีโอ...</span> : 'ส่งประเมินผล'}
                                 </button>
                             </form>
                         </div>
@@ -567,34 +503,29 @@
 
         function TrainerStatus({ session }) {
             if (!session.trainer_score) return (
-                <div className="text-center py-16 animate-fade-in">
-                    <Icon path={Icons.Award} className="w-20 h-20 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-2xl font-bold text-ttbNavy mb-2">สถานะ: รอการประเมิน</h3>
-                    <p className="text-gray-500">โปรดรอการสัมภาษณ์สดจากเทรนเนอร์ประจำพื้นที่ของคุณ</p>
+                <div className="text-center py-20 animate-fade-in max-w-lg mx-auto">
+                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6"><Icon path={Icons.Award} className="w-12 h-12 text-gray-400" /></div>
+                    <h3 className="text-3xl font-extrabold text-ttbNavy mb-4">สถานะ: รอการประเมิน</h3>
+                    <p className="text-gray-500 font-medium text-lg leading-relaxed">ข้อมูลของคุณถูกส่งเข้าระบบเรียบร้อยแล้ว<br/>โปรดรอการติดต่อนัดหมายสัมภาษณ์สดจากเทรนเนอร์ประจำพื้นที่</p>
                 </div>
             );
-            return <ResultScreen score={session.trainer_score} label="คะแนนจาก Trainer" passed={session.trainer_passed} />;
+            return <div className="pt-4"><ResultScreen score={session.trainer_score} label="คะแนนจาก Trainer Assessment" passed={session.trainer_passed} /></div>;
         }
 
-        function ResultScreen({ score, label, passed, onRetake }) {
+        function ResultScreen({ score, label, passed }) {
             return (
-                <div className="text-center py-8">
-                    <h3 className="text-2xl font-extrabold text-ttbNavy mb-8">{label}</h3>
+                <div className="text-center flex flex-col items-center">
+                    <h3 className="text-3xl font-extrabold text-ttbNavy mb-10">{label}</h3>
                     <div className="inline-block relative">
-                        <svg className="w-40 h-40 transform -rotate-90">
-                            <circle cx="80" cy="80" r="70" stroke="#f3f4f6" strokeWidth="12" fill="none" />
-                            <circle cx="80" cy="80" r="70" stroke={passed ? '#10b981' : '#ef4444'} strokeWidth="12" fill="none" strokeDasharray="439.8" strokeDashoffset={439.8 - (score/100)*439.8} strokeLinecap="round" className="transition-all duration-1000" />
+                        <svg className="w-56 h-56 transform -rotate-90 drop-shadow-md">
+                            <circle cx="112" cy="112" r="96" stroke="#f1f5f9" strokeWidth="16" fill="none" />
+                            <circle cx="112" cy="112" r="96" stroke={passed ? '#10b981' : '#ef4444'} strokeWidth="16" fill="none" strokeDasharray="603.18" strokeDashoffset={603.18 - (score/100)*603.18} strokeLinecap="round" className="transition-all duration-1000 ease-out" />
                         </svg>
-                        <div className="absolute inset-0 flex items-center justify-center text-4xl font-black text-ttbNavy">{score}<span className="text-lg text-gray-400">%</span></div>
+                        <div className="absolute inset-0 flex items-center justify-center flex-col">
+                            <span className="text-5xl font-black text-ttbNavy">{score}<span className="text-2xl text-gray-400 font-medium">%</span></span>
+                        </div>
                     </div>
-                    <div className="mt-6">
-                        <span className={`px-4 py-2 rounded-full text-sm font-bold ${passed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{passed ? 'ผ่านเกณฑ์' : 'ไม่ผ่านเกณฑ์'}</span>
-                    </div>
-                    {!passed && onRetake && (
-                        <button onClick={onRetake} className="mt-8 bg-ttbOrange hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-xl shadow-md inline-flex items-center">
-                            <Icon path={Icons.Refresh} className="w-5 h-5 mr-2" /> ขอทดสอบใหม่ด้วยตัวเอง
-                        </button>
-                    )}
+                    <div className="mt-8"><span className={`px-6 py-2.5 rounded-full text-base font-extrabold shadow-sm ${passed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{passed ? 'ผ่านเกณฑ์ (PASS)' : 'ไม่ผ่านเกณฑ์ (FAIL)'}</span></div>
                 </div>
             );
         }
@@ -602,98 +533,109 @@
         // ==========================================
         // 7. TRAINER APP
         // ==========================================
-        function TrainerApp({ trainer, users, sessions, updateSession }) {
+        function TrainerApp({ trainer, db, updateSession }) {
             const [filterRH, setFilterRH] = useState('All');
             const [evalUser, setEvalUser] = useState(null);
 
-            const cands = users.filter(u => u.role === 'Candidate' && sessions[u.id]);
+            const cands = db.users.filter(u => u.role === 'Candidate' && db.sessions[u.id]);
             const filtered = filterRH === 'All' ? cands : cands.filter(c => c.rh === filterRH);
             
-            if (evalUser) return <TrainerEvalScreen candidate={evalUser} session={sessions[evalUser.id]} trainer={trainer} updateSession={updateSession} onBack={() => setEvalUser(null)} />;
+            if (evalUser) return <TrainerEvalScreen candidate={evalUser} session={db.sessions[evalUser.id]} trainer={trainer} rubrics={db.rubrics} updateSession={updateSession} onBack={() => setEvalUser(null)} />;
 
             return (
-                <div className="space-y-6 animate-fade-in">
-                    <div className="flex justify-between items-center">
-                        <h2 className="text-2xl font-bold text-ttbNavy">Trainer Dashboard</h2>
-                        <select value={filterRH} onChange={e => setFilterRH(e.target.value)} className="border p-2 rounded-lg font-bold text-ttbBlue outline-none shadow-sm">
-                            <option value="All">ทุกสังกัด (All RH)</option>
-                            {Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}
-                        </select>
+                <div className="space-y-8 animate-fade-in">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+                        <div><h2 className="text-3xl font-extrabold text-ttbNavy">Trainer Dashboard</h2><p className="text-gray-500 font-medium mt-1">สรุปข้อมูลผู้เข้าสอบและการประเมิน</p></div>
+                        <div className="mt-4 md:mt-0 flex items-center bg-white p-2 rounded-xl shadow-sm border border-gray-200">
+                            <span className="text-sm font-bold text-gray-500 mr-3 ml-2">กรองตามสังกัด:</span>
+                            <select value={filterRH} onChange={e => setFilterRH(e.target.value)} className="border-none bg-gray-50 p-2 rounded-lg font-bold text-ttbBlue outline-none cursor-pointer">
+                                <option value="All">ทุกสังกัด (All RH)</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}
+                            </select>
+                        </div>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                        {[{t: "เริ่มสอบ", v: filtered.length, c: "bg-blue-50"}, {t: "ผ่าน (PASS)", v: filtered.filter(c => sessions[c.id].trainer_passed).length, c: "bg-green-50"}, 
-                          {t: "รอประเมิน (Pending)", v: filtered.filter(c => sessions[c.id].roleplay_passed && !sessions[c.id].trainer_passed).length, c: "bg-red-50 border border-red-200"},
-                          {t: "กำลังทำข้อสอบ", v: filtered.filter(c => !sessions[c.id].roleplay_passed).length, c: "bg-gray-50"}].map((s,i) => (
-                            <div key={i} className={`p-4 rounded-xl ${s.c}`}>
-                                <p className="text-xs font-bold text-gray-500">{s.t}</p><p className="text-3xl font-black text-ttbNavy">{s.v}</p>
-                            </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        {[{t: "เริ่มสอบ", v: filtered.length, c: "bg-blue-50 border-blue-100"}, 
+                          {t: "กำลังทำข้อสอบ", v: filtered.filter(c => !db.sessions[c.id].roleplay_passed).length, c: "bg-gray-50 border-gray-200"},
+                          {t: "รอประเมินสด (Pending)", v: filtered.filter(c => db.sessions[c.id].roleplay_passed && !db.sessions[c.id].trainer_passed).length, c: "bg-red-50 border-red-200 shadow-md ring-2 ring-red-100 transform scale-105"},
+                          {t: "ผ่านภาพรวม (CERTIFIED)", v: filtered.filter(c => db.sessions[c.id].overall_status === 'CERTIFIED').length, c: "bg-green-50 border-green-200"}
+                        ].map((s,i) => (
+                            <div key={i} className={`p-6 rounded-2xl border ${s.c} transition-all`}><p className="text-sm font-extrabold text-gray-600 mb-2 uppercase tracking-wide opacity-80">{s.t}</p><p className="text-4xl font-black text-ttbNavy">{s.v}</p></div>
                         ))}
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <table className="w-full text-left">
-                            <thead className="bg-ttbNavy text-white text-sm"><tr><th className="p-4">Candidate</th><th className="p-4">RH / Zone</th><th className="p-4">โจทย์ Roleplay</th><th className="p-4">Action</th></tr></thead>
-                            <tbody>
-                                {filtered.filter(c => sessions[c.id].roleplay_passed && !sessions[c.id].trainer_passed).map(c => (
-                                    <tr key={c.id} className="border-b hover:bg-gray-50">
-                                        <td className="p-4"><p className="font-bold text-ttbNavy">{c.first_name_en} {c.last_name_en}</p><p className="text-xs text-gray-500">{c.employee_id}</p></td>
-                                        <td className="p-4"><span className="font-bold text-ttbBlue">{c.rh}</span> <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">{c.zone}</span></td>
-                                        <td className="p-4 text-sm text-gray-600 truncate max-w-[200px]">{sessions[c.id].roleplay_assigned?.target}</td>
-                                        <td className="p-4"><button onClick={() => setEvalUser(c)} className="bg-ttbOrange text-white font-bold px-4 py-2 rounded-lg hover:bg-orange-600 shadow-sm text-sm">เริ่มประเมิน</button></td>
-                                    </tr>
-                                ))}
-                                {filtered.filter(c => sessions[c.id].roleplay_passed && !sessions[c.id].trainer_passed).length === 0 && (
-                                    <tr><td colSpan="4" className="text-center p-8 text-gray-500">ไม่มีผู้รอประเมิน</td></tr>
-                                )}
-                            </tbody>
-                        </table>
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div className="p-5 border-b border-gray-200 bg-gray-50"><h3 className="font-extrabold text-ttbNavy text-lg">ผู้เข้าสอบที่รอการประเมิน (Pending)</h3></div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead className="bg-ttbNavy text-white text-sm"><tr><th className="p-5">Candidate Name</th><th className="p-5">RH / Zone</th><th className="p-5">โจทย์ Roleplay ที่ได้รับ</th><th className="p-5 text-center">Action</th></tr></thead>
+                                <tbody>
+                                    {filtered.filter(c => db.sessions[c.id].roleplay_passed && !db.sessions[c.id].trainer_passed).map(c => (
+                                        <tr key={c.id} className="border-b border-gray-100 hover:bg-blue-50 transition-colors">
+                                            <td className="p-5"><p className="font-bold text-ttbNavy text-base">{c.first_name_en} {c.last_name_en}</p><p className="text-xs text-gray-500 font-mono mt-1">{c.employee_id}</p></td>
+                                            <td className="p-5"><span className="font-bold text-ttbBlue">{c.rh}</span> <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-md ml-1 font-medium">{c.zone}</span></td>
+                                            <td className="p-5 text-sm text-gray-600 font-medium max-w-xs truncate" title={db.sessions[c.id].roleplay_assigned?.target}>{db.sessions[c.id].roleplay_assigned?.target || '-'}</td>
+                                            <td className="p-5 text-center"><button onClick={() => setEvalUser(c)} className="bg-ttbOrange text-white font-bold px-6 py-2.5 rounded-xl hover:bg-orange-600 shadow-md transition-colors text-sm">เริ่มประเมิน</button></td>
+                                        </tr>
+                                    ))}
+                                    {filtered.filter(c => db.sessions[c.id].roleplay_passed && !db.sessions[c.id].trainer_passed).length === 0 && <tr><td colSpan="4" className="text-center p-12 text-gray-400 font-bold text-lg">ไม่มีผู้เข้าสอบที่รอรับการประเมินในขณะนี้ 🎉</td></tr>}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             );
         }
 
-        function TrainerEvalScreen({ candidate, session, trainer, updateSession, onBack }) {
+        function TrainerEvalScreen({ candidate, session, trainer, rubrics, updateSession, onBack }) {
             const submitScore = (score) => {
-                if(confirm(`ยืนยันการให้คะแนน ${score}% แก่ ${candidate.first_name_en} ใช่หรือไม่?`)) {
+                if(confirm(`ยืนยันบันทึกคะแนนให้ ${candidate.first_name_en} เท่ากับ ${score}% ใช่หรือไม่?`)) {
                     updateSession(candidate.id, { trainer_score: score, trainer_passed: score >= 80, overall_status: score >= 80 ? 'CERTIFIED' : 'IN_PROGRESS' });
-                    alert('บันทึกสำเร็จ'); onBack();
+                    alert('บันทึกผลการประเมินเรียบร้อยแล้ว'); onBack();
                 }
             };
 
-            const Guideline = ({ q, g }) => (
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-4">
-                    <p className="font-bold text-ttbNavy mb-2">{q}</p>
-                    <div className="bg-yellow-50 p-3 rounded-lg border-l-4 border-yellow-400 text-sm text-yellow-800"><b>แนวการตอบ (Rule):</b> {g}</div>
-                </div>
-            );
-
             return (
-                <div className="space-y-6 animate-fade-in">
-                    <button onClick={onBack} className="text-gray-500 font-bold flex items-center mb-4"><Icon path={Icons.ChevronLeft} className="w-4 h-4 mr-1"/> กลับ</button>
-                    <div className="bg-ttbNavy text-white p-6 rounded-xl flex justify-between items-center shadow-md">
-                        <div><p className="text-ttbOrange text-xs font-bold">ประเมินผู้สอบ</p><h2 className="text-2xl font-bold">{candidate.first_name_en} {candidate.last_name_en}</h2></div>
-                        <div className="text-right text-sm">RH: {candidate.rh}</div>
+                <div className="space-y-6 animate-fade-in pb-10">
+                    <button onClick={onBack} className="text-gray-500 font-bold flex items-center mb-2 hover:text-ttbNavy bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200 w-max"><Icon path={Icons.ChevronLeft} className="w-5 h-5 mr-1"/> กลับหน้ารวม</button>
+                    
+                    <div className="bg-ttbNavy text-white p-8 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center shadow-lg relative overflow-hidden">
+                        <div className="absolute right-0 top-0 opacity-10 transform scale-150 -translate-y-4"><Icon path={Icons.Award} className="w-48 h-48"/></div>
+                        <div className="relative z-10"><p className="text-ttbOrange text-sm font-black uppercase tracking-widest mb-1">แบบประเมินผู้เข้าสอบ</p><h2 className="text-3xl font-extrabold">{candidate.first_name_en} {candidate.last_name_en}</h2><p className="text-blue-200 font-mono mt-1 text-sm">{candidate.employee_id}</p></div>
+                        <div className="relative z-10 mt-4 md:mt-0 text-right bg-white/10 px-6 py-3 rounded-xl border border-white/20"><p className="text-xs text-blue-200 font-bold uppercase mb-1">สังกัด</p><p className="font-extrabold text-lg text-white">{candidate.rh} - {candidate.zone}</p></div>
                     </div>
                     
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <div className="bg-gray-900 rounded-xl aspect-video flex items-center justify-center text-white mb-4"><a href={session.roleplay_link} target="_blank" className="text-ttbOrange underline">เปิดลิงก์วิดีโอ (YouTube)</a></div>
-                            <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-200"><p className="font-bold text-emerald-800">AI Score: {session.ai_feedback?.score}%</p><p className="text-sm text-emerald-700 mt-1">{session.ai_feedback?.strengths}</p></div>
+                    <div className="grid md:grid-cols-2 gap-8">
+                        <div className="space-y-6">
+                            <div className="bg-gray-900 rounded-2xl aspect-video flex items-center justify-center text-white shadow-md relative group overflow-hidden">
+                                <Icon path={Icons.Video} className="w-16 h-16 text-gray-600 group-hover:text-ttbOrange transition-colors" />
+                                <a href={session.roleplay_link} target="_blank" className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity font-bold text-lg underline text-white">คลิกเพื่อเปิดวิดีโอ YouTube</a>
+                            </div>
+                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                                <h3 className="font-extrabold text-ttbNavy text-lg mb-4 flex items-center border-b border-gray-100 pb-3"><Icon path={Icons.CheckCircle} className="w-5 h-5 mr-2 text-green-500"/> สรุปผลลัพธ์จาก AI</h3>
+                                <div className="flex items-center"><div className="text-5xl font-black text-green-500 mr-6">{session.ai_feedback?.score}%</div><div className="text-sm font-medium"><p className="text-green-700 font-bold mb-1">จุดแข็งที่ตรวจพบ:</p><p className="text-gray-600 leading-relaxed">{session.ai_feedback?.strengths}</p></div></div>
+                            </div>
                         </div>
-                        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                            <h3 className="font-bold text-xl text-ttbNavy mb-4 border-b pb-2">คำถามสัมภาษณ์สด</h3>
-                            <Guideline q="1. ถ้าลูกค้ายกเลิกปีที่ 5 จะได้เงินเท่าไหร่?" g="ตอบว่าได้มูลค่าเวนคืน ซึ่งอาจน้อยกว่าเงินต้นที่จ่ายไป ไม่ปิดบังข้อมูล" />
-                            <Guideline q="2. ช่วงตลาดตกหนัก AI จะทำอย่างไร?" g="ตอบว่าใช้ Dynamic Allocation ย้ายเงินไปถือสินทรัพย์ปลอดภัยเพื่อปกป้องความเสี่ยง" />
+
+                        <div className="bg-white p-8 rounded-2xl shadow-lg border-t-8 border-ttbOrange flex flex-col">
+                            <h3 className="font-extrabold text-2xl text-ttbNavy mb-6 border-b border-gray-100 pb-4 flex items-center"><Icon path={Icons.Users} className="w-6 h-6 mr-3 text-ttbOrange" /> คำถามสัมภาษณ์สด</h3>
+                            <div className="flex-grow overflow-y-auto pr-2 space-y-2 mb-6">
+                                {rubrics && rubrics.length > 0 ? rubrics.map((t, i) => (
+                                    <div key={i} className="bg-gray-50 p-6 rounded-2xl border border-gray-200 mb-6 shadow-sm"><p className="font-bold text-ttbNavy text-lg mb-4 leading-relaxed">ข้อ {i+1}. {t.question}</p><div className="bg-yellow-50 p-4 rounded-xl border-l-8 border-yellow-400 text-sm"><p className="font-extrabold text-yellow-800 mb-2 uppercase tracking-wide">แนวทางการให้คะแนน (Rule):</p><p className="text-yellow-900 font-medium leading-relaxed">{t.rule}</p></div></div>
+                                )) : TRAINER_QUESTIONS.map((t, i) => (
+                                    <div key={i} className="bg-gray-50 p-6 rounded-2xl border border-gray-200 mb-6 shadow-sm"><p className="font-bold text-ttbNavy text-lg mb-4 leading-relaxed">ข้อ {i+1}. {t.q}</p><div className="bg-yellow-50 p-4 rounded-xl border-l-8 border-yellow-400 text-sm"><p className="font-extrabold text-yellow-800 mb-2 uppercase tracking-wide">แนวทางการให้คะแนน (Rule):</p><p className="text-yellow-900 font-medium leading-relaxed">{t.rule}</p></div></div>
+                                ))}
+                            </div>
                             
-                            <div className="mt-8 border-t pt-4">
-                                <p className="font-bold text-center mb-4 text-ttbNavy">กดเพื่อบันทึกคะแนนสรุป</p>
-                                <div className="grid grid-cols-4 gap-2">
-                                    <button onClick={() => submitScore(50)} className="bg-red-100 text-red-700 font-bold py-3 rounded-lg hover:bg-red-200">50% (Fail)</button>
-                                    <button onClick={() => submitScore(70)} className="bg-red-100 text-red-700 font-bold py-3 rounded-lg hover:bg-red-200">70% (Fail)</button>
-                                    <button onClick={() => submitScore(80)} className="bg-green-100 text-green-700 font-bold py-3 rounded-lg hover:bg-green-200">80% (Pass)</button>
-                                    <button onClick={() => submitScore(100)} className="bg-ttbBlue text-white font-bold py-3 rounded-lg hover:bg-ttbNavy">100% (Pass)</button>
+                            <div className="mt-auto pt-8 border-t border-gray-200">
+                                <p className="font-extrabold text-center mb-5 text-ttbNavy text-lg bg-blue-50 py-2 rounded-lg">กดปุ่มด้านล่างเพื่อบันทึกคะแนนสรุป</p>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <button onClick={() => submitScore(50)} className="bg-red-50 text-red-700 font-bold py-4 rounded-xl border-2 border-red-200 hover:bg-red-500 hover:text-white transition-all shadow-sm text-lg">50%</button>
+                                    <button onClick={() => submitScore(70)} className="bg-red-50 text-red-700 font-bold py-4 rounded-xl border-2 border-red-200 hover:bg-red-500 hover:text-white transition-all shadow-sm text-lg">70%</button>
+                                    <button onClick={() => submitScore(80)} className="bg-green-50 text-green-700 font-extrabold py-4 rounded-xl border-2 border-green-200 hover:bg-green-500 hover:text-white transition-all shadow-sm text-lg">80%</button>
+                                    <button onClick={() => submitScore(100)} className="bg-ttbBlue text-white font-extrabold py-4 rounded-xl hover:bg-ttbNavy hover:shadow-lg transition-all shadow-md text-lg">100%</button>
                                 </div>
+                                <p className="text-center text-xs text-gray-400 mt-5 font-bold tracking-wider uppercase">บันทึกผลโดยเทรนเนอร์: {trainer.first_name_en}</p>
                             </div>
                         </div>
                     </div>
@@ -704,37 +646,69 @@
         // ==========================================
         // 8. ADMIN APP
         // ==========================================
-        function AdminApp({ users, setUsers, sessions, setSessions }) {
+        function AdminApp({ db, setDb }) {
             const exportData = () => {
-                const ws = XLSX.utils.json_to_sheet(users.map(u => ({ EmpID: u.employee_id, Name: u.first_name_en, Role: u.role, Status: sessions[u.id]?.overall_status || 'N/A' })));
-                const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Report"); XLSX.writeFile(wb, "TTB_Certification_Report.xlsx");
+                const data = db.users.map(u => ({ 
+                    "Employee ID": u.employee_id, "ชื่อ": u.first_name_en, "นามสกุล": u.last_name_en, 
+                    "Role": u.role, "Position": u.position, "RH": u.rh, "Zone": u.zone,
+                    "PK Score": db.sessions[u.id]?.pk_score || '-', "Roleplay Score": db.sessions[u.id]?.ai_feedback?.score || '-',
+                    "Trainer Score": db.sessions[u.id]?.trainer_score || '-', "Status": db.sessions[u.id]?.overall_status || 'NOT STARTED'
+                }));
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Certification Report");
+                XLSX.writeFile(wb, "TTB_US_Multi_Asset_Report.xlsx");
             };
 
-            const resetUser = (id, name) => {
-                if(confirm(`ล้างข้อมูลการสอบของ ${name} ทั้งหมด?`)) {
-                    const newSess = {...sessions}; delete newSess[id]; setSessions(newSess);
+            const resetUser = async (id, name) => {
+                if(confirm(`รีเซ็ตระบบ: คุณต้องการลบข้อมูลผลการสอบของ ${name} ทั้งหมดและให้เริ่มใหม่ใช่หรือไม่?`)) {
+                    setDb(prev => { const s = {...prev.sessions}; delete s[id]; return {...prev, sessions: s}; });
+                    await supabase.from('exam_sessions').delete().eq('user_id', id);
+                    alert('รีเซ็ตข้อมูลการสอบเรียบร้อยแล้ว');
+                }
+            };
+
+            const delUser = async (id, name) => {
+                if(confirm(`ลบบัญชี: ยืนยันการลบบัญชีของ ${name}?`)) {
+                    setDb(prev => { const s = {...prev.sessions}; delete s[id]; return {...prev, users: prev.users.filter(x => x.id !== id), sessions: s}; });
+                    await supabase.from('users').delete().eq('id', id);
                 }
             };
 
             return (
-                <div className="space-y-6 animate-fade-in">
-                    <div className="flex justify-between items-center"><h2 className="text-2xl font-bold text-ttbNavy">Admin Management</h2>
-                    <button onClick={exportData} className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold flex items-center shadow-sm"><Icon path={Icons.Download} className="w-4 h-4 mr-2"/> Export Excel</button></div>
+                <div className="space-y-8 animate-fade-in pb-10">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+                        <div><h2 className="text-3xl font-extrabold text-ttbNavy">Admin Management</h2><p className="text-gray-500 font-medium mt-1">ระบบจัดการข้อมูลและรายงาน</p></div>
+                        <button onClick={exportData} className="mt-4 md:mt-0 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-bold flex items-center shadow-md transition-colors text-lg"><Icon path={Icons.Download} className="w-5 h-5 mr-2"/> Export Excel Report</button>
+                    </div>
                     
-                    <div className="grid grid-cols-3 gap-4 mb-6">
-                        <div className="bg-white p-6 rounded-xl shadow-sm border"><p className="text-sm font-bold text-gray-500">Total Users</p><p className="text-4xl font-black text-ttbNavy">{users.length}</p></div>
-                        <div className="bg-white p-6 rounded-xl shadow-sm border cursor-pointer hover:bg-gray-50" onClick={() => alert('อัปโหลดภาพสำเร็จ')}><p className="text-sm font-bold text-gray-500">Image Upload</p><p className="text-lg font-bold text-ttbOrange mt-2 flex"><Icon path={Icons.Upload} className="w-5 h-5 mr-1"/> Upload Guide</p></div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-between"><div className="space-y-1"><p className="text-sm font-bold text-gray-500 uppercase tracking-wider">Total Users</p><p className="text-5xl font-black text-ttbNavy">{db.users.length}</p></div><div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-ttbBlue"><Icon path={Icons.Users} className="w-8 h-8"/></div></div>
+                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-between"><div className="space-y-1"><p className="text-sm font-bold text-gray-500 uppercase tracking-wider">Certified (Pass)</p><p className="text-5xl font-black text-green-600">{Object.values(db.sessions).filter(s => s.overall_status === 'CERTIFIED').length}</p></div><div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-green-600"><Icon path={Icons.Award} className="w-8 h-8"/></div></div>
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors flex flex-col justify-center items-center text-center group" onClick={() => alert('เปิดหน้าต่างอัปโหลด Media (สำหรับภาพประกอบบนเว็บ)')}>
+                            <div className="w-14 h-14 bg-orange-50 rounded-full flex items-center justify-center text-ttbOrange mb-3 group-hover:scale-110 transition-transform"><Icon path={Icons.Upload} className="w-6 h-6"/></div>
+                            <p className="font-extrabold text-ttbNavy">Upload System Image</p>
+                        </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-                        <table className="w-full text-left text-sm"><thead className="bg-gray-50 border-b"><tr><th className="p-4">Name</th><th className="p-4">Role</th><th className="p-4">Status</th><th className="p-4">Action</th></tr></thead>
-                        <tbody>{users.map(u => (
-                            <tr key={u.id} className="border-b hover:bg-gray-50"><td className="p-4 font-bold text-ttbNavy">{u.first_name_en}</td><td className="p-4">{u.role}</td><td className="p-4 font-bold text-xs">{sessions[u.id]?.overall_status || '-'}</td>
-                            <td className="p-4 flex space-x-2">
-                                {u.role === 'Candidate' && <button onClick={() => resetUser(u.id, u.first_name_en)} className="text-orange-500 bg-orange-50 p-2 rounded" title="Restart Exam"><Icon path={Icons.Refresh} className="w-4 h-4"/></button>}
-                                <button onClick={() => setUsers(users.filter(x => x.id !== u.id))} className="text-red-500 bg-red-50 p-2 rounded"><Icon path={Icons.Trash} className="w-4 h-4"/></button>
-                            </td></tr>
-                        ))}</tbody></table>
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div className="p-6 border-b border-gray-200 bg-gray-50"><h3 className="font-extrabold text-ttbNavy text-xl">User & Data Management</h3></div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm"><thead className="bg-white border-b-2 border-gray-200"><tr><th className="p-5 font-extrabold text-gray-600 uppercase tracking-wide">Employee Info</th><th className="p-5 font-extrabold text-gray-600 text-center uppercase tracking-wide">Role / Position</th><th className="p-5 font-extrabold text-gray-600 text-center uppercase tracking-wide">Status</th><th className="p-5 font-extrabold text-gray-600 text-center uppercase tracking-wide">Actions</th></tr></thead>
+                            <tbody className="font-medium">
+                                {db.users.map(u => (
+                                <tr key={u.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                                    <td className="p-5"><p className="font-bold text-ttbNavy text-base">{u.first_name_en} {u.last_name_en}</p><p className="text-gray-500 font-mono mt-1">{u.employee_id}</p></td>
+                                    <td className="p-5 text-center"><span className={`px-4 py-1.5 rounded-lg text-xs font-bold ${u.role === 'Admin' ? 'bg-purple-100 text-purple-700' : u.role === 'Trainer' ? 'bg-blue-100 text-ttbBlue' : 'bg-gray-100 text-gray-700'}`}>{u.role}</span><div className="text-xs text-gray-500 mt-2 font-bold">{u.position}</div></td>
+                                    <td className="p-5 text-center"><span className={`px-4 py-1.5 rounded-md text-xs font-extrabold ${db.sessions[u.id]?.overall_status === 'CERTIFIED' ? 'bg-green-100 text-green-700' : db.sessions[u.id] ? 'bg-yellow-100 text-yellow-700' : 'text-gray-400 bg-gray-100'}`}>{db.sessions[u.id]?.overall_status || 'NOT STARTED'}</span></td>
+                                    <td className="p-5">
+                                        <div className="flex justify-center space-x-3">
+                                            {u.role === 'Candidate' && <button onClick={() => resetUser(u.id, u.first_name_en)} className="text-ttbOrange bg-orange-50 hover:bg-ttbOrange hover:text-white p-3 rounded-lg transition-colors shadow-sm" title="Restart Exam"><Icon path={Icons.Refresh} className="w-5 h-5"/></button>}
+                                            <button onClick={() => delUser(u.id, u.first_name_en)} className="text-red-600 bg-red-50 hover:bg-red-600 hover:text-white p-3 rounded-lg transition-colors shadow-sm" title="Delete User"><Icon path={Icons.Trash} className="w-5 h-5"/></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}</tbody></table>
+                        </div>
                     </div>
                 </div>
             );
@@ -745,4 +719,5 @@
     </script>
 </body>
 </html>
+
 
