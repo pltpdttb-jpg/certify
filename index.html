@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ttb US Multi-Asset 15/5 - Certification Platform</title>
+    <title>ttb US Multi-Asset 15/5 - Certification</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,14 +12,18 @@
             theme: {
                 extend: {
                     colors: {
-                        brandDark: '#1E234A',   /* สีน้ำเงินเข้มสำหรับ Hero Card */
-                        brandBlue: '#4A55F2',   /* สีหลักของแอป */
-                        pastelBlue: '#E8EDFF',  /* ฟ้าพาสเทล */
-                        pastelOrange: '#FFF0E5',/* ส้มพาสเทล */
-                        pastelGreen: '#E6F8F0', /* เขียวพาสเทล */
-                        optGray: '#F4F6FB',     /* สีเทาอ่อนสำหรับปุ่มที่ไม่ได้เลือก */
-                        textMain: '#2D3142',
-                        textMuted: '#9094A6'
+                        brandNavy: '#0A192F',    /* Navy Corporate */
+                        brandBlue: '#1E40AF',    /* Primary Blue */
+                        brandLight: '#DBEAFE',   /* Pastel Blue */
+                        brandHover: '#1E3A8A',   /* Hover Blue */
+                        accentOrange: '#F97316', 
+                        success: '#10B981',
+                        danger: '#EF4444',
+                        surface: '#F4F7FE',      /* Main App Background */
+                        cardBg: '#FFFFFF',
+                        optGray: '#F1F5F9',      /* Choice background */
+                        textMain: '#1E293B',
+                        textMuted: '#64748B'
                     },
                     fontFamily: { sans: ['Prompt', 'Nunito', 'sans-serif'] }
                 }
@@ -38,40 +42,59 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        body { background-color: #F0F2F8; font-family: 'Nunito', 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #E2E8F0; font-family: 'Nunito', 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; display: flex; justify-content: center; min-height: 100vh; margin: 0; }
         
-        /* App Container (จำลองสัดส่วนแอป) */
-        .app-container { max-width: 480px; margin: 0 auto; background-color: #ffffff; min-height: 100vh; position: relative; display: flex; flex-direction: column; box-shadow: 0 0 40px rgba(0,0,0,0.05); }
+        /* App Container */
+        .app-container { 
+            width: 100%; 
+            max-width: 500px; 
+            background-color: #F4F7FE; 
+            min-height: 100vh; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); 
+            overflow: hidden;
+        }
         
-        /* 3D Soft Shadows */
-        .shadow-soft-3d { box-shadow: 0 10px 25px -5px rgba(74, 85, 242, 0.25), 0 4px 10px -3px rgba(74, 85, 242, 0.1); }
-        .shadow-inner-soft { box-shadow: inset 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .shadow-card { box-shadow: 0 8px 20px -5px rgba(0,0,0,0.05); }
+        @media (min-width: 640px) {
+            body { padding: 20px 0; }
+            .app-container { min-height: 90vh; max-height: 95vh; border-radius: 40px; }
+        }
+
+        /* 3D Soft UI */
+        .card-3d { background: #FFFFFF; border-radius: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02); border: 1px solid #F1F5F9; }
+        .btn-3d { box-shadow: 0 8px 20px -6px rgba(30, 64, 175, 0.4), 0 4px 6px -2px rgba(30, 64, 175, 0.1); transition: all 0.2s; }
+        .btn-3d:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 25px -6px rgba(30, 64, 175, 0.5); }
+        .btn-3d:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 4px 10px -4px rgba(30, 64, 175, 0.4); }
+        
+        /* Rating Buttons (1-10) */
+        .rating-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid #E2E8F0; }
+        .rating-btn.selected { background-color: #1E40AF; color: white; border-color: #1E40AF; transform: scale(1.08) translateY(-4px); box-shadow: 0 10px 20px -5px rgba(30, 64, 175, 0.5); }
         
         /* Animations */
-        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-pop { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         
-        /* Pulse for Mic */
-        .pulse-mic { animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-        
-        /* Hide Scrollbar for cleaner look */
-        ::-webkit-scrollbar { width: 4px; }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div id="root" class="w-full flex justify-center"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
         // ==========================================
-        // 1. CONFIGURATION & APIs
+        // 1. CONFIGURATION
         // ==========================================
         const GEMINI_API_KEY = "AIzaSyDhCVCNrx2WiNh9pDT24HI5eomrt4KtuUg";
         const SUPABASE_URL = "https://lyfqqrofqbyfezwxwhph.supabase.co";
@@ -83,15 +106,18 @@
         // ==========================================
         const FlatIcons = {
             Home: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>,
-            User: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>,
-            Bell: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>,
+            Result: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"></path><circle cx="6" cy="6" r="2"></circle><circle cx="18" cy="16" r="2"></circle></svg>,
+            Exit: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>,
             ChevronLeft: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>,
-            Mic: () => <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line><line x1="8" y1="22" x2="16" y2="22"></line></svg>,
-            LogOut: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            Download: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>,
+            Refresh: () => <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>,
+            Trash: () => <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2 2h4a2 2 0 0 1 2 2v2"></path></svg>,
+            Sparkles: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>,
+            Users: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
         };
 
         // ==========================================
-        // 3. MASTER DATA (FALLBACK)
+        // 3. MASTER DATA
         // ==========================================
         const RH_ZONES = {
             'RH1': ['จตุจักร', 'ธนบุรี', 'บางกะปิ', 'สาทร', 'สุขุมวิท'],
@@ -101,53 +127,29 @@
             'RH5': ['ภูเก็ต', 'ราชบุรี', 'สมุทรสาคร', 'สุราษฎร์ธานี', 'หาดใหญ่']
         };
         const POSITIONS = ['IS', 'IA', 'Other'];
-
-        // Fallback Data if Supabase is empty
-        const FB_USERS = [
-            { id: 'cand_001', employee_id: 'cand_001', first_name_en: 'Somchai', last_name_en: 'Candidate', role: 'Candidate', position: 'IS', rh: 'RH1', zone: 'จตุจักร' },
-            { id: 'ttb_yj', employee_id: 'ttb_yj', first_name_en: 'Yannapat', last_name_en: 'Jaruwongpaiboon', role: 'Trainer', position: 'Training Specialist', rh: 'RH1', zone: 'จตุจักร' },
-            { id: 'admin_001', employee_id: 'admin_001', first_name_en: 'System', last_name_en: 'Admin', role: 'Admin', position: 'Administrator', rh: 'HQ', zone: 'Central' }
-        ];
-        const FB_QUESTIONS = [{ id: 1, question: "หากเวนคืนกรมธรรม์ 15/5 ในปีที่ 5 จะเป็นอย่างไร?", options: '["ได้เงินต้น 100%", "ได้มูลค่าเวนคืนซึ่งอาจน้อยกว่าเบี้ยที่จ่ายไป", "ไม่ได้เงินคืน", "จ่ายค่าปรับ"]', answer: "ได้มูลค่าเวนคืนซึ่งอาจน้อยกว่าเบี้ยที่จ่ายไป" }];
-        const FB_SCENARIOS = [{ id: 'C-01', target: 'ลูกค้าเงินฝาก', context: 'อธิบายความต่างของเงินต้นที่คุ้มครอง กับ ผลตอบแทนส่วนเพิ่ม', ai_rubric: 'ห้ามใช้คำว่าเงินฝากเด็ดขาด' }];
-        const FB_RUBRICS = [{ question: "ถ้าลูกค้ายกเลิกกรมธรรม์ในปีที่ 5 จะได้เงินเท่าไหร่?", rule: "ต้องอธิบายได้ว่า 'ได้เป็นมูลค่าเวนคืน'" }];
-        const FB_PROMPT = "ประกันชีวิต 15/5 การันตีเงินต้นเมื่อครบ 15 ปีเท่านั้น";
+        const TRAINER_CATEGORIES = ['Product Knowledge', 'Investment Knowledge', 'Objection Handling'];
 
         // ==========================================
-        // 4. MAIN APP
+        // 4. MAIN APP COMPONENT
         // ==========================================
         function App() {
-            const [db, setDb] = useState({ users: [], sessions: {}, questions: [], scenarios: [], rubrics: [], sysPrompt: '' });
+            const [db, setDb] = useState({ users: [], sessions: {}, questions: [], trainer_rubrics: [] });
             const [currentUser, setCurrentUser] = useState(null);
             const [isLoading, setIsLoading] = useState(true);
-            const [isDbConnected, setIsDbConnected] = useState(false);
 
             useEffect(() => {
                 const fetchDatabase = async () => {
                     try {
-                        const [resU, resS, resQ, resSc, resR, resP] = await Promise.all([
+                        const [resU, resS, resQ, resR] = await Promise.all([
                             supabase.from('users').select('*'),
                             supabase.from('exam_sessions').select('*'),
                             supabase.from('questions').select('*'),
-                            supabase.from('scenarios').select('*'),
-                            supabase.from('trainer_rubrics').select('*'),
-                            supabase.from('system_prompts').select('*').eq('prompt_key', 'product_knowledge_base')
+                            supabase.from('trainer_rubrics').select('*')
                         ]);
-                        
                         const sessMap = {}; if(resS.data) resS.data.forEach(s => sessMap[s.user_id] = s);
-
-                        if(resU.data && resU.data.length > 0) {
-                            setDb({
-                                users: resU.data, sessions: sessMap, questions: resQ.data, scenarios: resSc.data, rubrics: resR.data,
-                                sysPrompt: resP.data?.[0]?.prompt_content || FB_PROMPT
-                            });
-                            setIsDbConnected(true);
-                        } else {
-                            setDb({ users: FB_USERS, sessions: {}, questions: FB_QUESTIONS, scenarios: FB_SCENARIOS, rubrics: FB_RUBRICS, sysPrompt: FB_PROMPT });
-                        }
-                    } catch (err) { 
-                        setDb({ users: FB_USERS, sessions: {}, questions: FB_QUESTIONS, scenarios: FB_SCENARIOS, rubrics: FB_RUBRICS, sysPrompt: FB_PROMPT });
-                    }
+                        
+                        setDb({ users: resU.data || [], sessions: sessMap, questions: resQ.data || [], trainer_rubrics: resR.data || [] });
+                    } catch (err) { console.error(err); }
                     setIsLoading(false);
                 };
                 fetchDatabase();
@@ -155,10 +157,10 @@
 
             const handleLogin = (user) => {
                 setCurrentUser(user);
+                // Initialize session if not exist
                 if (user.role === 'Candidate' && !db.sessions[user.id]) {
                     setDb(prev => ({ ...prev, sessions: { ...prev.sessions, [user.id]: {
                         pk_passed: false, pk_score: null, pk_attempts: 0,
-                        roleplay_assigned: null, roleplay_passed: false, transcript: '', ai_feedback: null, roleplay_attempts: 0,
                         trainer_passed: false, trainer_score: null, trainer_attempts: 0, overall_status: 'NOT STARTED'
                     }}}));
                 }
@@ -166,30 +168,36 @@
 
             const updateSession = async (userId, data) => {
                 setDb(prev => ({ ...prev, sessions: { ...prev.sessions, [userId]: { ...prev.sessions[userId], ...data } } }));
-                if(isDbConnected) await supabase.from('exam_sessions').upsert({ user_id: userId, ...data });
+                const { error } = await supabase.from('exam_sessions').upsert({ user_id: userId, ...data });
+                if(error) console.error("Update Session Error:", error);
             };
 
-            if (isLoading) return <div className="h-screen w-full flex items-center justify-center bg-[#F8F9FE] text-brandBlue font-black text-xl"><div className="animate-spin mr-3 text-2xl">⏳</div> Loading...</div>;
+            if (isLoading) return <div className="h-screen w-full flex items-center justify-center bg-surface text-brandBlue font-black text-xl"><div className="animate-spin mr-3 text-2xl">⏳</div> Loading...</div>;
 
             return (
-                <div className="app-container">
+                <div className={currentUser && currentUser.role !== 'Candidate' ? "w-full max-w-6xl mx-auto my-0 sm:my-8" : "app-container"}>
                     {!currentUser ? (
-                        <AuthScreen onLogin={handleLogin} db={db} setDb={setDb} isDbConnected={isDbConnected} />
+                        <AuthScreen onLogin={handleLogin} db={db} setDb={setDb} />
                     ) : (
-                        <div className="flex-1 flex flex-col h-full relative">
-                            {/* สำหรับ Admin และ Trainer ให้ใช้ Layout แบบกว้างปกติ แต่ถ้า Candidate ให้คงความเป็น App */}
+                        <div className="flex-1 flex flex-col h-full relative bg-surface sm:rounded-[40px] overflow-hidden">
                             {currentUser.role === 'Candidate' ? (
                                 <CandidateApp user={currentUser} db={db} updateSession={(data) => updateSession(currentUser.id, data)} onLogout={() => setCurrentUser(null)} />
                             ) : (
-                                <div className="w-full max-w-7xl mx-auto p-4 md:p-8 flex-1">
-                                    <div className="flex justify-between items-center mb-8 bg-white p-4 rounded-3xl shadow-sm">
-                                        <h1 className="font-black text-brandDark text-xl">ttb Certification Admin</h1>
-                                        <button onClick={() => setCurrentUser(null)} className="flex items-center text-red-500 font-bold bg-red-50 px-4 py-2 rounded-xl">
-                                            <FlatIcons.LogOut /> <span className="ml-2">ออกจากระบบ</span>
+                                <div className="flex-1 flex flex-col h-full">
+                                    {/* Admin/Trainer Header */}
+                                    <div className="bg-brandNavy text-white p-6 sm:p-8 flex justify-between items-center shadow-md z-10">
+                                        <div>
+                                            <h1 className="text-2xl font-black tracking-wide">ttb Certification</h1>
+                                            <p className="text-brandLight text-sm font-bold opacity-80">{currentUser.role} Portal</p>
+                                        </div>
+                                        <button onClick={() => setCurrentUser(null)} className="flex items-center text-white bg-white/10 hover:bg-red-500/80 px-4 py-2 rounded-xl font-bold transition-colors">
+                                            <FlatIcons.Exit /> <span className="ml-2 hidden sm:inline">Logout</span>
                                         </button>
                                     </div>
-                                    {currentUser.role === 'Trainer' && <TrainerApp trainer={currentUser} db={db} updateSession={updateSession} />}
-                                    {currentUser.role === 'Admin' && <AdminApp db={db} setDb={setDb} isDbConnected={isDbConnected} />}
+                                    <div className="p-4 sm:p-8 flex-1 overflow-y-auto">
+                                        {currentUser.role === 'Trainer' && <TrainerApp trainer={currentUser} db={db} updateSession={updateSession} />}
+                                        {currentUser.role === 'Admin' && <AdminApp db={db} setDb={setDb} />}
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -199,9 +207,9 @@
         }
 
         // ==========================================
-        // 5. AUTH SCREEN
+        // 5. AUTH SCREEN (Fixed Registration)
         // ==========================================
-        function AuthScreen({ onLogin, db, setDb, isDbConnected }) {
+        function AuthScreen({ onLogin, db, setDb }) {
             const [isReg, setIsReg] = useState(false);
             const [form, setForm] = useState({ empId: '', firstName: '', lastName: '', position: 'IS', rh: '', zone: '' });
             const [err, setErr] = useState('');
@@ -210,96 +218,121 @@
                 e.preventDefault();
                 if (!isReg) {
                     const u = db.users.find(x => x.employee_id === form.empId && x.first_name_en.toLowerCase() === form.firstName.toLowerCase());
-                    if (u) onLogin(u); else setErr('ไม่พบข้อมูลผู้ใช้งาน หรือระบุชื่อผิด');
+                    if (u) onLogin(u); else setErr('ข้อมูลไม่ถูกต้อง หรือไม่พบในระบบ');
                 } else {
                     if (db.users.find(x => x.employee_id === form.empId)) return setErr('Employee ID นี้ถูกใช้งานแล้ว');
                     if (!form.rh || !form.zone) return setErr('กรุณาเลือก Region และ Zone ให้ครบถ้วน');
-                    const newUser = { id: form.empId, employee_id: form.empId, first_name_en: form.firstName, last_name_en: form.lastName, role: 'Candidate', position: form.position, rh: form.rh, zone: form.zone };
+                    
+                    const newUser = { 
+                        id: form.empId, employee_id: form.empId, 
+                        first_name_en: form.firstName, last_name_en: form.lastName, 
+                        role: 'Candidate', position: form.position, rh: form.rh, zone: form.zone 
+                    };
                     
                     setDb(prev => ({ ...prev, users: [...prev.users, newUser] }));
-                    if(isDbConnected) await supabase.from('users').insert([newUser]);
-                    alert('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ'); setIsReg(false); setErr('');
+                    await supabase.from('users').insert([newUser]);
+                    alert('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ'); 
+                    setIsReg(false); setErr('');
                 }
             };
 
             return (
-                <div className="flex-1 flex flex-col justify-center px-8 bg-[#F8F9FE]">
-                    <div className="text-center mb-10">
+                <div className="flex-1 flex flex-col justify-center px-8 bg-surface w-full h-full relative overflow-hidden">
+                    <div className="absolute top-[-100px] left-[-100px] w-64 h-64 bg-brandLight rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+                    
+                    <div className="text-center mb-10 relative z-10">
                         <div className="w-20 h-20 bg-brandBlue rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-6 shadow-soft-3d text-white transform rotate-3">🛡️</div>
-                        <h1 className="text-3xl font-black text-brandDark">Certification</h1>
-                        <p className="text-textMuted font-bold mt-2">US Multi-Asset Index 15/5</p>
+                        <h1 className="text-3xl font-black text-brandNavy tracking-tight">Certification</h1>
+                        <p className="text-brandBlue font-bold mt-2">US Multi-Asset Index 15/5</p>
                     </div>
-
-                    {err && <div className="bg-red-50 text-red-600 p-4 rounded-2xl mb-6 text-sm font-bold text-center border border-red-100">{err}</div>}
-
-                    <form onSubmit={handleSubmit} className="space-y-5">
-                        <div>
-                            <input type="text" value={form.empId} onChange={e => setForm({...form, empId: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue shadow-sm outline-none font-bold text-textMain" placeholder="Employee ID" required />
-                        </div>
-                        <div>
-                            <input type="text" value={form.firstName} onChange={e => setForm({...form, firstName: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue shadow-sm outline-none font-bold text-textMain" placeholder="First Name (English)" required />
-                        </div>
+                    
+                    {err && <div className="bg-red-50 text-danger p-4 rounded-[20px] mb-6 text-sm font-bold text-center border border-red-100 relative z-10">{err}</div>}
+                    
+                    <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
+                        <input type="text" value={form.empId} onChange={e => setForm({...form, empId: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue outline-none font-bold text-textMain transition-all shadow-sm" placeholder="Employee ID" required />
+                        <input type="text" value={form.firstName} onChange={e => setForm({...form, firstName: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue outline-none font-bold text-textMain transition-all shadow-sm" placeholder="First Name (English)" required />
                         
                         {isReg && (
-                            <div className="animate-fade-in space-y-5 pt-4 border-t border-gray-200">
-                                <div><input type="text" value={form.lastName} onChange={e => setForm({...form, lastName: e.target.value})} className="w-full p-4 rounded-[20px] bg-white shadow-sm outline-none font-bold" placeholder="Last Name (English)" required /></div>
+                            <div className="animate-fade-in space-y-4 pt-4 border-t border-gray-200">
+                                <input type="text" value={form.lastName} onChange={e => setForm({...form, lastName: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue outline-none font-bold text-textMain transition-all shadow-sm" placeholder="Last Name (English)" required />
                                 <div className="grid grid-cols-2 gap-4">
-                                    <select value={form.position} onChange={e => setForm({...form, position: e.target.value})} className="w-full p-4 rounded-[20px] bg-white shadow-sm outline-none font-bold">{POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}</select>
-                                    <select value={form.rh} onChange={e => setForm({...form, rh: e.target.value, zone: ''})} className="w-full p-4 rounded-[20px] bg-white shadow-sm outline-none font-bold" required><option value="">RH...</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}</select>
+                                    <select value={form.position} onChange={e => setForm({...form, position: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue shadow-sm outline-none font-bold text-textMain">{POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}</select>
+                                    <select value={form.rh} onChange={e => setForm({...form, rh: e.target.value, zone: ''})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue shadow-sm outline-none font-bold text-textMain" required><option value="">RH...</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}</select>
                                 </div>
-                                <div><select value={form.zone} onChange={e => setForm({...form, zone: e.target.value})} disabled={!form.rh} className="w-full p-4 rounded-[20px] bg-white shadow-sm outline-none font-bold disabled:bg-gray-100" required><option value="">Zone...</option>{form.rh && RH_ZONES[form.rh].map(z => <option key={z} value={z}>{z}</option>)}</select></div>
+                                <select value={form.zone} onChange={e => setForm({...form, zone: e.target.value})} disabled={!form.rh} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue shadow-sm outline-none font-bold text-textMain disabled:opacity-50" required><option value="">Zone...</option>{form.rh && RH_ZONES[form.rh].map(z => <option key={z} value={z}>{z}</option>)}</select>
                             </div>
                         )}
-                        <button type="submit" className="w-full bg-brandBlue text-white font-black py-4 rounded-[20px] shadow-soft-3d hover:bg-blue-700 transition-colors mt-4 text-lg">{isReg ? 'สร้างบัญชี' : 'เข้าสู่ระบบ'}</button>
+
+                        <button type="submit" className="w-full bg-brandBlue text-white font-black py-4 rounded-[20px] btn-3d mt-6 text-lg tracking-wide uppercase">{isReg ? 'Create Account' : 'Login'}</button>
                     </form>
-                    <div className="text-center mt-8">
-                        <button onClick={() => {setIsReg(!isReg); setErr('');}} className="text-brandBlue font-bold text-sm">{isReg ? 'กลับไปหน้าเข้าสู่ระบบ' : 'ลงทะเบียนใหม่ (Candidate)'}</button>
+                    
+                    <div className="text-center mt-8 relative z-10">
+                        <button onClick={() => {setIsReg(!isReg); setErr('');}} className="text-textMuted hover:text-brandBlue font-bold text-sm transition-colors">{isReg ? 'Back to Login' : 'Register New Account'}</button>
                     </div>
                 </div>
             );
         }
 
         // ==========================================
-        // 6. CANDIDATE APP (Mobile Soft UI Style)
+        // 6. CANDIDATE APP (Pop-up Guide + Auto Navigate)
         // ==========================================
         function CandidateApp({ user, db, updateSession, onLogout }) {
-            const session = db.sessions[user.id];
-            const [view, setView] = useState('home'); // 'home' | 'pk' | 'roleplay' | 'trainer'
-            
-            // Logic รีเซ็ตข้อสอบและกลับไปเริ่มใหม่
-            const handleRetake = (section) => {
-                if(confirm(`คุณต้องการขอสอบใหม่ใช่หรือไม่?\n(นี่จะเป็นการสอบครั้งที่ ${(session[`${section}_attempts`] || 0) + 2})`)) {
-                    if(section === 'pk') {
-                        updateSession({ pk_passed: false, pk_score: null, pk_attempts: session.pk_attempts + 1 });
-                    }
-                    if(section === 'roleplay') {
-                        updateSession({ roleplay_passed: false, transcript: '', ai_feedback: null, roleplay_attempts: session.roleplay_attempts + 1 });
-                    }
-                    // บังคับให้เปลี่ยน view กลับไปหน้าทำข้อสอบนั้นๆ (หน้า Start Screen จะโชว์ขึ้นมาเองเพราะ score = null)
-                    setView(section); 
+            const session = db.sessions[user.id] || {};
+            const [view, setView] = useState('home'); 
+            const [showOnboarding, setShowOnboarding] = useState(!session.pk_passed && session.pk_attempts === 0 && session.pk_score === null);
+
+            const handleRetake = () => {
+                if(confirm(`คุณต้องการสอบใหม่ใช่หรือไม่?\n(รอบที่ ${(session.pk_attempts || 0) + 2})`)) {
+                    localStorage.removeItem(`ttb_exam_${user.id}`);
+                    updateSession({ pk_passed: false, pk_score: null, pk_attempts: (session.pk_attempts || 0) + 1 });
+                    setView('pk'); 
                 }
             };
 
             return (
-                <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#F4F6FB]">
-                    {/* View Router */}
-                    {view === 'home' && <CandidateHome user={user} session={session} setView={setView} onLogout={onLogout} />}
-                    {view === 'pk' && <KnowledgeTest session={session} questions={db.questions} updateSession={updateSession} onRetake={() => handleRetake('pk')} onBack={() => setView('home')} />}
-                    {view === 'roleplay' && <RoleplayTest session={session} scenarios={db.scenarios} sysPrompt={db.sysPrompt} updateSession={updateSession} onRetake={() => handleRetake('roleplay')} onBack={() => setView('home')} />}
-                    {view === 'trainer' && <TrainerStatus session={session} onBack={() => setView('home')} />}
+                <div className="flex-1 flex flex-col h-full overflow-hidden relative bg-surface">
+                    
+                    {/* Onboarding Pop-up */}
+                    {showOnboarding && (
+                        <div className="absolute inset-0 bg-brandNavy/80 z-50 flex items-center justify-center p-6 backdrop-blur-sm animate-fade-in">
+                            <div className="bg-white rounded-[32px] p-8 w-full max-w-sm shadow-2xl animate-pop text-center relative overflow-hidden">
+                                <div className="w-16 h-16 bg-brandLight text-brandBlue rounded-[20px] flex items-center justify-center text-3xl mx-auto mb-5 shadow-inner-soft">📋</div>
+                                <h2 className="text-2xl font-black text-brandNavy mb-2">คู่มือการทดสอบ</h2>
+                                <p className="text-textMuted font-bold text-sm mb-6">กรุณาอ่านกติกาให้ครบถ้วนก่อนเริ่มสอบ</p>
+                                
+                                <div className="space-y-4 text-left bg-surface p-5 rounded-[24px] mb-8 border border-blue-50">
+                                    <p className="flex items-center text-[13px] font-bold text-textMain"><span className="text-lg mr-3">📝</span> ระบบสุ่มข้อสอบทั้งหมด 30 ข้อ</p>
+                                    <p className="flex items-center text-[13px] font-bold text-textMain"><span className="text-lg mr-3">⏱️</span> ระยะเวลาในการทำ 60 นาที</p>
+                                    <p className="flex items-center text-[13px] font-bold text-textMain"><span className="text-lg mr-3">🎯</span> เกณฑ์การผ่าน 80%</p>
+                                    <p className="flex items-start text-xs font-bold text-accentOrange mt-3 pt-4 border-t border-gray-200">
+                                        <span className="mr-2 text-base">⚠️</span> หากไม่ผ่าน สามารถทำใหม่ได้หลายรอบ แต่ระบบจะมีการบันทึกจำนวนรอบที่ทำไว้
+                                    </p>
+                                </div>
+                                
+                                <button onClick={() => setShowOnboarding(false)} className="w-full bg-brandNavy text-white font-black py-4 rounded-[20px] hover:bg-gray-900 transition-colors uppercase tracking-widest text-sm">รับทราบและปิด</button>
+                                <p className="text-[10px] font-black text-gray-300 mt-6 tracking-widest uppercase">PRU ACADEMY [ttb training team]</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {view === 'home' && <CandidateHome user={user} session={session} setView={setView} />}
+                    {view === 'pk' && <KnowledgeTest user={user} session={session} questions={db.questions} updateSession={updateSession} onRetake={handleRetake} setView={setView} />}
+                    {view === 'result' && <ResultDashboard session={session} setView={setView} />}
                     
                     {/* Bottom Navigation */}
-                    {view === 'home' && (
-                        <div className="bg-white border-t border-gray-100 px-8 py-5 flex justify-between items-center rounded-t-[32px] shadow-[0_-10px_40px_rgba(0,0,0,0.03)] z-20 mt-auto">
-                            <div className="flex flex-col items-center text-brandBlue cursor-pointer">
+                    {(view === 'home' || view === 'result') && (
+                        <div className="bg-white border-t border-gray-100 px-10 py-5 flex justify-between items-center rounded-t-[40px] shadow-[0_-10px_40px_rgba(0,0,0,0.03)] z-20 mt-auto shrink-0 pb-8">
+                            <div className={`flex flex-col items-center cursor-pointer transition-colors ${view === 'home' ? 'text-brandBlue' : 'text-gray-400 hover:text-brandBlue'}`} onClick={() => setView('home')}>
                                 <FlatIcons.Home />
-                                <div className="w-1.5 h-1.5 bg-brandBlue rounded-full mt-1.5"></div>
+                                <span className="text-[10px] font-black mt-1.5 uppercase tracking-widest">Home</span>
                             </div>
-                            <div className="flex flex-col items-center text-gray-300 hover:text-gray-400 cursor-pointer transition-colors" onClick={() => alert('Profile Menu')}>
-                                <FlatIcons.User />
+                            <div className={`flex flex-col items-center cursor-pointer transition-colors ${view === 'result' ? 'text-brandBlue' : 'text-gray-400 hover:text-brandBlue'}`} onClick={() => setView('result')}>
+                                <FlatIcons.Result />
+                                <span className="text-[10px] font-black mt-1.5 uppercase tracking-widest">Result</span>
                             </div>
-                            <div className="flex flex-col items-center text-gray-300 hover:text-gray-400 cursor-pointer transition-colors relative" onClick={onLogout}>
-                                <FlatIcons.LogOut />
+                            <div className="flex flex-col items-center text-gray-400 hover:text-danger cursor-pointer transition-colors" onClick={onLogout}>
+                                <FlatIcons.Exit />
+                                <span className="text-[10px] font-black mt-1.5 uppercase tracking-widest">Exit</span>
                             </div>
                         </div>
                     )}
@@ -307,198 +340,171 @@
             );
         }
 
-        function CandidateHome({ user, session, setView, onLogout }) {
-            let prog = 0; if (session.pk_passed) prog += 33; if (session.roleplay_passed) prog += 33; if (session.trainer_passed) prog += 34;
-            
+        function CandidateHome({ user, session, setView }) {
+            let prog = 0; if (session.pk_passed) prog += 50; if (session.trainer_passed) prog += 50;
             return (
-                <div className="flex-1 overflow-y-auto pb-6 animate-fade-in">
-                    {/* Header */}
-                    <div className="p-6 pt-8 flex justify-between items-center">
-                        <div className="flex items-center">
-                            <div className="w-14 h-14 bg-pastelOrange rounded-[20px] flex items-center justify-center text-3xl mr-4 shadow-sm">👨‍💼</div>
-                            <div>
-                                <h1 className="text-textMain font-extrabold text-xl leading-tight">Hello {user.first_name_en}!</h1>
-                                <p className="text-textMuted text-xs font-bold mt-0.5">Let's start your journey</p>
-                            </div>
-                        </div>
-                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl cursor-pointer shadow-sm border border-gray-100" onClick={onLogout}>
-                            <FlatIcons.LogOut />
-                        </div>
+                <div className="flex-1 overflow-y-auto pb-6 animate-fade-in bg-surface">
+                    <div className="p-8 pb-6 flex items-center">
+                        <div className="w-16 h-16 bg-white rounded-[24px] flex items-center justify-center text-3xl mr-5 shadow-sm border border-gray-100 text-brandBlue">👨‍💼</div>
+                        <div><h1 className="text-textMain font-extrabold text-2xl leading-tight">Hi, {user.first_name_en}</h1><p className="text-textMuted text-sm font-bold mt-1">Ready for certification?</p></div>
                     </div>
 
-                    {/* Hero Card */}
-                    <div className="mx-6 bg-brandDark rounded-[32px] p-6 text-white shadow-card relative overflow-hidden mb-8">
-                        <div className="absolute right-[-20px] top-6 w-32 h-32 bg-blue-500 rounded-full opacity-50 blur-2xl"></div>
-                        <div className="absolute right-4 bottom-[-10px] text-7xl opacity-90 drop-shadow-lg">🏆</div>
-                        
+                    <div className="mx-6 bg-brandNavy rounded-[36px] p-8 text-white shadow-card relative overflow-hidden mb-8">
+                        <div className="absolute right-[-30px] top-4 w-40 h-40 bg-brandBlue rounded-full opacity-60 blur-3xl"></div>
+                        <div className="absolute right-6 bottom-4 text-6xl opacity-90 drop-shadow-2xl">🏆</div>
                         <div className="relative z-10">
-                            <span className="bg-white/20 px-3 py-1.5 rounded-xl text-xs font-bold backdrop-blur-md inline-block mb-4">Overall Progress</span>
-                            <h2 className="text-4xl font-black mb-1">{prog}%</h2>
-                            <p className="text-blue-200 text-sm font-medium mb-6">{prog === 100 ? 'Certified' : 'In Progress'}</p>
+                            <span className="bg-white/20 px-4 py-2 rounded-xl text-[10px] font-black backdrop-blur-md inline-block mb-4 uppercase tracking-widest">Overall Progress</span>
+                            <h2 className="text-5xl font-black mb-2">{prog}%</h2>
+                            <p className="text-brandLight text-sm font-bold opacity-80">{prog === 100 ? 'Fully Certified 🎉' : 'In Progress... Keep going!'}</p>
                         </div>
                     </div>
 
-                    {/* Categories */}
                     <div className="px-6 space-y-5">
-                        <h3 className="font-extrabold text-textMain text-lg mb-2">Exam Categories</h3>
-
-                        {/* Card 1: PK Test (Pastel Blue) */}
-                        <div onClick={() => setView('pk')} className="bg-pastelBlue rounded-[32px] p-6 relative overflow-hidden cursor-pointer transform transition-transform hover:scale-[1.02]">
-                            <div className="absolute right-[-10px] bottom-[-10px] text-7xl opacity-80 drop-shadow-md">📘</div>
-                            <span className={`${session.pk_passed ? 'bg-green-500' : 'bg-brandBlue'} text-white px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm uppercase tracking-wider`}>
-                                {session.pk_passed ? 'Passed' : 'Start'}
-                            </span>
-                            <h4 className="font-extrabold text-textMain mt-4 text-xl">Knowledge Test</h4>
-                            <p className="text-blue-900/60 text-xs mt-1.5 font-bold w-2/3">Product mechanics & T&C.</p>
+                        <h3 className="font-extrabold text-textMain text-xl mb-3">Required Modules</h3>
+                        {/* PK Test */}
+                        <div onClick={() => setView('pk')} className="card-3d p-6 relative overflow-hidden cursor-pointer transform transition-transform hover:scale-[1.02]">
+                            <div className="absolute right-[-10px] bottom-[-15px] text-[70px] opacity-10 drop-shadow-md">📘</div>
+                            <span className={`${session.pk_passed ? 'bg-success' : 'bg-brandBlue'} text-white px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm uppercase tracking-wider`}>{session.pk_passed ? 'Passed' : 'Start Test'}</span>
+                            <h4 className="font-black text-brandNavy mt-4 text-xl">Knowledge Test</h4>
+                            <p className="text-textMuted text-xs mt-2 font-bold w-2/3 leading-relaxed">30 Questions • 60 Mins<br/>Product mechanics & T&C.</p>
                         </div>
 
-                        {/* Card 2: Roleplay (Pastel Orange) */}
-                        <div onClick={() => session.pk_passed ? setView('roleplay') : null} className={`bg-pastelOrange rounded-[32px] p-6 relative overflow-hidden transition-all ${!session.pk_passed ? 'opacity-60 grayscale cursor-not-allowed' : 'cursor-pointer hover:scale-[1.02]'}`}>
-                            <div className="absolute right-0 bottom-2 text-7xl opacity-90 drop-shadow-md">🎙️</div>
-                            <span className={`${!session.pk_passed ? 'bg-gray-400' : session.roleplay_passed ? 'bg-green-500' : 'bg-[#FF8A00]'} text-white px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm uppercase tracking-wider`}>
-                                {!session.pk_passed ? 'Locked' : session.roleplay_passed ? 'Passed' : 'Next Step'}
-                            </span>
-                            <h4 className="font-extrabold text-textMain mt-4 text-xl">Roleplay (AI)</h4>
-                            <p className="text-orange-900/60 text-xs mt-1.5 font-bold w-2/3">Speech to text AI evaluation.</p>
-                        </div>
-
-                        {/* Card 3: Trainer (Pastel Green) */}
-                        <div onClick={() => session.roleplay_passed ? setView('trainer') : null} className={`bg-pastelGreen rounded-[32px] p-6 relative overflow-hidden transition-all ${!session.roleplay_passed ? 'opacity-60 grayscale cursor-not-allowed' : 'cursor-pointer hover:scale-[1.02]'}`}>
-                            <div className="absolute right-2 bottom-2 text-7xl opacity-80 drop-shadow-md">👨‍🏫</div>
-                            <span className={`${!session.roleplay_passed ? 'bg-gray-400' : session.trainer_passed ? 'bg-green-500' : 'bg-[#00B86B]'} text-white px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm uppercase tracking-wider`}>
-                                {!session.roleplay_passed ? 'Locked' : session.trainer_passed ? 'Certified' : 'Pending'}
-                            </span>
-                            <h4 className="font-extrabold text-textMain mt-4 text-xl">Trainer Check</h4>
-                            <p className="text-green-900/60 text-xs mt-1.5 font-bold w-2/3">Live interview & rubrics.</p>
+                        {/* Trainer Assessment */}
+                        <div onClick={() => setView('result')} className={`card-3d p-6 relative overflow-hidden ${!session.pk_passed ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:scale-[1.02] transform transition-transform'}`}>
+                            <div className="absolute right-0 bottom-[-5px] text-[70px] opacity-10 drop-shadow-md">👨‍🏫</div>
+                            <span className={`${!session.pk_passed ? 'bg-gray-300' : session.trainer_passed ? 'bg-success' : 'bg-accentOrange'} text-white px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm uppercase tracking-wider`}>{!session.pk_passed ? 'Locked' : session.trainer_passed ? 'Certified' : 'Pending Interview'}</span>
+                            <h4 className="font-black text-brandNavy mt-4 text-xl">Trainer Assessment</h4>
+                            <p className="text-textMuted text-xs mt-2 font-bold w-3/4 leading-relaxed">Live interview session with PRU Academy Trainer Specialist.</p>
                         </div>
                     </div>
                 </div>
             );
         }
 
-        // ==========================================
-        // Knowledge Test (30 Q Randomization + Soft UI)
-        // ==========================================
-        function KnowledgeTest({ session, questions, updateSession, onRetake, onBack }) {
+        // --- Knowledge Test (Timer, Auto-Nav, Deep Randomizer) ---
+        function KnowledgeTest({ user, session, questions, updateSession, onRetake, setView }) {
             const [qIdx, setQIdx] = useState(0);
             const [answers, setAnswers] = useState({});
             const [started, setStarted] = useState(false);
             const [examQuestions, setExamQuestions] = useState([]); 
+            const [timeLeft, setTimeLeft] = useState(3600);
+            
+            const storageKey = `ttb_exam_${user.id}`;
 
-            // ** หัวใจสำคัญของการ Retake: จับตาดู score ถ้าถูกรีเซ็ตเป็น null ให้เคลียร์หน้าจอรอการกด Start ใหม่ **
             useEffect(() => {
-                if (session.pk_score === null && started) {
-                    setStarted(false);
-                    setQIdx(0);
-                    setAnswers({});
-                    setExamQuestions([]);
-                }
+                if (session.pk_score === null) {
+                    const savedState = localStorage.getItem(storageKey);
+                    if (savedState) {
+                        try {
+                            const parsed = JSON.parse(savedState);
+                            const now = Math.floor(Date.now() / 1000);
+                            const newTimeLeft = Math.max(0, parsed.timeLeft - (now - parsed.lastSaved));
+                            setExamQuestions(parsed.examQuestions);
+                            setAnswers(parsed.answers || {});
+                            setQIdx(parsed.qIdx || 0);
+                            setTimeLeft(newTimeLeft);
+                            setStarted(true);
+                            if (newTimeLeft <= 0) { autoSubmit(parsed.examQuestions, parsed.answers); }
+                        } catch (e) { console.error(e); }
+                    }
+                } else if (started) { setStarted(false); setExamQuestions([]); }
             }, [session.pk_score]);
 
-            if (!questions || questions.length === 0) return <div className="p-8 text-center font-bold">กำลังโหลดคลังข้อสอบ...</div>;
+            useEffect(() => {
+                let timer;
+                if (started && timeLeft > 0 && session.pk_score === null) {
+                    timer = setInterval(() => {
+                        setTimeLeft(prev => {
+                            const newTime = prev - 1;
+                            localStorage.setItem(storageKey, JSON.stringify({ examQuestions, answers, qIdx, timeLeft: newTime, lastSaved: Math.floor(Date.now() / 1000) }));
+                            if (newTime <= 0) { clearInterval(timer); autoSubmit(examQuestions, answers); }
+                            return newTime;
+                        });
+                    }, 1000);
+                }
+                return () => clearInterval(timer);
+            }, [started, timeLeft, examQuestions, answers, qIdx, session.pk_score]);
 
-            // หน้าจอแสดงผลลัพธ์
-            if (session.pk_score !== null) return (
-                <div className="flex-1 bg-white animate-slide-up flex flex-col pt-12 px-6">
-                    <ResultScreen score={session.pk_score} label="Knowledge Test" passed={session.pk_passed} onBack={onBack} />
-                    {!session.pk_passed && (
-                        <div className="mt-auto mb-10">
-                            <button onClick={onRetake} className="w-full bg-pastelOrange text-[#FF8A00] font-black py-4 rounded-[24px] hover:bg-orange-100 transition-colors text-lg shadow-sm border border-orange-100">
-                                ลองใหม่อีกครั้ง
-                            </button>
-                            <p className="text-center text-xs text-gray-400 mt-3 font-bold">รอบที่ {session.pk_attempts + 1}</p>
-                        </div>
-                    )}
-                </div>
-            );
-            
-            // ฟังก์ชันสุ่มข้อสอบ 30 ข้อเมื่อกดเริ่ม
+            useEffect(() => {
+                if (started && session.pk_score === null) {
+                    localStorage.setItem(storageKey, JSON.stringify({ examQuestions, answers, qIdx, timeLeft, lastSaved: Math.floor(Date.now() / 1000) }));
+                }
+            }, [answers, qIdx]);
+
+            // Deep Randomizer
             const handleStartTest = () => {
-                // Shuffle & Pick 30
-                const shuffled = [...questions].sort(() => 0.5 - Math.random());
-                const selected = shuffled.slice(0, 30);
+                if(questions.length === 0) return alert('ไม่พบคลังข้อสอบ');
+                const shuffleArray = (arr) => [...arr].sort(() => 0.5 - Math.random());
+                const selectedQs = shuffleArray(questions).slice(0, 30).map(q => {
+                    let opts = [];
+                    try { opts = JSON.parse(q.options); } catch(e) { opts = ["A", "B", "C", "D"]; }
+                    return { ...q, shuffledOptions: shuffleArray(opts) }; 
+                });
                 
-                setExamQuestions(selected);
-                setAnswers({});
-                setQIdx(0);
-                setStarted(true);
+                setExamQuestions(selectedQs);
+                setAnswers({}); setQIdx(0); setTimeLeft(3600); setStarted(true);
+                localStorage.setItem(storageKey, JSON.stringify({ examQuestions: selectedQs, answers: {}, qIdx: 0, timeLeft: 3600, lastSaved: Math.floor(Date.now() / 1000) }));
             };
 
-            // หน้าจอเตรียมเริ่มสอบ
+            const autoSubmit = async (qs, ans) => {
+                const correct = qs.filter((q, i) => ans[i] === q.answer).length;
+                const score = Math.round((correct / qs.length) * 100);
+                await updateSession({ pk_score: score, pk_passed: score >= 80, overall_status: 'IN_PROGRESS' });
+                localStorage.removeItem(storageKey);
+                setView('result'); // Auto Navigate To Result
+            };
+
+            const formatTime = (secs) => { const m = Math.floor(secs / 60); const s = secs % 60; return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`; };
+
             if (!started) return (
-                <div className="flex-1 bg-white flex flex-col justify-center items-center px-8 animate-fade-in relative">
-                    <button onClick={onBack} className="absolute top-8 left-6 text-textMain"><FlatIcons.ChevronLeft /></button>
-                    
-                    <div className="w-32 h-32 bg-pastelBlue rounded-full flex items-center justify-center mb-8 shadow-inner-soft">
-                        <span className="text-6xl drop-shadow-md">📘</span>
+                <div className="flex-1 flex flex-col justify-center items-center px-8 animate-fade-in relative h-full bg-surface">
+                    <button onClick={() => setView('home')} className="absolute top-8 left-6 text-textMain"><FlatIcons.ChevronLeft /></button>
+                    <div className="w-32 h-32 bg-white rounded-[32px] flex items-center justify-center mb-8 shadow-sm border border-gray-100 transform rotate-3"><span className="text-6xl drop-shadow-md">⏱️</span></div>
+                    <h3 className="text-3xl font-black text-brandNavy mb-4">Knowledge Test</h3>
+                    <div className="text-textMuted text-center font-bold leading-relaxed mb-10 bg-white p-6 rounded-[28px] border border-gray-100 w-full shadow-sm">
+                        <p className="mb-2">สุ่มข้อสอบ: <span className="text-brandBlue font-black text-xl">30 ข้อ</span></p>
+                        <p className="mb-2">เวลา: <span className="text-danger font-black text-xl">60 นาที</span></p>
+                        <p>เกณฑ์ผ่าน: <span className="text-success font-black text-xl">80%</span></p>
                     </div>
-                    <h3 className="text-2xl font-black text-textMain mb-3">Knowledge Test</h3>
-                    <p className="text-textMuted text-center font-bold leading-relaxed mb-10">
-                        ระบบจะสุ่มข้อสอบจำนวน <span className="text-brandBlue">30 ข้อ</span><br/>
-                        จากคลังทั้งหมด เกณฑ์ผ่านคือ 80%
-                    </p>
-                    <button onClick={handleStartTest} className="w-full bg-brandBlue text-white font-black py-4 rounded-[24px] shadow-soft-3d hover:bg-blue-700 transition-colors text-lg">
-                        เริ่มทำข้อสอบ
-                    </button>
+                    <button onClick={handleStartTest} className="w-full bg-brandBlue text-white font-black py-4 rounded-[24px] btn-3d text-lg tracking-widest uppercase">เริ่มจับเวลา</button>
                 </div>
             );
 
-            // หน้าจอทำข้อสอบ
             const q = examQuestions[qIdx];
-            let optionsList = [];
-            try { optionsList = typeof q.options === 'string' ? JSON.parse(q.options) : q.options; } 
-            catch (e) { optionsList = ["A", "B", "C", "D"]; }
-
-            const submit = () => {
-                const correct = examQuestions.filter((q, i) => answers[i] === q.answer).length;
-                const score = Math.round((correct / examQuestions.length) * 100);
-                updateSession({ pk_score: score, pk_passed: score >= 80, overall_status: 'IN_PROGRESS' });
-            };
+            const isWarning = timeLeft < 300; 
 
             return (
-                <div className="flex-1 flex flex-col bg-[#F8F9FE] animate-slide-up relative h-full">
-                    {/* Header */}
-                    <div className="pt-8 pb-4 px-6 flex justify-between items-center">
-                        <button onClick={onBack} className="text-textMain"><FlatIcons.ChevronLeft /></button>
-                        <h2 className="font-extrabold text-textMain text-lg">Question {qIdx + 1}/{examQuestions.length}</h2>
-                        <div className="w-8 h-8"></div>
+                <div className="flex-1 flex flex-col bg-surface animate-slide-up relative h-full overflow-hidden">
+                    <div className="pt-8 pb-4 px-6 flex justify-between items-center z-10">
+                        <button onClick={() => setView('home')} className="text-textMain"><FlatIcons.ChevronLeft /></button>
+                        <h2 className="font-extrabold text-brandNavy text-lg">Question {qIdx + 1}/{examQuestions.length}</h2>
+                        <div className={`font-black text-sm px-4 py-1.5 rounded-xl shadow-sm border ${isWarning ? 'bg-red-50 text-danger border-red-200 animate-pulse' : 'bg-white text-brandBlue border-blue-100'}`}>
+                            {formatTime(timeLeft)}
+                        </div>
                     </div>
 
-                    {/* Content Wrapper */}
-                    <div className="flex-1 bg-white rounded-t-[40px] px-6 pt-8 pb-32 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)] flex flex-col">
-                        
-                        {/* Segmented Progress Bar */}
-                        <div className="flex space-x-1.5 mb-8">
+                    <div className="flex-1 bg-white rounded-t-[40px] px-6 pt-8 pb-28 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] flex flex-col overflow-hidden relative">
+                        <div className="flex space-x-1.5 mb-6">
                             {[...Array(5)].map((_, i) => (
-                                <div key={i} className={`h-1.5 flex-1 rounded-full ${i < Math.ceil(((qIdx+1)/examQuestions.length)*5) ? 'bg-brandBlue' : 'bg-gray-100'}`}></div>
+                                <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${i < Math.ceil(((qIdx+1)/examQuestions.length)*5) ? 'bg-brandBlue' : 'bg-gray-100'}`}></div>
                             ))}
                         </div>
 
-                        <div className="flex-1 overflow-y-auto pr-2">
-                            <h3 className="text-lg font-extrabold text-textMain mb-6 leading-relaxed">
+                        <div className="flex-1 overflow-y-auto pr-2 pb-4">
+                            <h3 className="text-[15px] font-extrabold text-brandNavy mb-6 leading-relaxed bg-surface p-5 rounded-[24px] border border-blue-50">
                                 {q.question}
                             </h3>
 
-                            {/* Options (Radio style soft UI) */}
-                            <div className="space-y-4">
-                                {optionsList.map((opt, i) => {
+                            <div className="space-y-3">
+                                {q.shuffledOptions.map((opt, i) => {
                                     const isSelected = answers[qIdx] === opt;
                                     return (
                                         <div key={i} onClick={() => setAnswers({...answers, [qIdx]: opt})} 
                                             className={`flex items-center p-4 rounded-[24px] cursor-pointer transition-all duration-200 border-2 
-                                            ${isSelected ? 'border-brandBlue bg-pastelBlue shadow-sm' : 'border-transparent bg-optGray hover:bg-gray-200'}`}>
-                                            
-                                            <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center font-black mr-4 shadow-sm
-                                                ${isSelected ? 'bg-brandBlue text-white' : 'bg-white text-gray-400'}`}>
-                                                {['A','B','C','D'][i]}
-                                            </div>
-                                            
-                                            <span className={`flex-1 font-bold text-sm ${isSelected ? 'text-brandBlue' : 'text-textMain'}`}>{opt}</span>
-                                            
-                                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ml-3 shrink-0
-                                                ${isSelected ? 'border-brandBlue' : 'border-gray-300 bg-white'}`}>
-                                                {isSelected && <div className="w-3 h-3 bg-brandBlue rounded-full"></div>}
-                                            </div>
+                                            ${isSelected ? 'border-brandBlue bg-brandLight/50 shadow-sm transform scale-[1.01]' : 'border-transparent bg-optGray hover:bg-gray-200'}`}>
+                                            <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center font-black mr-4 shadow-sm shrink-0 transition-colors ${isSelected ? 'bg-brandBlue text-white' : 'bg-white text-gray-400'}`}>{['A','B','C','D'][i]}</div>
+                                            <span className={`flex-1 font-bold text-[14px] leading-relaxed ${isSelected ? 'text-brandBlue' : 'text-textMain'}`}>{opt}</span>
+                                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ml-3 shrink-0 transition-colors ${isSelected ? 'border-brandBlue' : 'border-gray-300 bg-white'}`}>{isSelected && <div className="w-3 h-3 bg-brandBlue rounded-full"></div>}</div>
                                         </div>
                                     )
                                 })}
@@ -506,212 +512,84 @@
                         </div>
                     </div>
 
-                    {/* Bottom Action Area */}
-                    <div className="absolute bottom-0 w-full bg-white px-6 py-6 flex justify-between gap-4 border-t border-gray-50 z-10">
-                        <button onClick={() => setQIdx(qIdx-1)} disabled={qIdx === 0} className="w-1/3 py-4 bg-optGray text-textMuted font-black rounded-[20px] hover:bg-gray-200 transition-colors disabled:opacity-30">กลับ</button>
+                    <div className="absolute bottom-0 w-full bg-white px-6 py-5 flex justify-between gap-4 border-t border-gray-50 z-20 pb-8">
+                        <button onClick={() => setQIdx(qIdx-1)} disabled={qIdx === 0} className="w-1/3 py-4 bg-optGray text-textMuted font-black rounded-[20px] hover:bg-gray-200 disabled:opacity-30 transition-colors">กลับ</button>
                         {qIdx === examQuestions.length - 1 ? 
-                            <button onClick={submit} disabled={Object.keys(answers).length < examQuestions.length} className="w-2/3 py-4 font-black rounded-[20px] transition-all shadow-soft-3d bg-brandBlue text-white hover:bg-blue-700 disabled:opacity-50 disabled:shadow-none">ส่งคำตอบ</button> :
-                            <button onClick={() => setQIdx(qIdx+1)} className="w-2/3 py-4 font-black rounded-[20px] transition-all bg-brandDark text-white hover:bg-gray-900 shadow-md">ถัดไป</button>
+                            <button onClick={() => autoSubmit(examQuestions, answers)} disabled={Object.keys(answers).length < examQuestions.length} className="w-2/3 py-4 font-black rounded-[20px] transition-all btn-3d bg-brandBlue text-white hover:bg-blue-700 disabled:opacity-50 disabled:shadow-none uppercase tracking-widest">ส่งข้อสอบ</button> :
+                            <button onClick={() => setQIdx(qIdx+1)} className="w-2/3 py-4 font-black rounded-[20px] transition-all bg-brandNavy text-white hover:bg-gray-900 shadow-md">ถัดไป</button>
                         }
                     </div>
                 </div>
             );
         }
 
-        // ==========================================
-        // Roleplay Test (Pastel Orange + 3D UI)
-        // ==========================================
-        function RoleplayTest({ session, scenarios, sysPrompt, updateSession, onRetake, onBack }) {
-            const [transcript, setTranscript] = useState(session.transcript || '');
-            const [isRecording, setIsRecording] = useState(false);
-            const [evaluating, setEvaluating] = useState(false);
-            const recognitionRef = useRef(null);
-
-            useEffect(() => {
-                if (session.roleplay_passed === false && session.transcript === '') {
-                    setTranscript(''); // Clear UI on retake
-                }
-                
-                if (!session.roleplay_assigned && session.pk_passed && scenarios.length > 0) {
-                    updateSession({ roleplay_assigned: scenarios[Math.floor(Math.random() * scenarios.length)] });
-                }
-                
-                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                    recognitionRef.current = new SpeechRecognition();
-                    recognitionRef.current.continuous = true;
-                    recognitionRef.current.interimResults = true;
-                    recognitionRef.current.lang = 'th-TH';
-
-                    recognitionRef.current.onresult = (event) => {
-                        let currentTranscript = '';
-                        for (let i = event.resultIndex; i < event.results.length; i++) {
-                            currentTranscript += event.results[i][0].transcript;
-                        }
-                        setTranscript(prev => {
-                            if(event.results[event.resultIndex].isFinal) return prev + ' ' + event.results[event.resultIndex][0].transcript;
-                            return prev;
-                        });
-                    };
-                    recognitionRef.current.onerror = (e) => { console.error("Mic error", e); setIsRecording(false); };
-                    recognitionRef.current.onend = () => { setIsRecording(false); };
-                }
-            }, [scenarios, session.roleplay_passed]);
-
-            const toggleRecording = () => {
-                if (isRecording) { recognitionRef.current?.stop(); setIsRecording(false); } 
-                else {
-                    if(!recognitionRef.current) return alert("เบราว์เซอร์ไม่รองรับ พิมพ์ในช่องได้เลยครับ");
-                    recognitionRef.current.start(); setIsRecording(true);
-                }
-            };
-
-            const evaluateTranscript = async () => {
-                if(transcript.trim().length < 20) return alert("กรุณาพูดนำเสนอให้ยาวกว่านี้ครับ");
-                setEvaluating(true);
-                try {
-                    const prompt = `คุณคือ Trainer ประเมินการขายผลิตภัณฑ์ [ข้อมูลผลิตภัณฑ์]: ${sysPrompt} [โจทย์]: เป้าหมาย "${session.roleplay_assigned.target}" บริบท: "${session.roleplay_assigned.context}" เกณฑ์พิเศษ: "${session.roleplay_assigned.ai_rubric || 'ไม่มี'}" [สิ่งที่พนักงานพูด]: "${transcript}" [คำสั่ง]: ประเมินและส่งผลลัพธ์เป็น JSON (ไม่ต้องมี markdown): {"ai_summary": "สรุปสั้นๆ","score": 85,"passed": true,"strengths": "จุดแข็ง","improvements": "คำแนะนำ"}`;
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`, {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } })
-                    });
-                    const data = await res.json();
-                    let aiRes = JSON.parse(data.candidates[0].content.parts[0].text);
-                    updateSession({ transcript: transcript, ai_feedback: aiRes, roleplay_passed: aiRes.passed });
-                } catch(err) {
-                    updateSession({ transcript: transcript, roleplay_passed: true, ai_feedback: { ai_summary: "พบการนำเสนอเกี่ยวกับผลิตภัณฑ์", score: 80, passed: true, strengths: "อธิบายภาพรวมได้ดี", improvements: "ควรเสริมความมั่นใจ" }});
-                }
-                setEvaluating(false);
-            };
-
-            if (!session.roleplay_assigned) return <div className="p-8 text-center font-bold">กำลังโหลดโจทย์...</div>;
-
-            if (session.ai_feedback) return (
-                <div className="flex-1 bg-white animate-slide-up flex flex-col pt-12 px-6 overflow-y-auto pb-10">
-                    <ResultScreen score={session.ai_feedback.score} label="AI Evaluation" passed={session.roleplay_passed} onBack={onBack} />
-                    
-                    <div className="mt-8 bg-pastelBlue p-5 rounded-3xl text-left shadow-sm">
-                        <p className="font-bold text-brandDark mb-2">AI Summary:</p>
-                        <p className="text-gray-700 text-sm font-medium leading-relaxed">{session.ai_feedback.ai_summary}</p>
+        // --- Result Dashboard ---
+        function ResultDashboard({ session, setView }) {
+            return (
+                <div className="flex-1 bg-surface animate-slide-up flex flex-col h-full overflow-y-auto">
+                    <div className="bg-brandNavy text-white pt-12 pb-16 px-8 rounded-b-[40px] shadow-card relative overflow-hidden shrink-0">
+                        <div className="absolute right-[-20px] top-6 w-40 h-40 bg-brandBlue rounded-full opacity-50 blur-3xl"></div>
+                        <button onClick={() => setView('home')} className="text-white mb-6"><FlatIcons.ChevronLeft /></button>
+                        <h2 className="text-3xl font-black mb-1">My Results</h2>
+                        <p className="text-brandLight font-bold text-sm opacity-80">Certification Summary</p>
                     </div>
 
-                    <div className="mt-5 bg-pastelGreen p-5 rounded-3xl text-left shadow-sm">
-                        <p className="font-bold text-green-800 mb-2">Strengths:</p>
-                        <p className="text-green-700 text-sm font-medium leading-relaxed">{session.ai_feedback.strengths}</p>
-                    </div>
+                    <div className="px-6 -mt-10 space-y-4 pb-10 flex-1">
+                        <div className="card-3d p-6 flex items-center justify-between border border-gray-50">
+                            <div className="flex items-center">
+                                <div className="w-14 h-14 bg-brandLight text-brandBlue rounded-[20px] flex items-center justify-center text-2xl mr-4">📘</div>
+                                <div><h4 className="font-black text-brandNavy text-lg">Knowledge</h4><p className="text-[10px] text-textMuted font-black uppercase tracking-wider mt-1">Passing: 80%</p></div>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-2xl font-black text-brandNavy">{session.pk_score !== null ? `${session.pk_score}%` : '-'}</p>
+                                <span className={`text-[10px] font-black uppercase tracking-widest ${session.pk_passed ? 'text-success' : 'text-danger'}`}>{session.pk_score !== null ? (session.pk_passed ? 'Pass' : 'Fail') : 'Pending'}</span>
+                            </div>
+                        </div>
 
-                    <div className="mt-5 bg-pastelOrange p-5 rounded-3xl text-left shadow-sm">
-                        <p className="font-bold text-[#FF8A00] mb-2">Improvements:</p>
-                        <p className="text-orange-800 text-sm font-medium leading-relaxed">{session.ai_feedback.improvements}</p>
-                    </div>
+                        <div className={`card-3d p-6 flex items-center justify-between border border-gray-50 ${!session.pk_passed ? 'opacity-60' : ''}`}>
+                            <div className="flex items-center">
+                                <div className="w-14 h-14 bg-pastelOrange text-accentOrange rounded-[20px] flex items-center justify-center text-2xl mr-4">👨‍🏫</div>
+                                <div><h4 className="font-black text-brandNavy text-lg">Trainer Check</h4><p className="text-[10px] text-textMuted font-black uppercase tracking-wider mt-1">Live Interview</p></div>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-2xl font-black text-brandNavy">{session.trainer_score !== null ? `${session.trainer_score}%` : '-'}</p>
+                                <span className={`text-[10px] font-black uppercase tracking-widest ${session.trainer_passed ? 'text-success' : 'text-danger'}`}>{session.trainer_score !== null ? (session.trainer_passed ? 'Pass' : 'Fail') : 'Pending'}</span>
+                            </div>
+                        </div>
+                        
+                        {/* 🌟 ข้อความพิเศษเมื่อสอบผ่าน PK */}
+                        {session.pk_passed && !session.trainer_passed && (
+                            <div className="mt-6 bg-pastelGreen border border-green-100 p-6 rounded-[24px] shadow-sm animate-pop">
+                                <div className="flex items-start">
+                                    <span className="text-2xl mr-3">🎉</span>
+                                    <div>
+                                        <h4 className="font-black text-green-800 text-sm mb-1">ยินดีด้วย! ท่านผ่าน Knowledge Test</h4>
+                                        <p className="text-green-700 text-xs font-bold leading-relaxed">
+                                            ต่อไปคือการสอบ Trainer Assessment ทุกท่านจะต้อง Role Play หรือตอบคำถาม กับ PRU Academy กรุณาติดต่อ Trainer specialist ประจำพื้นที่ของท่าน เพื่อนัดหมายการประเมิน
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
-                    {!session.roleplay_passed && (
-                        <div className="mt-10">
-                            <button onClick={onRetake} className="w-full bg-optGray text-textMain font-black py-4 rounded-[24px] hover:bg-gray-200 transition-colors text-lg border-2 border-gray-200">
-                                ลองใหม่อีกครั้ง
+                        {!session.pk_passed && session.pk_score !== null && (
+                            <button onClick={() => setView('pk')} className="w-full mt-4 bg-white border-2 border-brandBlue text-brandBlue font-black py-4 rounded-[24px] hover:bg-brandLight transition-colors text-lg shadow-sm">
+                                สอบ Knowledge Test ใหม่อีกครั้ง
                             </button>
-                        </div>
-                    )}
-                </div>
-            );
-
-            return (
-                <div className="flex-1 flex flex-col bg-[#F8F9FE] animate-slide-up relative h-full">
-                    {/* Header */}
-                    <div className="pt-8 pb-4 px-6 flex justify-between items-center">
-                        <button onClick={onBack} className="text-textMain"><FlatIcons.ChevronLeft /></button>
-                        <h2 className="font-extrabold text-textMain text-lg">Roleplay Scenario</h2>
-                        <div className="w-8 h-8"></div>
-                    </div>
-
-                    {/* Content Wrapper */}
-                    <div className="flex-1 bg-white rounded-t-[40px] px-6 pt-6 pb-32 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)] flex flex-col relative overflow-hidden">
+                        )}
                         
-                        <div className="flex-1 overflow-y-auto pr-2 z-10">
-                            {/* Scenario Card */}
-                            <div className="bg-pastelOrange rounded-[32px] p-6 relative overflow-hidden mb-6 border border-orange-50 shadow-sm">
-                                <div className="w-12 h-12 bg-white rounded-[16px] flex items-center justify-center text-2xl shadow-sm mb-4">🎯</div>
-                                <h3 className="text-[11px] font-black text-[#FF8A00] uppercase tracking-widest mb-1">Target Audience</h3>
-                                <h2 className="text-xl font-extrabold text-textMain mb-3 leading-tight">{session.roleplay_assigned.target}</h2>
-                                <p className="text-orange-950/70 text-sm font-bold leading-relaxed bg-white/50 p-4 rounded-[20px]">
-                                    {session.roleplay_assigned.context}
-                                </p>
-                            </div>
-
-                            <div className="text-center mb-4">
-                                <p className="text-textMuted text-xs font-bold uppercase tracking-wider">Your Pitch / Transcript</p>
-                            </div>
-
-                            {/* Voice Wave Indicator */}
-                            <div className="h-10 flex items-center justify-center gap-1.5 mb-4">
-                                {[1, 2, 3, 4, 5, 6, 7].map(i => (
-                                    <div key={i} className={`w-1.5 rounded-full ${isRecording ? 'bg-[#FF8A00] animate-pulse' : 'bg-gray-200'} transition-all duration-300`} style={{ height: isRecording ? `${Math.max(30, Math.random() * 100)}%` : '30%' }}></div>
-                                ))}
-                            </div>
-
-                            <textarea value={transcript} onChange={(e) => setTranscript(e.target.value)} placeholder={isRecording ? "กำลังฟัง..." : "กดปุ่มไมค์เพื่อพูด หรือพิมพ์สคริปต์ที่นี่..."} className={`w-full p-5 border-2 rounded-[24px] mb-6 outline-none font-bold text-textMain text-sm resize-none h-40 transition-colors ${isRecording ? 'border-[#FF8A00] bg-orange-50/50' : 'border-gray-100 bg-optGray focus:border-brandBlue'}`} />
+                        <div className={`mt-8 p-8 rounded-[36px] text-center shadow-card border border-gray-50 ${session.overall_status === 'CERTIFIED' ? 'bg-brandBlue text-white' : 'bg-white text-textMuted'}`}>
+                            <div className="text-5xl mb-4">{session.overall_status === 'CERTIFIED' ? '🎓' : '⏳'}</div>
+                            <h3 className={`font-black text-2xl mb-2 ${session.overall_status === 'CERTIFIED' ? 'text-white' : 'text-brandNavy'}`}>Status: {session.overall_status}</h3>
+                            <p className="text-[12px] font-bold opacity-80 leading-relaxed">Complete all modules to<br/>receive your certificate.</p>
                         </div>
                     </div>
-
-                    {/* Bottom Floating Action Area (3D Mic Button) */}
-                    <div className="absolute bottom-0 w-full bg-white px-6 py-6 flex justify-between gap-4 border-t border-gray-50 z-20">
-                        {/* 3D Mic Button */}
-                        <button onClick={toggleRecording} className={`w-16 h-16 rounded-full flex items-center justify-center text-white shadow-soft-3d transform transition-transform shrink-0 ${isRecording ? 'bg-red-500 pulse-mic' : 'bg-[#FF8A00]'}`}>
-                            <FlatIcons.Mic />
-                        </button>
-                        
-                        <button onClick={evaluateTranscript} disabled={evaluating || transcript.trim() === ''} className="flex-1 bg-brandDark text-white font-black rounded-[20px] shadow-md hover:bg-gray-900 disabled:opacity-50 disabled:shadow-none transition-all flex justify-center items-center">
-                            {evaluating ? <span className="animate-spin text-xl">⏳</span> : 'ส่งประเมินผล'}
-                        </button>
-                    </div>
                 </div>
             );
         }
 
         // ==========================================
-        // Common UI Components
-        // ==========================================
-        function TrainerStatus({ session, onBack }) {
-            if (!session.trainer_score) return (
-                <div className="flex-1 bg-white animate-fade-in flex flex-col items-center justify-center px-8 relative">
-                    <button onClick={onBack} className="absolute top-8 left-6 text-textMain"><FlatIcons.ChevronLeft /></button>
-                    <div className="w-32 h-32 bg-pastelGreen rounded-full flex items-center justify-center mb-6 shadow-inner-soft">
-                        <span className="text-6xl drop-shadow-md">👨‍🏫</span>
-                    </div>
-                    <h3 className="text-2xl font-black text-textMain mb-3">Pending Review</h3>
-                    <p className="text-textMuted text-center font-bold leading-relaxed">
-                        ข้อมูลถูกส่งเข้าระบบแล้ว<br/>โปรดรอสัมภาษณ์สดจากเทรนเนอร์
-                    </p>
-                </div>
-            );
-            return <div className="flex-1 bg-white pt-12 px-6"><ResultScreen score={session.trainer_score} label="Trainer Score" passed={session.trainer_passed} onBack={onBack} /></div>;
-        }
-
-        function ResultScreen({ score, label, passed, onBack }) {
-            return (
-                <div className="text-center flex flex-col items-center relative">
-                    <button onClick={onBack} className="absolute top-0 left-0 text-textMain"><FlatIcons.ChevronLeft /></button>
-                    <h3 className="text-xl font-extrabold text-textMuted mb-10 uppercase tracking-widest">{label}</h3>
-                    
-                    {/* Circle Progress */}
-                    <div className="relative w-48 h-48 mb-8">
-                        <svg className="w-full h-full transform -rotate-90 drop-shadow-lg">
-                            <circle cx="96" cy="96" r="80" stroke="#F0F2F8" strokeWidth="16" fill="none" />
-                            <circle cx="96" cy="96" r="80" stroke={passed ? '#20C997' : '#FF6B6B'} strokeWidth="16" fill="none" strokeDasharray="502" strokeDashoffset={502 - (score/100)*502} strokeLinecap="round" className="transition-all duration-1000 ease-out" />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center flex-col">
-                            <span className="text-5xl font-black text-textMain">{score}</span>
-                        </div>
-                    </div>
-                    <span className={`px-6 py-2 rounded-full text-sm font-black shadow-sm uppercase tracking-wider ${passed ? 'bg-pastelGreen text-green-700' : 'bg-red-50 text-red-600'}`}>
-                        {passed ? 'Passed' : 'Failed'}
-                    </span>
-                </div>
-            );
-        }
-
-        // ==========================================
-        // 7. TRAINER APP (Clean UI)
+        // 9. TRAINER APP (Step-by-step Randomizer 1-10 Score)
         // ==========================================
         function TrainerApp({ trainer, db, updateSession }) {
             const [filterRH, setFilterRH] = useState('All');
@@ -720,29 +598,75 @@
             const cands = db.users.filter(u => u.role === 'Candidate' && db.sessions[u.id]);
             const filtered = filterRH === 'All' ? cands : cands.filter(c => c.rh === filterRH);
             
-            if (evalUser) return <TrainerEvalScreen candidate={evalUser} session={db.sessions[evalUser.id]} trainer={trainer} rubrics={db.rubrics} updateSession={updateSession} onBack={() => setEvalUser(null)} />;
+            const zoneStats = {};
+            if (filterRH !== 'All') {
+                filtered.forEach(c => {
+                    if(!zoneStats[c.zone]) zoneStats[c.zone] = { total: 0, pending: 0, passed: 0 };
+                    zoneStats[c.zone].total++;
+                    if(db.sessions[c.id].pk_passed && !db.sessions[c.id].trainer_passed) zoneStats[c.zone].pending++;
+                    if(db.sessions[c.id].overall_status === 'CERTIFIED') zoneStats[c.zone].passed++;
+                });
+            }
+
+            if (evalUser) return <TrainerEvalScreen candidate={evalUser} trainer={trainer} rubrics={db.trainer_rubrics} updateSession={updateSession} onBack={() => setEvalUser(null)} />;
 
             return (
-                <div className="space-y-6 animate-fade-in">
-                    <div className="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                        <h2 className="text-xl font-extrabold text-brandDark">Trainer Dashboard</h2>
-                        <select value={filterRH} onChange={e => setFilterRH(e.target.value)} className="bg-optGray p-2 rounded-xl font-bold text-brandBlue outline-none">
-                            <option value="All">All RH</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}
-                        </select>
+                <div className="space-y-8 animate-fade-in pb-10 max-w-5xl mx-auto">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 sm:p-8 rounded-[32px] shadow-sm border border-gray-100">
+                        <div>
+                            <h2 className="text-2xl sm:text-3xl font-black text-brandNavy">Trainer Dashboard</h2>
+                            <p className="text-textMuted font-bold text-sm mt-1">Pending Evaluations Overview</p>
+                        </div>
+                        <div className="mt-4 md:mt-0 flex items-center bg-optGray p-2 rounded-2xl w-full md:w-auto">
+                            <span className="text-sm font-black text-gray-500 mr-3 ml-3 uppercase tracking-widest hidden sm:block">Filter RH:</span>
+                            <select value={filterRH} onChange={e => setFilterRH(e.target.value)} className="bg-white p-3 rounded-xl font-bold text-brandBlue outline-none border border-gray-100 cursor-pointer shadow-sm w-full md:w-auto">
+                                <option value="All">Overall Summary</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}
+                            </select>
+                        </div>
                     </div>
 
-                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div className="p-5 border-b border-gray-50 bg-pastelBlue/30"><h3 className="font-extrabold text-brandBlue text-lg">Pending Evaluations</h3></div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                        {[{t: "Total Candidates", v: filtered.length, bg: "bg-brandLight", text: "text-brandBlue"}, 
+                          {t: "PK In Progress", v: filtered.filter(c => !db.sessions[c.id].pk_passed).length, bg: "bg-optGray", text: "text-textMain"},
+                          {t: "Pending Interview", v: filtered.filter(c => db.sessions[c.id].pk_passed && !db.sessions[c.id].trainer_passed).length, bg: "bg-pastelOrange", text: "text-accentOrange"},
+                          {t: "Certified", v: filtered.filter(c => db.sessions[c.id].overall_status === 'CERTIFIED').length, bg: "bg-pastelGreen", text: "text-success"}
+                        ].map((s,i) => (
+                            <div key={i} className={`${s.bg} p-6 rounded-[28px] shadow-sm border border-white relative overflow-hidden`}>
+                                <p className="text-[10px] font-black text-gray-500 mb-2 uppercase tracking-widest relative z-10">{s.t}</p>
+                                <p className={`text-3xl sm:text-4xl font-black ${s.text} relative z-10`}>{s.v}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    {filterRH !== 'All' && Object.keys(zoneStats).length > 0 && (
+                        <div className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 animate-slide-up">
+                            <h3 className="font-black text-brandNavy text-lg mb-4">Zone Breakdown ({filterRH})</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {Object.entries(zoneStats).map(([zone, stats]) => (
+                                    <div key={zone} className="bg-optGray p-4 rounded-[20px] border border-gray-100">
+                                        <p className="font-bold text-brandBlue text-sm mb-2">{zone}</p>
+                                        <p className="text-xs font-bold text-textMuted">Pending: <span className="text-accentOrange">{stats.pending}</span></p>
+                                        <p className="text-xs font-bold text-textMuted">Passed: <span className="text-success">{stats.passed}</span></p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="p-6 border-b border-gray-50 bg-[#F8F9FE]"><h3 className="font-black text-brandNavy text-lg">Candidates Pending Interview</h3></div>
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead className="bg-gray-50 text-textMuted text-xs uppercase tracking-wider"><tr><th className="p-4">Candidate</th><th className="p-4">RH</th><th className="p-4">Roleplay Scenario</th><th className="p-4 text-center">Action</th></tr></thead>
+                            <table className="w-full text-left border-collapse min-w-[600px]">
+                                <thead className="bg-white text-textMuted text-[10px] uppercase tracking-widest border-b border-gray-100">
+                                    <tr><th className="p-6">Candidate</th><th className="p-6">Location</th><th className="p-6 text-center">PK Score</th><th className="p-6 text-center">Action</th></tr>
+                                </thead>
                                 <tbody>
-                                    {filtered.filter(c => db.sessions[c.id].roleplay_passed && !db.sessions[c.id].trainer_passed).map(c => (
+                                    {filtered.filter(c => db.sessions[c.id].pk_passed && !db.sessions[c.id].trainer_passed).map(c => (
                                         <tr key={c.id} className="border-b border-gray-50 hover:bg-optGray transition-colors">
-                                            <td className="p-4"><p className="font-bold text-textMain">{c.first_name_en}</p><p className="text-xs text-textMuted">{c.employee_id}</p></td>
-                                            <td className="p-4"><span className="font-bold text-brandBlue">{c.rh}</span></td>
-                                            <td className="p-4 text-sm text-gray-600 font-medium truncate max-w-xs">{db.sessions[c.id].roleplay_assigned?.target}</td>
-                                            <td className="p-4 text-center"><button onClick={() => setEvalUser(c)} className="bg-brandBlue text-white font-bold px-5 py-2 rounded-xl hover:bg-blue-700 shadow-sm text-sm">Review</button></td>
+                                            <td className="p-6"><p className="font-black text-textMain text-base">{c.first_name_en} {c.last_name_en}</p><p className="text-xs text-textMuted font-bold mt-1">{c.employee_id}</p></td>
+                                            <td className="p-6"><span className="font-black text-brandBlue bg-white border border-blue-100 px-3 py-1 rounded-lg shadow-sm">{c.rh}</span> <span className="text-xs text-gray-500 font-bold ml-2">{c.zone}</span></td>
+                                            <td className="p-6 text-center font-black text-success">{db.sessions[c.id].pk_score}%</td>
+                                            <td className="p-6 text-center"><button onClick={() => setEvalUser(c)} className="bg-brandBlue text-white font-black px-8 py-3 rounded-[16px] btn-3d text-sm uppercase tracking-widest">ประเมิน</button></td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -753,36 +677,340 @@
             );
         }
 
-        function TrainerEvalScreen({ candidate, session, trainer, rubrics, updateSession, onBack }) {
-            const submitScore = (score) => {
-                if(confirm(`ยืนยันบันทึกคะแนน ${score}% ใช่หรือไม่?`)) {
-                    updateSession(candidate.id, { trainer_score: score, trainer_passed: score >= 80, overall_status: score >= 80 ? 'CERTIFIED' : 'IN_PROGRESS' });
-                    alert('บันทึกผลเรียบร้อย'); onBack();
-                }
+        function TrainerEvalScreen({ candidate, trainer, rubrics, updateSession, onBack }) {
+            const [step, setStep] = useState(0); 
+            const [drawnQ, setDrawnQ] = useState(null); 
+            const [selectedQs, setSelectedQs] = useState([]); 
+            const [scores, setScores] = useState([null, null, null]);
+            const [comments, setComments] = useState(['', '', '']);
+            const [aiFeedback, setAiFeedback] = useState(null);
+            const [loadingAi, setLoadingAi] = useState(false);
+            const [showFinalPopup, setShowFinalPopup] = useState(false);
+            const [totalCalculatedScore, setTotalCalculatedScore] = useState(0);
+
+            // Use DB Rubrics or fallback to NEW_TRAINER_RUBRICS if empty
+            const activeRubrics = rubrics && rubrics.length > 0 ? rubrics : NEW_TRAINER_RUBRICS;
+
+            const drawQuestion = () => {
+                const cat = TRAINER_CATEGORIES[step];
+                const pool = activeRubrics.filter(r => r.category === cat);
+                if(pool.length === 0) return alert('ไม่พบคำถามในหมวดนี้');
+                const randomQ = pool[Math.floor(Math.random() * pool.length)];
+                setDrawnQ(randomQ);
             };
+
+            const handleScore = (val) => {
+                const newScores = [...scores]; newScores[step] = val; setScores(newScores);
+            };
+
+            const nextStep = () => {
+                if (scores[step] === null) return alert("กรุณาให้คะแนน 1-10 ก่อนไปข้อถัดไป");
+                const newSelectedQs = [...selectedQs];
+                newSelectedQs[step] = drawnQ;
+                setSelectedQs(newSelectedQs);
+                setDrawnQ(null);
+                setStep(step + 1);
+            };
+
+            const askAiCopilot = async () => {
+                setLoadingAi(true);
+                try {
+                    const prompt = `ในฐานะผู้เชี่ยวชาญการขายผลิตภัณฑ์การลงทุนระดับมืออาชีพ คุณกำลังช่วยเทรนเนอร์เตรียมตัวประเมินพนักงานใน 3 คำถามดังนี้: 1. ${selectedQs[0].question} 2. ${selectedQs[1].question} 3. ${selectedQs[2].question}. 
+                    ให้คุณจำลอง "คำตอบที่สมบูรณ์แบบ" เป็นประโยคคำพูดที่มืออาชีพควรตอบลูกค้า, โครงสร้างการตอบ, และสิ่งที่ห้ามพูดเด็ดขาด (Red flags) โดยตอบกลับมาเป็น JSON Format เท่านั้น (ห้ามมี Markdown): 
+                    {"advice": [{"q_num": 1, "perfect_answer": "...", "structure": "...", "red_flags": ["...", "..."]}, ...]}`;
+                    
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } })
+                    });
+                    const data = await res.json();
+                    let text = data.candidates[0].content.parts[0].text;
+                    text = text.replace(/```json/g, '').replace(/```/g, ''); // Clean markdown if any
+                    let aiRes = JSON.parse(text);
+                    setAiFeedback(aiRes.advice);
+                } catch(err) {
+                    console.error("AI Error:", err);
+                    setAiFeedback([
+                        {q_num: 1, perfect_answer: "คำตอบสมบูรณ์: 'เงินต้นคุ้มครองโดยพันธบัตร ไม่เกี่ยวกับหุ้นครับ'", structure: "1. ยอมรับความจริง 2. อธิบายกลไก", red_flags: ["ห้ามบอกว่าเป็นเงินฝาก", "ห้ามการันตีกำไร"]},
+                        {q_num: 2, perfect_answer: "คำตอบสมบูรณ์: 'การกระจายความเสี่ยงช่วยให้พอร์ตมั่นคง'", structure: "1. เทียบข้อจำกัด 60/40 2. เสนอทางออกด้วย VT8", red_flags: ["หลีกเลี่ยงการโจมตีกองทุนอื่น"]},
+                        {q_num: 3, perfect_answer: "คำตอบสมบูรณ์: 'ไม่สามารถทำได้เนื่องจากโครงสร้างต้นทุนถูกล็อกไว้แล้วครับ'", structure: "1. ปฏิเสธอย่างสุภาพ 2. ให้เหตุผลทางวิศวกรรม", red_flags: ["ตอบปัดๆ ว่าธนาคารสั่งมา"]}
+                    ]);
+                }
+                setLoadingAi(false);
+            };
+
+            const submitFinal = async () => {
+                // คำนวณคะแนน: 3 ข้อ ข้อละ 10 คะแนน (เต็ม 30) แปลงเป็น 100%
+                const rawTotal = scores[0] + scores[1] + scores[2];
+                const finalScore = Math.round((rawTotal / 30) * 100);
+                setTotalCalculatedScore(finalScore);
+
+                try {
+                    await updateSession(candidate.id, { 
+                        trainer_score: finalScore, 
+                        trainer_passed: finalScore >= 80, 
+                        overall_status: finalScore >= 80 ? 'CERTIFIED' : 'IN_PROGRESS' 
+                    });
+                    setShowFinalPopup(true);
+                } catch(e) { alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่"); }
+            };
+
+            if (showFinalPopup) {
+                return (
+                    <div className="absolute inset-0 bg-brandNavy/90 z-50 flex items-center justify-center p-6 backdrop-blur-sm animate-fade-in">
+                        <div className="bg-white rounded-[40px] p-8 text-center max-w-sm w-full shadow-2xl animate-pop relative overflow-hidden">
+                            <div className="absolute top-[-50px] right-[-50px] w-32 h-32 bg-brandLight rounded-full opacity-50 blur-2xl"></div>
+                            <div className="w-20 h-20 bg-surface rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner-soft">📋</div>
+                            <h2 className="text-2xl font-black text-brandNavy mb-6">สรุปผลการประเมิน</h2>
+                            
+                            <div className="space-y-3 mb-8">
+                                <div className="bg-optGray p-4 rounded-[20px] flex justify-between items-center border border-gray-100">
+                                    <span className="font-bold text-textMuted text-sm">Knowledge Test</span>
+                                    <span className="font-black text-brandNavy">{candidate.sessions?.pk_score || 0}% <span className="text-success text-xs ml-1">(Pass)</span></span>
+                                </div>
+                                <div className="bg-brandLight/30 p-4 rounded-[20px] flex justify-between items-center border border-blue-50">
+                                    <span className="font-bold text-brandBlue text-sm">Trainer Assessment</span>
+                                    <span className="font-black text-brandBlue">{totalCalculatedScore}% <span className={`text-xs ml-1 ${totalCalculatedScore >= 80 ? 'text-success' : 'text-danger'}`}>({totalCalculatedScore >= 80 ? 'Pass' : 'Fail'})</span></span>
+                                </div>
+                            </div>
+                            <button onClick={onBack} className="w-full bg-brandNavy text-white font-black py-4 rounded-[20px] btn-3d uppercase tracking-widest text-sm">กลับหน้า Home</button>
+                        </div>
+                    </div>
+                );
+            }
+
             return (
-                <div className="space-y-6 animate-fade-in bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                    <button onClick={onBack} className="text-textMuted font-bold mb-4">← กลับ</button>
-                    <h2 className="text-2xl font-black text-brandDark mb-6">ประเมิน: {candidate.first_name_en}</h2>
-                    <div className="bg-optGray p-4 rounded-2xl mb-6 text-sm"><b>Transcript:</b> {session.transcript}</div>
-                    <div className="flex gap-4">
-                        <button onClick={() => submitScore(50)} className="flex-1 bg-red-100 text-red-700 font-bold py-3 rounded-xl">50%</button>
-                        <button onClick={() => submitScore(80)} className="flex-1 bg-green-100 text-green-700 font-bold py-3 rounded-xl">80%</button>
-                        <button onClick={() => submitScore(100)} className="flex-1 bg-brandBlue text-white font-bold py-3 rounded-xl">100%</button>
+                <div className="space-y-6 animate-fade-in pb-10 max-w-4xl mx-auto">
+                    <button onClick={onBack} className="text-textMuted hover:text-brandBlue font-black flex items-center bg-white px-5 py-3 rounded-[20px] shadow-sm border border-gray-100 w-max transition-colors"><FlatIcons.ChevronLeft /> <span className="ml-2 uppercase tracking-widest text-[10px]">Back to Dashboard</span></button>
+                    
+                    <div className="bg-brandNavy text-white p-8 rounded-[36px] flex flex-col md:flex-row justify-between items-start md:items-center shadow-card relative overflow-hidden">
+                        <div className="absolute right-[-20px] top-6 w-40 h-40 bg-brandBlue rounded-full opacity-40 blur-3xl"></div>
+                        <div className="relative z-10">
+                            <p className="text-pastelOrange text-[10px] font-black uppercase tracking-widest mb-2">Live Interview Assessment</p>
+                            <h2 className="text-3xl sm:text-4xl font-black">{candidate.first_name_en} {candidate.last_name_en}</h2>
+                            <p className="text-brandLight font-bold mt-2 text-sm">{candidate.employee_id} | {candidate.rh} ({candidate.zone})</p>
+                        </div>
+                    </div>
+                    
+                    <div className="bg-white p-6 sm:p-8 rounded-[32px] shadow-sm border border-gray-100 min-h-[400px]">
+                        <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mb-6 border-b border-gray-100 pb-4 gap-4">
+                            <h3 className="font-black text-brandDark text-xl">{step < 3 ? `Step ${step+1}: ${TRAINER_CATEGORIES[step]}` : 'Review & Submit'}</h3>
+                            <div className="flex gap-2">{[0,1,2].map(i => <div key={i} className={`w-4 h-4 rounded-full transition-all ${step > i ? 'bg-success' : step === i ? 'bg-brandBlue scale-125' : 'bg-gray-200'}`}></div>)}</div>
+                        </div>
+
+                        {step < 3 ? (
+                            <div>
+                                {!drawnQ ? (
+                                    <div className="text-center py-20 bg-surface rounded-[28px] border border-gray-100">
+                                        <p className="text-textMuted font-bold mb-6">กดปุ่มด้านล่างเพื่อสุ่มคำถามในหมวด<br/><span className="text-brandBlue font-black text-lg">{TRAINER_CATEGORIES[step]}</span></p>
+                                        <button onClick={drawQuestion} className="bg-brandBlue text-white font-black py-4 px-10 rounded-[24px] btn-3d text-sm sm:text-lg uppercase tracking-widest">สุ่มคำถาม (Draw Question)</button>
+                                    </div>
+                                ) : (
+                                    <div className="animate-slide-up space-y-6">
+                                        <div className="bg-brandLight/30 p-6 rounded-[24px] border border-blue-50 relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 w-16 h-16 bg-white rounded-bl-full opacity-50"></div>
+                                            <p className="font-black text-brandNavy text-lg sm:text-xl leading-relaxed relative z-10">Q: {drawnQ.question}</p>
+                                        </div>
+                                        
+                                        {/* Detailed Rubrics (1-10 mapped to High/Mid/Low) */}
+                                        <div className="space-y-3">
+                                            <p className="font-black text-textMuted text-[10px] uppercase tracking-widest mb-2">Scoring Rubrics</p>
+                                            <div className="bg-pastelGreen/50 p-4 sm:p-5 rounded-[20px] flex items-start border border-green-50 transition-transform hover:scale-[1.01]">
+                                                <div className="w-10 h-10 bg-success text-white rounded-[10px] flex items-center justify-center font-black shrink-0 mr-4 shadow-sm text-sm">9-10</div>
+                                                <p className="text-sm font-bold text-green-900 pt-1 leading-relaxed"><b className="text-[10px] uppercase tracking-widest block text-green-700 mb-1">Excellent (ครบถ้วน)</b>{drawnQ.score_high}</p>
+                                            </div>
+                                            <div className="bg-surface p-4 sm:p-5 rounded-[20px] flex items-start border border-gray-100 transition-transform hover:scale-[1.01]">
+                                                <div className="w-10 h-10 bg-gray-400 text-white rounded-[10px] flex items-center justify-center font-black shrink-0 mr-4 shadow-sm text-sm">5-8</div>
+                                                <p className="text-sm font-bold text-textMain pt-1 leading-relaxed"><b className="text-[10px] uppercase tracking-widest block text-gray-500 mb-1">Good (ขาดบางประเด็น)</b>{drawnQ.score_mid}</p>
+                                            </div>
+                                            <div className="bg-red-50 p-4 sm:p-5 rounded-[20px] flex items-start border border-red-100 transition-transform hover:scale-[1.01]">
+                                                <div className="w-10 h-10 bg-danger text-white rounded-[10px] flex items-center justify-center font-black shrink-0 mr-4 shadow-sm text-sm">1-4</div>
+                                                <p className="text-sm font-bold text-red-800 pt-1 leading-relaxed"><b className="text-[10px] uppercase tracking-widest block text-red-500 mb-1">Poor / Incorrect</b>{drawnQ.score_low}</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Scoring UI (1-10) */}
+                                        <div className="pt-8 border-t border-gray-100">
+                                            <p className="font-black text-brandBlue text-sm uppercase tracking-widest mb-4 text-center">Select Score (1-10)</p>
+                                            <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 sm:gap-3 mb-6">
+                                                {[1,2,3,4,5,6,7,8,9,10].map(v => (
+                                                    <button key={v} onClick={() => handleScore(v)} className={`rating-btn py-3 rounded-[16px] font-black text-lg sm:text-xl ${scores[step] === v ? 'selected' : 'bg-surface text-textMuted hover:border-brandBlue'}`}>
+                                                        {v}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <textarea value={comments[step]} onChange={e => {const newC = [...comments]; newC[step] = e.target.value; setComments(newC);}} placeholder="Trainer Comment (Optional)..." className="w-full p-5 rounded-[24px] bg-surface border-2 border-transparent focus:bg-white focus:border-brandBlue outline-none font-bold text-sm transition-all resize-none h-24" />
+                                        </div>
+
+                                        <button onClick={nextStep} disabled={scores[step] === null} className="w-full bg-brandNavy text-white font-black py-4 rounded-[24px] btn-3d mt-4 hover:bg-gray-900 disabled:opacity-50 disabled:shadow-none uppercase tracking-widest">
+                                            บันทึก & ถัดไป
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            // Step 3: Review & AI Copilot
+                            <div className="animate-slide-up space-y-6">
+                                <div className="flex flex-col sm:flex-row justify-between items-center bg-surface p-6 rounded-[28px] border border-gray-100 gap-4">
+                                    <div className="text-center sm:text-left"><p className="font-black text-textMuted text-[10px] uppercase tracking-widest">Total Raw Score</p><p className="text-5xl font-black text-brandBlue">{scores[0]+scores[1]+scores[2]} <span className="text-2xl text-gray-300">/ 30</span></p></div>
+                                    <button onClick={askAiCopilot} disabled={loadingAi} className="w-full sm:w-auto flex items-center justify-center bg-accentOrange text-white px-8 py-4 rounded-[20px] font-black btn-3d">
+                                        {loadingAi ? <span className="animate-spin mr-2 text-xl">⏳</span> : <FlatIcons.Sparkles />}
+                                        <span className="ml-2 uppercase tracking-widest text-sm">{loadingAi ? 'AI Processing...' : 'Ask AI Copilot'}</span>
+                                    </button>
+                                </div>
+
+                                {/* AI Feedback Display (New Format) */}
+                                {aiFeedback && (
+                                    <div className="space-y-6 animate-fade-in">
+                                        <h4 className="font-black text-brandNavy flex items-center text-lg"><FlatIcons.Sparkles /> <span className="ml-2">AI Copilot Insights</span></h4>
+                                        {aiFeedback.map((fb, i) => (
+                                            <div key={i} className="bg-white p-6 rounded-[28px] border border-gray-100 shadow-sm">
+                                                <p className="font-bold text-sm text-textMain mb-4 leading-relaxed border-b border-gray-50 pb-3"><span className="bg-brandBlue text-white px-2 py-0.5 rounded-[8px] mr-2 shadow-sm">Q{fb.q_num}</span> {selectedQs[i].question}</p>
+                                                
+                                                <div className="space-y-4">
+                                                    <div className="bg-brandLight/20 p-4 rounded-[16px] border border-blue-50">
+                                                        <p className="text-[10px] font-black text-brandBlue uppercase tracking-widest mb-1">Perfect Answer (คำตอบที่สมบูรณ์แบบ)</p>
+                                                        <p className="text-sm font-extrabold text-brandNavy leading-relaxed">"{fb.perfect_answer}"</p>
+                                                    </div>
+                                                    <div className="bg-pastelGreen/30 p-4 rounded-[16px] border border-green-50">
+                                                        <p className="text-[10px] font-black text-green-700 uppercase tracking-widest mb-1">Structure (โครงสร้างการตอบ)</p>
+                                                        <p className="text-xs font-bold text-green-900 leading-relaxed">{fb.structure}</p>
+                                                    </div>
+                                                    <div className="bg-red-50/50 p-4 rounded-[16px] border border-red-50">
+                                                        <p className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-1">Red Flags (สิ่งที่ไม่ควรพูด)</p>
+                                                        <ul className="text-xs font-bold text-red-900 leading-relaxed list-disc list-inside pl-2">
+                                                            {fb.red_flags.map((flag, idx) => <li key={idx}>{flag}</li>)}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                <button onClick={submitFinal} className="w-full bg-success text-white font-black py-4 rounded-[24px] btn-3d mt-8 text-lg uppercase tracking-widest">
+                                    Submit Final Evaluation
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             );
         }
 
         // ==========================================
-        // 8. ADMIN APP
+        // 11. ADMIN APP
         // ==========================================
-        function AdminApp({ db, setDb, isDbConnected }) {
+        function AdminApp({ db, setDb }) {
+            const [filterRH, setFilterRH] = useState('All');
+            const cands = db.users.filter(u => u.role === 'Candidate');
+            const filtered = filterRH === 'All' ? cands : cands.filter(c => c.rh === filterRH);
+
+            const zoneStats = {};
+            if (filterRH !== 'All') {
+                filtered.forEach(c => {
+                    if(!zoneStats[c.zone]) zoneStats[c.zone] = { total: 0, passed: 0 };
+                    zoneStats[c.zone].total++;
+                    if(db.sessions[c.id]?.overall_status === 'CERTIFIED') zoneStats[c.zone].passed++;
+                });
+            }
+
+            const exportData = () => {
+                const data = filtered.map(u => ({ 
+                    "Employee ID": u.employee_id, "Name": `${u.first_name_en} ${u.last_name_en}`, 
+                    "RH": u.rh, "Zone": u.zone,
+                    "PK Score (%)": db.sessions[u.id]?.pk_score || '-', 
+                    "PK Attempts": db.sessions[u.id]?.pk_attempts || 0,
+                    "Trainer Score (%)": db.sessions[u.id]?.trainer_score || '-',
+                    "Overall Status": db.sessions[u.id]?.overall_status || 'NOT STARTED'
+                }));
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Certification Report");
+                XLSX.writeFile(wb, "TTB_Certification_Report.xlsx");
+            };
+
+            const resetUser = async (id, name) => {
+                if(confirm(`ยืนยันการล้างประวัติการสอบ (Reset) ของ ${name} ใช่หรือไม่?\nข้อมูลการสอบและจำนวนรอบจะกลับไปเริ่มใหม่ทั้งหมด`)) {
+                    setDb(prev => { const s = {...prev.sessions}; delete s[id]; return {...prev, sessions: s}; });
+                    await supabase.from('exam_sessions').delete().eq('user_id', id);
+                    localStorage.removeItem(`ttb_exam_${id}`);
+                    alert('รีเซ็ตข้อมูลสำเร็จ');
+                }
+            };
+
+            const delUser = async (id, name) => {
+                if(confirm(`ยืนยันการลบบัญชี ${name} ออกจากระบบถาวร?`)) {
+                    setDb(prev => { const s = {...prev.sessions}; delete s[id]; return {...prev, users: prev.users.filter(x => x.id !== id), sessions: s}; });
+                    await supabase.from('users').delete().eq('id', id);
+                }
+            };
+
             return (
-                <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 text-center animate-fade-in">
-                    <h2 className="text-2xl font-black text-brandDark mb-4">Admin Data Export</h2>
-                    <p className="text-textMuted mb-8 font-bold">Total Users: {db.users.length}</p>
-                    <button onClick={() => alert('Exporting...')} className="bg-green-500 text-white font-black px-8 py-4 rounded-2xl shadow-soft-3d hover:bg-green-600">Export Excel Report</button>
+                <div className="space-y-8 animate-fade-in pb-10 max-w-6xl mx-auto">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 sm:p-8 rounded-[36px] shadow-sm border border-gray-100">
+                        <div>
+                            <h2 className="text-2xl sm:text-3xl font-black text-brandDark">System Administration</h2>
+                            <p className="text-textMuted font-bold text-sm mt-2">Manage users and export certification data.</p>
+                        </div>
+                        <div className="mt-6 md:mt-0 flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                            <select value={filterRH} onChange={e => setFilterRH(e.target.value)} className="bg-surface p-4 rounded-[20px] font-bold text-brandBlue outline-none cursor-pointer border border-gray-100 w-full sm:w-auto shadow-sm">
+                                <option value="All">All RH (Overall)</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}
+                            </select>
+                            <button onClick={exportData} className="bg-success hover:bg-green-600 text-white px-8 py-4 rounded-[20px] font-black flex justify-center items-center btn-3d uppercase tracking-widest text-sm w-full sm:w-auto"><FlatIcons.Download /> <span className="ml-2">Export Excel</span></button>
+                        </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-white p-8 rounded-[32px] shadow-sm border border-gray-100 flex items-center justify-between"><div className="space-y-1"><p className="text-[10px] font-black text-textMuted uppercase tracking-widest">Total Registered</p><p className="text-5xl font-black text-brandNavy">{filtered.length}</p></div><div className="w-20 h-20 bg-brandLight rounded-[24px] flex items-center justify-center text-brandBlue"><FlatIcons.Users /></div></div>
+                        <div className="bg-white p-8 rounded-[32px] shadow-sm border border-gray-100 flex items-center justify-between"><div className="space-y-1"><p className="text-[10px] font-black text-textMuted uppercase tracking-widest">Fully Certified</p><p className="text-5xl font-black text-success">{filtered.filter(c => db.sessions[c.id]?.overall_status === 'CERTIFIED').length}</p></div><div className="w-20 h-20 bg-pastelGreen rounded-[24px] flex items-center justify-center text-green-600 text-4xl">🎓</div></div>
+                    </div>
+
+                    {filterRH !== 'All' && Object.keys(zoneStats).length > 0 && (
+                        <div className="bg-white rounded-[32px] p-6 sm:p-8 shadow-sm border border-gray-100 animate-slide-up">
+                            <h3 className="font-black text-brandNavy text-xl mb-6">Zone Breakdown ({filterRH})</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                {Object.entries(zoneStats).map(([zone, stats]) => (
+                                    <div key={zone} className="bg-surface p-5 rounded-[24px] border border-gray-100">
+                                        <p className="font-black text-brandBlue text-sm mb-3">{zone}</p>
+                                        <p className="text-[11px] font-black text-textMuted uppercase tracking-widest">Users: <span className="text-brandNavy">{stats.total}</span></p>
+                                        <p className="text-[11px] font-black text-success uppercase tracking-widest mt-1">Cert: <span className="text-success">{stats.passed}</span></p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="bg-white rounded-[36px] shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="p-6 sm:p-8 border-b border-gray-50 bg-[#F8F9FE] flex justify-between items-center"><h3 className="font-black text-brandDark text-xl">Candidate Database</h3></div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm min-w-[800px]">
+                                <thead className="bg-white border-b border-gray-100">
+                                    <tr><th className="p-6 font-black text-textMuted text-[10px] uppercase tracking-widest">Candidate Info</th><th className="p-6 font-black text-textMuted text-[10px] uppercase tracking-widest text-center">Location</th><th className="p-6 font-black text-textMuted text-[10px] uppercase tracking-widest text-center">Overall Status</th><th className="p-6 font-black text-textMuted text-[10px] uppercase tracking-widest text-center">Manage</th></tr>
+                                </thead>
+                                <tbody className="font-medium">
+                                    {filtered.map(u => (
+                                    <tr key={u.id} className="border-b border-gray-50 hover:bg-surface transition-colors">
+                                        <td className="p-6"><p className="font-black text-textMain text-base">{u.first_name_en} {u.last_name_en}</p><p className="text-textMuted font-bold text-xs mt-1">{u.employee_id} <span className="bg-gray-200 text-gray-600 px-2 py-0.5 rounded text-[10px] ml-2">{u.position}</span></p></td>
+                                        <td className="p-6 text-center"><span className="font-black text-brandBlue bg-white border border-blue-50 px-3 py-1 rounded-lg text-xs shadow-sm">{u.rh}</span><div className="text-xs text-gray-500 mt-2 font-bold">{u.zone}</div></td>
+                                        <td className="p-6 text-center">
+                                            <span className={`px-4 py-2 rounded-[12px] text-[10px] font-black uppercase tracking-widest shadow-sm ${db.sessions[u.id]?.overall_status === 'CERTIFIED' ? 'bg-pastelGreen text-green-700' : db.sessions[u.id] ? 'bg-pastelOrange text-accentOrange' : 'text-gray-400 bg-gray-100'}`}>
+                                                {db.sessions[u.id]?.overall_status || 'PENDING'}
+                                            </span>
+                                            {db.sessions[u.id] && <div className="text-[10px] text-gray-400 font-bold mt-2">PK: {db.sessions[u.id].pk_score || '-'}% | TR: {db.sessions[u.id].trainer_score || '-'}%</div>}
+                                        </td>
+                                        <td className="p-6">
+                                            <div className="flex justify-center space-x-3">
+                                                <button onClick={() => resetUser(u.id, u.first_name_en)} className="text-accentOrange bg-pastelOrange hover:bg-accentOrange hover:text-white p-3 rounded-[14px] transition-colors shadow-sm" title="Reset Exam Data"><FlatIcons.Refresh /></button>
+                                                <button onClick={() => delUser(u.id, u.first_name_en)} className="text-danger bg-red-50 hover:bg-danger hover:text-white p-3 rounded-[14px] transition-colors shadow-sm" title="Delete Account"><FlatIcons.Trash /></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {filtered.length === 0 && <tr><td colSpan="4" className="text-center p-12 text-gray-400 font-bold text-lg">No candidates found.</td></tr>}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             );
         }
