@@ -93,7 +93,7 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ==========================================
-        // 2. FLAT ICONS
+        // 2. FLAT ICONS & SHARED COMPONENTS
         // ==========================================
         const FlatIcons = {
             Home: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>,
@@ -107,6 +107,15 @@
             Users: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
         };
 
+        // ✅ ฟุตเตอร์เครดิตสำหรับทุกหน้า
+        function PoweredByFooter() {
+            return (
+                <div className="text-center py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest w-full">
+                    Powered by : PRU ACADEMY <span className="text-brandBlue">[ttb training team]</span>
+                </div>
+            );
+        }
+
         const RH_ZONES = {
             'RH1': ['จตุจักร', 'ธนบุรี', 'บางกะปิ', 'สาทร', 'สุขุมวิท'],
             'RH2': ['ชลบุรี', 'บางนา', 'พัทยา', 'ระยอง'],
@@ -114,7 +123,6 @@
             'RH4': ['ดอนเมือง', 'นครราชสีมา', 'สระบุรี', 'อุดรธานี', 'อุบลราชธานี'],
             'RH5': ['ภูเก็ต', 'ราชบุรี', 'สมุทรสาคร', 'สุราษฎร์ธานี', 'หาดใหญ่']
         };
-        // ✅ บังคับให้สมัครได้เฉพาะ IS/IA เท่านั้น
         const REG_POSITIONS = ['IS', 'IA']; 
         const TRAINER_CATEGORIES = ['Product Knowledge', 'Investment Knowledge', 'Objection Handling'];
 
@@ -224,7 +232,6 @@
                         setErr('Employee ID นี้ถูกใช้งานแล้ว กรุณาเข้าสู่ระบบ');
                         setIsSubmitting(false); return;
                     }
-                    // ✅ Validation ตรวจสอบข้อมูลครบถ้วน
                     if (!form.rh || !form.zone || !form.lastName) {
                         setErr('กรุณากรอกข้อมูล นามสกุล, Region และ Zone ให้ครบถ้วน');
                         setIsSubmitting(false); return;
@@ -235,7 +242,7 @@
                         employee_id: form.empId, 
                         first_name_en: form.firstName, 
                         last_name_en: form.lastName, 
-                        role: 'Candidate', // ล็อก Role อัตโนมัติ
+                        role: 'Candidate',
                         position: form.position, 
                         rh: form.rh, 
                         zone: form.zone 
@@ -267,7 +274,7 @@
                     
                     {err && <div className="bg-red-50 text-danger p-4 rounded-[20px] mb-6 text-sm font-bold text-center border border-red-100 relative z-10 animate-pop">{err}</div>}
                     
-                    <form onSubmit={handleSubmit} className="space-y-4 relative z-10 pb-10">
+                    <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
                         <div>
                             <input type="text" value={form.empId} onChange={e => setForm({...form, empId: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue outline-none font-bold text-textMain transition-all shadow-sm" placeholder="Employee ID" required />
                         </div>
@@ -301,12 +308,19 @@
                         <button type="submit" disabled={isSubmitting} className="w-full bg-brandBlue text-white font-black py-4 rounded-[20px] btn-3d mt-6 text-lg tracking-wide uppercase disabled:opacity-70 flex justify-center items-center">
                             {isSubmitting ? <span className="animate-spin text-xl mr-2">⏳</span> : (isReg ? 'สร้างบัญชี (Register)' : 'Login')}
                         </button>
+                        
+                        {/* ✅ ย้ายลิงก์ลงทะเบียนมาอยู่ใต้ปุ่ม Login ทันที และแก้ไขข้อความ/สี */}
+                        <div className="text-center mt-6">
+                            <button type="button" onClick={() => {setIsReg(!isReg); setErr('');}} className="text-textMuted hover:text-brandBlue font-bold text-sm transition-colors">
+                                {isReg ? 'มีบัญชีอยู่แล้ว กลับไปหน้าเข้าสู่ระบบ' : (
+                                    <span>คลิ๊กที่นี่ เพื่อลงทะเบียนเข้าใช้งาน <span className="text-danger">เฉพาะครั้งแรก</span></span>
+                                )}
+                            </button>
+                        </div>
                     </form>
 
-                    <div className="text-center pb-8 relative z-10 mt-auto">
-                        <button type="button" onClick={() => {setIsReg(!isReg); setErr('');}} className="text-textMuted hover:text-brandBlue font-bold text-sm transition-colors">
-                            {isReg ? 'มีบัญชีอยู่แล้ว? กลับไปหน้าเข้าสู่ระบบ' : 'พนักงานใหม่ (IS/IA)? ลงทะเบียนเข้าสอบที่นี่'}
-                        </button>
+                    <div className="mt-auto relative z-10 pt-8 pb-4">
+                        <PoweredByFooter />
                     </div>
                 </div>
             );
@@ -335,7 +349,7 @@
                                     <p className="flex items-start text-xs font-bold text-accentOrange mt-3 pt-4 border-t border-gray-200"><span className="mr-2 text-base">⚠️</span> หากสอบไม่ผ่าน สามารถสอบใหม่ได้ แต่ระบบจะบันทึกจำนวนครั้งไว้ หากผ่านแล้วจะไม่สามารถสอบซ้ำได้</p>
                                 </div>
                                 <button onClick={() => setShowOnboarding(false)} className="w-full bg-brandNavy text-white font-black py-4 rounded-[20px] hover:bg-gray-900 transition-colors uppercase tracking-widest text-sm">รับทราบและปิด</button>
-                                <p className="text-[10px] font-black text-gray-300 mt-6 tracking-widest uppercase">PRU ACADEMY [ttb training team]</p>
+                                <div className="mt-6"><PoweredByFooter /></div>
                             </div>
                         </div>
                     )}
@@ -358,13 +372,16 @@
         function CandidateHome({ user, session, setView }) {
             let prog = 0; if (session.pk_passed) prog += 50; if (session.trainer_passed) prog += 50;
             return (
-                <div className="flex-1 overflow-y-auto pb-6 animate-fade-in bg-surface">
+                <div className="flex-1 overflow-y-auto pb-6 animate-fade-in bg-surface flex flex-col">
                     <div className="p-8 pb-6 flex items-center"><div className="w-16 h-16 bg-white rounded-[24px] flex items-center justify-center text-3xl mr-5 shadow-sm border border-gray-100 text-brandBlue">👨‍💼</div><div><h1 className="text-textMain font-extrabold text-2xl leading-tight">Hi, {user.first_name_en}</h1><p className="text-textMuted text-sm font-bold mt-1">Ready for certification?</p></div></div>
                     <div className="mx-6 bg-brandNavy rounded-[36px] p-8 text-white shadow-card relative overflow-hidden mb-8"><div className="absolute right-[-30px] top-4 w-40 h-40 bg-brandBlue rounded-full opacity-60 blur-3xl"></div><div className="absolute right-6 bottom-4 text-6xl opacity-90 drop-shadow-2xl">🏆</div><div className="relative z-10"><span className="bg-white/20 px-4 py-2 rounded-xl text-[10px] font-black backdrop-blur-md inline-block mb-4 uppercase tracking-widest">Overall Progress</span><h2 className="text-5xl font-black mb-2">{prog}%</h2><p className="text-brandLight text-sm font-bold opacity-80">{prog === 100 ? 'Fully Certified 🎉' : 'In Progress... Keep going!'}</p></div></div>
-                    <div className="px-6 space-y-5"><h3 className="font-extrabold text-textMain text-xl mb-3">Required Modules</h3>
-                        {/* ✅ ล็อกไม่ให้ทำข้อสอบใหม่ถ้าผ่านแล้ว */}
+                    <div className="px-6 space-y-5 flex-1">
+                        <h3 className="font-extrabold text-textMain text-xl mb-3">Required Modules</h3>
                         <div onClick={() => { if(!session.pk_passed) setView('pk'); }} className={`card-3d p-6 relative overflow-hidden ${session.pk_passed ? 'opacity-80 cursor-default' : 'cursor-pointer hover:scale-[1.02] transform transition-transform'}`}><div className="absolute right-[-10px] bottom-[-15px] text-[70px] opacity-10 drop-shadow-md">📘</div><span className={`${session.pk_passed ? 'bg-success' : 'bg-brandBlue'} text-white px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm uppercase tracking-wider`}>{session.pk_passed ? 'Passed' : 'Start Test'}</span><h4 className="font-black text-brandNavy mt-4 text-xl">Knowledge Test</h4><p className="text-textMuted text-xs mt-2 font-bold w-2/3 leading-relaxed">30 Questions • 60 Mins</p></div>
                         <div onClick={() => setView('result')} className={`card-3d p-6 relative overflow-hidden ${!session.pk_passed ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:scale-[1.02] transform transition-transform'}`}><div className="absolute right-0 bottom-[-5px] text-[70px] opacity-10 drop-shadow-md">👨‍🏫</div><span className={`${!session.pk_passed ? 'bg-gray-300' : session.trainer_passed ? 'bg-success' : 'bg-accentOrange'} text-white px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm uppercase tracking-wider`}>{!session.pk_passed ? 'Locked' : session.trainer_passed ? 'Certified' : 'Pending Interview'}</span><h4 className="font-black text-brandNavy mt-4 text-xl">Trainer Assessment</h4><p className="text-textMuted text-xs mt-2 font-bold w-3/4 leading-relaxed">Live interview session with PRU Academy.</p></div>
+                    </div>
+                    <div className="mt-8 px-6 pb-4">
+                        <PoweredByFooter />
                     </div>
                 </div>
             );
@@ -376,7 +393,7 @@
             const [answers, setAnswers] = useState({});
             const [started, setStarted] = useState(false);
             const [examQuestions, setExamQuestions] = useState([]); 
-            const [timeLeft, setTimeLeft] = useState(3600); // ✅ 60 นาที (3600 วินาที)
+            const [timeLeft, setTimeLeft] = useState(3600); 
             const storageKey = `ttb_exam_${user.id}`;
 
             useEffect(() => {
@@ -410,7 +427,6 @@
 
             const handleStartTest = () => {
                 if(questions.length === 0) return alert('ไม่พบคลังข้อสอบ');
-                // ✅ สุ่มข้อสอบ และ สุ่มตัวเลือกคำตอบใหม่ทุกครั้ง
                 const shuffle = (arr) => [...arr].sort(() => 0.5 - Math.random());
                 const sq = shuffle(questions).slice(0, 30).map(q => {
                     let opts = []; try { opts = JSON.parse(q.options); } catch(e) { opts = ["A", "B", "C", "D"]; }
@@ -423,7 +439,6 @@
             const autoSubmit = (qs, ans) => {
                 const correct = qs.filter((q, i) => ans[i] === q.answer).length;
                 const score = Math.round((correct / qs.length) * 100);
-                // ✅ ส่งข้อสอบ บันทึกคะแนน และนับรอบ (Attempts)
                 updateSession({ 
                     pk_score: score, 
                     pk_passed: score >= 80, 
@@ -446,6 +461,7 @@
                         {session.pk_attempts > 0 && <p className="mt-4 pt-4 border-t border-gray-100 text-accentOrange text-sm">การสอบครั้งนี้เป็น รอบที่ {session.pk_attempts + 1}</p>}
                     </div>
                     <button onClick={handleStartTest} className="w-full bg-brandBlue text-white font-black py-4 rounded-[24px] btn-3d text-lg tracking-widest uppercase">เริ่มจับเวลา</button>
+                    <div className="absolute bottom-8 w-full"><PoweredByFooter /></div>
                 </div>
             );
 
@@ -461,7 +477,7 @@
                         <div className="flex space-x-1.5 mb-6">{[...Array(5)].map((_, i) => (<div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${i < Math.ceil(((qIdx+1)/examQuestions.length)*5) ? 'bg-brandBlue' : 'bg-gray-100'}`}></div>))}</div>
                         <div className="flex-1 overflow-y-auto pr-2 pb-4">
                             <h3 className="text-[15px] font-extrabold text-brandNavy mb-6 leading-relaxed bg-surface p-5 rounded-[24px] border border-blue-50">{q.question}</h3>
-                            <div className="space-y-3">
+                            <div className="space-y-3 mb-8">
                                 {q.shuffledOptions.map((opt, i) => {
                                     const sel = answers[qIdx] === opt;
                                     return (
@@ -473,6 +489,7 @@
                                     )
                                 })}
                             </div>
+                            <PoweredByFooter />
                         </div>
                     </div>
                     <div className="absolute bottom-0 w-full bg-white px-6 py-5 flex justify-between gap-4 border-t border-gray-50 z-20 pb-8">
@@ -491,14 +508,13 @@
             return (
                 <div className="flex-1 bg-surface animate-slide-up flex flex-col h-full overflow-y-auto">
                     <div className="bg-brandNavy text-white pt-12 pb-16 px-8 rounded-b-[40px] shadow-card relative overflow-hidden shrink-0"><div className="absolute right-[-20px] top-6 w-40 h-40 bg-brandBlue rounded-full opacity-50 blur-3xl"></div><button onClick={() => setView('home')} className="text-white mb-6"><FlatIcons.ChevronLeft /></button><h2 className="text-3xl font-black mb-1">My Results</h2><p className="text-brandLight font-bold text-sm opacity-80">Certification Summary</p></div>
-                    <div className="px-6 -mt-10 space-y-4 pb-10 flex-1">
+                    <div className="px-6 -mt-10 space-y-4 pb-10 flex-1 flex flex-col">
                         <div className="card-3d p-6 flex items-center justify-between border border-gray-50"><div className="flex items-center"><div className="w-14 h-14 bg-brandLight text-brandBlue rounded-[20px] flex items-center justify-center text-2xl mr-4">📘</div><div><h4 className="font-black text-brandNavy text-lg">Knowledge</h4><p className="text-[10px] text-textMuted font-black uppercase tracking-wider mt-1">Passing: 80%</p></div></div><div className="text-right"><p className="text-2xl font-black text-brandNavy">{session.pk_score !== null ? `${session.pk_score}%` : '-'}</p><span className={`text-[10px] font-black uppercase tracking-widest ${session.pk_passed ? 'text-success' : 'text-danger'}`}>{session.pk_score !== null ? (session.pk_passed ? 'Pass' : 'Fail') : 'Pending'}</span></div></div>
                         <div className={`card-3d p-6 flex items-center justify-between border border-gray-50 ${!session.pk_passed ? 'opacity-60' : ''}`}><div className="flex items-center"><div className="w-14 h-14 bg-pastelOrange text-accentOrange rounded-[20px] flex items-center justify-center text-2xl mr-4">👨‍🏫</div><div><h4 className="font-black text-brandNavy text-lg">Trainer Check</h4><p className="text-[10px] text-textMuted font-black uppercase tracking-wider mt-1">Live Interview</p></div></div><div className="text-right"><p className="text-2xl font-black text-brandNavy">{session.trainer_score !== null ? `${session.trainer_score}%` : '-'}</p><span className={`text-[10px] font-black uppercase tracking-widest ${session.trainer_passed ? 'text-success' : 'text-danger'}`}>{session.trainer_score !== null ? (session.trainer_passed ? 'Pass' : 'Fail') : 'Pending'}</span></div></div>
                         
                         {session.pk_passed && !session.trainer_passed && (
                             <div className="mt-6 bg-pastelGreen border border-green-100 p-6 rounded-[24px] shadow-sm animate-pop"><div className="flex items-start"><span className="text-2xl mr-3">🎉</span><div><h4 className="font-black text-green-800 text-sm mb-1">ยินดีด้วย! ท่านผ่าน Knowledge Test</h4><p className="text-green-700 text-xs font-bold leading-relaxed">ต่อไปคือการสอบ Trainer Assessment ท่านจะต้อง Role Play หรือตอบคำถาม กับ PRU Academy กรุณาติดต่อ Trainer specialist ประจำพื้นที่ของท่าน เพื่อนัดหมายการประเมินต่อไป</p></div></div></div>
                         )}
-                        {/* ✅ ล็อกไม่ให้แสดงปุ่มสอบใหม่ ถ้าผ่านแล้ว */}
                         {!session.pk_passed && session.pk_score !== null && (
                             <button onClick={() => { 
                                 if(confirm(`เริ่มทำ Knowledge Test ใหม่?\n(จะเป็นการสอบรอบที่ ${(session.pk_attempts || 0) + 1})`)) { 
@@ -508,6 +524,8 @@
                             }} className="w-full mt-4 bg-white border-2 border-brandBlue text-brandBlue font-black py-4 rounded-[24px] hover:bg-brandLight transition-colors text-lg shadow-sm">สอบ Knowledge Test ใหม่อีกครั้ง</button>
                         )}
                         <div className={`mt-8 p-8 rounded-[36px] text-center shadow-card border border-gray-50 ${session.overall_status === 'CERTIFIED' ? 'bg-brandBlue text-white' : 'bg-white text-textMuted'}`}><div className="text-5xl mb-4">{session.overall_status === 'CERTIFIED' ? '🎓' : '⏳'}</div><h3 className={`font-black text-2xl mb-2 ${session.overall_status === 'CERTIFIED' ? 'text-white' : 'text-brandNavy'}`}>Status: {session.overall_status}</h3><p className="text-[12px] font-bold opacity-80 leading-relaxed">Complete all modules to<br/>receive your certificate.</p></div>
+                        
+                        <div className="mt-auto pt-6"><PoweredByFooter /></div>
                     </div>
                 </div>
             );
@@ -536,7 +554,7 @@
             if (evalUser) return <TrainerEvalScreen candidate={evalUser} trainer={trainer} rubrics={db.rubrics} updateSession={updateSession} onBack={() => setEvalUser(null)} />;
 
             return (
-                <div className="space-y-8 animate-fade-in pb-10 max-w-5xl mx-auto">
+                <div className="space-y-8 animate-fade-in pb-10 max-w-5xl mx-auto flex flex-col min-h-full">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 sm:p-8 rounded-[32px] shadow-sm border border-gray-100">
                         <div><h2 className="text-2xl sm:text-3xl font-black text-brandNavy">Trainer Dashboard</h2><p className="text-textMuted font-bold text-sm mt-1">Pending Evaluations Overview</p></div>
                         <div className="mt-4 md:mt-0 flex items-center bg-optGray p-2 rounded-2xl w-full md:w-auto"><span className="text-sm font-black text-gray-500 mr-3 ml-3 uppercase tracking-widest hidden sm:block">Filter RH:</span><select value={filterRH} onChange={e => setFilterRH(e.target.value)} className="bg-white p-3 rounded-xl font-bold text-brandBlue outline-none border border-gray-100 cursor-pointer shadow-sm w-full md:w-auto"><option value="All">Overall Summary</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}</select></div>
@@ -546,7 +564,7 @@
                             <div key={i} className={`${s.bg} p-6 rounded-[28px] shadow-sm border border-white relative overflow-hidden`}><p className="text-[10px] font-black text-gray-500 mb-2 uppercase tracking-widest relative z-10">{s.t}</p><p className={`text-3xl sm:text-4xl font-black ${s.text} relative z-10`}>{s.v}</p></div>
                         ))}
                     </div>
-                    <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
+                    <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden flex-1">
                         <div className="p-6 border-b border-gray-50 bg-[#F8F9FE]"><h3 className="font-black text-brandNavy text-lg">Candidates Pending Interview</h3></div>
                         <div className="overflow-x-auto"><table className="w-full text-left border-collapse min-w-[600px]"><thead className="bg-white text-textMuted text-[10px] uppercase tracking-widest border-b border-gray-100"><tr><th className="p-6">Candidate</th><th className="p-6">Location</th><th className="p-6 text-center">PK Score</th><th className="p-6 text-center">Action</th></tr></thead><tbody>
                             {filtered.filter(c => db.sessions[c.id].pk_passed && !db.sessions[c.id].trainer_passed).map(c => {
@@ -562,11 +580,11 @@
                             {filtered.filter(c => db.sessions[c.id].pk_passed && !db.sessions[c.id].trainer_passed).length === 0 && <tr><td colSpan="4" className="text-center p-16 text-gray-400 font-black text-lg">No pending evaluations 🎉</td></tr>}
                         </tbody></table></div>
                     </div>
+                    <div className="mt-auto pt-6"><PoweredByFooter /></div>
                 </div>
             );
         }
 
-        // --- Trainer Evaluation Screen (With Retake Logic) ---
         function TrainerEvalScreen({ candidate, trainer, rubrics, updateSession, onBack }) {
             const [step, setStep] = useState(0); 
             const [drawnQ, setDrawnQ] = useState(null); 
@@ -578,7 +596,6 @@
             const [showFinalPopup, setShowFinalPopup] = useState(false);
             const [totalCalculatedScore, setTotalCalculatedScore] = useState(0);
 
-            // ✅ ฟังก์ชันเคลียร์ค่าเพื่อเริ่มสอบรอบใหม่
             const resetEvaluation = () => {
                 setStep(0); setDrawnQ(null); setSelectedQs([]); setScores([null, null, null]); setComments(['', '', '']);
                 setAiFeedback(null); setShowFinalPopup(false); setTotalCalculatedScore(0);
@@ -599,7 +616,6 @@
                 setDrawnQ(null); setStep(step + 1);
             };
 
-            // 🔥 RAG AI Integration
             const askAiCopilot = async () => {
                 setLoadingAi(true);
                 try {
@@ -642,7 +658,7 @@
             const submitFinal = async () => {
                 const finalScore = Math.round(((scores[0] + scores[1] + scores[2]) / 30) * 100);
                 setTotalCalculatedScore(finalScore);
-                const attemptNum = (candidate.sessions?.trainer_attempts || 0) + 1; // ✅ นับรอบการสอบสัมภาษณ์
+                const attemptNum = (candidate.sessions?.trainer_attempts || 0) + 1;
                 try {
                     await updateSession(candidate.id, { 
                         trainer_score: finalScore, 
@@ -664,7 +680,6 @@
                             <div className="bg-optGray p-4 rounded-[20px] flex justify-between items-center border border-gray-100"><span className="font-bold text-textMuted text-sm">Knowledge Test</span><span className="font-black text-brandNavy">{candidate.sessions?.pk_score || 0}% <span className="text-success text-xs ml-1">(Pass)</span></span></div>
                             <div className="bg-brandLight/30 p-4 rounded-[20px] flex justify-between items-center border border-blue-50"><span className="font-bold text-brandBlue text-sm">Trainer Assessment</span><span className="font-black text-brandBlue">{totalCalculatedScore}% <span className={`text-xs ml-1 ${totalCalculatedScore >= 80 ? 'text-success' : 'text-danger'}`}>({totalCalculatedScore >= 80 ? 'Pass' : 'Fail'})</span></span></div>
                         </div>
-                        {/* ✅ หากไม่ผ่าน อนุญาตให้เทรนเนอร์กดประเมินใหม่ได้ทันที */}
                         {totalCalculatedScore < 80 ? (
                             <div className="space-y-3 relative z-10">
                                 <button onClick={resetEvaluation} className="w-full bg-accentOrange text-white font-black py-4 rounded-[20px] btn-3d uppercase tracking-widest text-sm">ประเมินรอบใหม่ (เริ่มสุ่มคำถามใหม่)</button>
@@ -678,7 +693,7 @@
             );
 
             return (
-                <div className="space-y-6 animate-fade-in pb-10 max-w-4xl mx-auto">
+                <div className="space-y-6 animate-fade-in pb-10 max-w-4xl mx-auto flex flex-col min-h-full">
                     <button onClick={onBack} className="text-textMuted hover:text-brandBlue font-black flex items-center bg-white px-5 py-3 rounded-[20px] shadow-sm border border-gray-100 w-max transition-colors"><FlatIcons.ChevronLeft /> <span className="ml-2 uppercase tracking-widest text-[10px]">Back to Dashboard</span></button>
                     
                     <div className="bg-brandNavy text-white p-8 rounded-[36px] flex flex-col md:flex-row justify-between items-start md:items-center shadow-card relative overflow-hidden">
@@ -686,7 +701,7 @@
                         <div className="relative z-10"><p className="text-pastelOrange text-[10px] font-black uppercase tracking-widest mb-2">Live Interview Assessment {(candidate.sessions?.trainer_attempts || 0) > 0 && `(รอบประเมินที่ ${(candidate.sessions?.trainer_attempts || 0) + 1})`}</p><h2 className="text-3xl sm:text-4xl font-black">{candidate.first_name_en} {candidate.last_name_en}</h2><p className="text-brandLight font-bold mt-2 text-sm">{candidate.employee_id} | {candidate.rh} ({candidate.zone})</p></div>
                     </div>
                     
-                    <div className="bg-white p-6 sm:p-8 rounded-[32px] shadow-sm border border-gray-100 min-h-[400px]">
+                    <div className="bg-white p-6 sm:p-8 rounded-[32px] shadow-sm border border-gray-100 flex-1">
                         <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mb-6 border-b border-gray-100 pb-4 gap-4">
                             <h3 className="font-black text-brandDark text-xl">{step < 3 ? `Step ${step+1}: ${TRAINER_CATEGORIES[step]}` : 'Review & Submit'}</h3>
                             <div className="flex gap-2">{[0,1,2].map(i => <div key={i} className={`w-4 h-4 rounded-full transition-all ${step > i ? 'bg-success' : step === i ? 'bg-brandBlue scale-125' : 'bg-gray-200'}`}></div>)}</div>
@@ -748,6 +763,7 @@
                             </div>
                         )}
                     </div>
+                    <div className="mt-auto pt-6"><PoweredByFooter /></div>
                 </div>
             );
         }
@@ -797,7 +813,7 @@
             };
 
             return (
-                <div className="space-y-8 animate-fade-in pb-10 max-w-6xl mx-auto">
+                <div className="space-y-8 animate-fade-in pb-10 max-w-6xl mx-auto flex flex-col min-h-full">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 sm:p-8 rounded-[36px] shadow-sm border border-gray-100">
                         <div><h2 className="text-2xl sm:text-3xl font-black text-brandDark">System Administration</h2><p className="text-textMuted font-bold text-sm mt-2">Manage users and export certification data.</p></div>
                         <div className="mt-6 md:mt-0 flex flex-col sm:flex-row gap-4 w-full md:w-auto"><select value={filterRH} onChange={e => setFilterRH(e.target.value)} className="bg-surface p-4 rounded-[20px] font-bold text-brandBlue outline-none cursor-pointer border border-gray-100 w-full sm:w-auto shadow-sm"><option value="All">All RH (Overall)</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}</select><button onClick={exportData} className="bg-success hover:bg-green-600 text-white px-8 py-4 rounded-[20px] font-black flex justify-center items-center btn-3d uppercase tracking-widest text-sm w-full sm:w-auto"><FlatIcons.Download /> <span className="ml-2">Export Excel</span></button></div>
@@ -809,7 +825,7 @@
                     {filterRH !== 'All' && Object.keys(zoneStats).length > 0 && (
                         <div className="bg-white rounded-[32px] p-6 sm:p-8 shadow-sm border border-gray-100 animate-slide-up"><h3 className="font-black text-brandNavy text-xl mb-6">Zone Breakdown ({filterRH})</h3><div className="grid grid-cols-2 md:grid-cols-5 gap-4">{Object.entries(zoneStats).map(([zone, stats]) => (<div key={zone} className="bg-surface p-5 rounded-[24px] border border-gray-100"><p className="font-black text-brandBlue text-sm mb-3">{zone}</p><p className="text-[11px] font-black text-textMuted uppercase tracking-widest">Users: <span className="text-brandNavy">{stats.total}</span></p><p className="text-[11px] font-black text-success uppercase tracking-widest mt-1">Cert: <span className="text-success">{stats.passed}</span></p></div>))}</div></div>
                     )}
-                    <div className="bg-white rounded-[36px] shadow-sm border border-gray-100 overflow-hidden">
+                    <div className="bg-white rounded-[36px] shadow-sm border border-gray-100 overflow-hidden flex-1">
                         <div className="p-6 sm:p-8 border-b border-gray-50 bg-[#F8F9FE] flex justify-between items-center"><h3 className="font-black text-brandDark text-xl">Candidate Database</h3></div>
                         <div className="overflow-x-auto"><table className="w-full text-left text-sm min-w-[800px]"><thead className="bg-white border-b border-gray-100"><tr><th className="p-6 font-black text-textMuted text-[10px] uppercase tracking-widest">Candidate Info</th><th className="p-6 font-black text-textMuted text-[10px] uppercase tracking-widest text-center">Location</th><th className="p-6 font-black text-textMuted text-[10px] uppercase tracking-widest text-center">Overall Status</th><th className="p-6 font-black text-textMuted text-[10px] uppercase tracking-widest text-center">Manage</th></tr></thead><tbody className="font-medium">
                             {filtered.map(u => (
@@ -818,6 +834,7 @@
                         {filtered.length === 0 && <tr><td colSpan="4" className="text-center p-12 text-gray-400 font-bold text-lg">No candidates found in this region.</td></tr>}
                         </tbody></table></div>
                     </div>
+                    <div className="mt-auto pt-6"><PoweredByFooter /></div>
                 </div>
             );
         }
