@@ -12,16 +12,16 @@
             theme: {
                 extend: {
                     colors: {
-                        brandNavy: '#0A192F',    /* Navy Corporate */
-                        brandBlue: '#1E40AF',    /* Primary Blue */
-                        brandLight: '#DBEAFE',   /* Pastel Blue */
-                        brandHover: '#1E3A8A',   /* Hover Blue */
+                        brandNavy: '#0A192F',    
+                        brandBlue: '#1E40AF',    
+                        brandLight: '#DBEAFE',   
+                        brandHover: '#1E3A8A',   
                         accentOrange: '#F97316', 
                         success: '#10B981',
                         danger: '#EF4444',
-                        surface: '#F4F7FE',      /* Main App Background */
+                        surface: '#F4F7FE',      
                         cardBg: '#FFFFFF',
-                        optGray: '#F1F5F9',      /* Choice background */
+                        optGray: '#F1F5F9',      
                         textMain: '#1E293B',
                         textMuted: '#64748B'
                     },
@@ -44,10 +44,9 @@
     <style>
         body { background-color: #E2E8F0; font-family: 'Nunito', 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; display: flex; justify-content: center; min-height: 100vh; margin: 0; }
         
-        /* App Container */
         .app-container { 
             width: 100%; 
-            max-width: 500px; 
+            max-width: 540px; 
             background-color: #F4F7FE; 
             min-height: 100vh; 
             position: relative; 
@@ -62,17 +61,14 @@
             .app-container { min-height: 90vh; max-height: 95vh; border-radius: 40px; }
         }
 
-        /* 3D Soft UI */
         .card-3d { background: #FFFFFF; border-radius: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02); border: 1px solid #F1F5F9; }
         .btn-3d { box-shadow: 0 8px 20px -6px rgba(30, 64, 175, 0.4), 0 4px 6px -2px rgba(30, 64, 175, 0.1); transition: all 0.2s; }
         .btn-3d:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 25px -6px rgba(30, 64, 175, 0.5); }
         .btn-3d:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 4px 10px -4px rgba(30, 64, 175, 0.4); }
         
-        /* Rating Buttons (1-10) */
         .rating-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid #E2E8F0; }
         .rating-btn.selected { background-color: #1E40AF; color: white; border-color: #1E40AF; transform: scale(1.08) translateY(-4px); box-shadow: 0 10px 20px -5px rgba(30, 64, 175, 0.5); }
         
-        /* Animations */
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-pop { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
@@ -81,7 +77,6 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
@@ -102,7 +97,7 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ==========================================
-        // 2. FLAT ICONS (SVG)
+        // 2. FLAT ICONS
         // ==========================================
         const FlatIcons = {
             Home: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>,
@@ -116,9 +111,6 @@
             Users: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
         };
 
-        // ==========================================
-        // 3. MASTER DATA
-        // ==========================================
         const RH_ZONES = {
             'RH1': ['จตุจักร', 'ธนบุรี', 'บางกะปิ', 'สาทร', 'สุขุมวิท'],
             'RH2': ['ชลบุรี', 'บางนา', 'พัทยา', 'ระยอง'],
@@ -133,7 +125,7 @@
         // 4. MAIN APP COMPONENT
         // ==========================================
         function App() {
-            const [db, setDb] = useState({ users: [], sessions: {}, questions: [], trainer_rubrics: [] });
+            const [db, setDb] = useState({ users: [], sessions: {}, questions: [], rubrics: [] });
             const [currentUser, setCurrentUser] = useState(null);
             const [isLoading, setIsLoading] = useState(true);
 
@@ -148,7 +140,12 @@
                         ]);
                         const sessMap = {}; if(resS.data) resS.data.forEach(s => sessMap[s.user_id] = s);
                         
-                        setDb({ users: resU.data || [], sessions: sessMap, questions: resQ.data || [], trainer_rubrics: resR.data || [] });
+                        setDb({ 
+                            users: resU.data || [], 
+                            sessions: sessMap, 
+                            questions: resQ.data || [],
+                            rubrics: resR.data || []
+                        });
                     } catch (err) { console.error(err); }
                     setIsLoading(false);
                 };
@@ -157,7 +154,6 @@
 
             const handleLogin = (user) => {
                 setCurrentUser(user);
-                // Initialize session if not exist
                 if (user.role === 'Candidate' && !db.sessions[user.id]) {
                     setDb(prev => ({ ...prev, sessions: { ...prev.sessions, [user.id]: {
                         pk_passed: false, pk_score: null, pk_attempts: 0,
@@ -168,8 +164,7 @@
 
             const updateSession = async (userId, data) => {
                 setDb(prev => ({ ...prev, sessions: { ...prev.sessions, [userId]: { ...prev.sessions[userId], ...data } } }));
-                const { error } = await supabase.from('exam_sessions').upsert({ user_id: userId, ...data });
-                if(error) console.error("Update Session Error:", error);
+                await supabase.from('exam_sessions').upsert({ user_id: userId, ...data });
             };
 
             if (isLoading) return <div className="h-screen w-full flex items-center justify-center bg-surface text-brandBlue font-black text-xl"><div className="animate-spin mr-3 text-2xl">⏳</div> Loading...</div>;
@@ -179,12 +174,11 @@
                     {!currentUser ? (
                         <AuthScreen onLogin={handleLogin} db={db} setDb={setDb} />
                     ) : (
-                        <div className="flex-1 flex flex-col h-full relative bg-surface sm:rounded-[40px] overflow-hidden">
+                        <div className="flex-1 flex flex-col h-full relative bg-surface sm:rounded-[40px] overflow-hidden shadow-2xl">
                             {currentUser.role === 'Candidate' ? (
                                 <CandidateApp user={currentUser} db={db} updateSession={(data) => updateSession(currentUser.id, data)} onLogout={() => setCurrentUser(null)} />
                             ) : (
                                 <div className="flex-1 flex flex-col h-full">
-                                    {/* Admin/Trainer Header */}
                                     <div className="bg-brandNavy text-white p-6 sm:p-8 flex justify-between items-center shadow-md z-10">
                                         <div>
                                             <h1 className="text-2xl font-black tracking-wide">ttb Certification</h1>
@@ -207,74 +201,128 @@
         }
 
         // ==========================================
-        // 5. AUTH SCREEN (Fixed Registration)
+        // 5. AUTH SCREEN (WITH REGISTRATION)
         // ==========================================
         function AuthScreen({ onLogin, db, setDb }) {
             const [isReg, setIsReg] = useState(false);
             const [form, setForm] = useState({ empId: '', firstName: '', lastName: '', position: 'IS', rh: '', zone: '' });
             const [err, setErr] = useState('');
+            const [isSubmitting, setIsSubmitting] = useState(false);
 
             const handleSubmit = async (e) => {
                 e.preventDefault();
+                setErr('');
+                setIsSubmitting(true);
+
                 if (!isReg) {
+                    // Login Flow
                     const u = db.users.find(x => x.employee_id === form.empId && x.first_name_en.toLowerCase() === form.firstName.toLowerCase());
-                    if (u) onLogin(u); else setErr('ข้อมูลไม่ถูกต้อง หรือไม่พบในระบบ');
+                    if (u) {
+                        onLogin(u);
+                    } else {
+                        setErr('ข้อมูลไม่ถูกต้อง หรือไม่พบในระบบ');
+                    }
+                    setIsSubmitting(false);
                 } else {
-                    if (db.users.find(x => x.employee_id === form.empId)) return setErr('Employee ID นี้ถูกใช้งานแล้ว');
-                    if (!form.rh || !form.zone) return setErr('กรุณาเลือก Region และ Zone ให้ครบถ้วน');
-                    
+                    // Registration Flow
+                    if (db.users.find(x => x.employee_id === form.empId)) {
+                        setErr('Employee ID นี้ถูกใช้งานแล้ว กรุณาเข้าสู่ระบบ');
+                        setIsSubmitting(false);
+                        return;
+                    }
+                    if (!form.rh || !form.zone) {
+                        setErr('กรุณาเลือก Region และ Zone ให้ครบถ้วน');
+                        setIsSubmitting(false);
+                        return;
+                    }
+
                     const newUser = { 
-                        id: form.empId, employee_id: form.empId, 
-                        first_name_en: form.firstName, last_name_en: form.lastName, 
-                        role: 'Candidate', position: form.position, rh: form.rh, zone: form.zone 
+                        id: form.empId, 
+                        employee_id: form.empId, 
+                        first_name_en: form.firstName, 
+                        last_name_en: form.lastName, 
+                        role: 'Candidate', 
+                        position: form.position, 
+                        rh: form.rh, 
+                        zone: form.zone 
                     };
-                    
-                    setDb(prev => ({ ...prev, users: [...prev.users, newUser] }));
-                    await supabase.from('users').insert([newUser]);
-                    alert('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ'); 
-                    setIsReg(false); setErr('');
+
+                    try {
+                        // Insert to Supabase DB
+                        const { error } = await supabase.from('users').insert([newUser]);
+                        if (error) throw error;
+
+                        // Update Local State
+                        setDb(prev => ({ ...prev, users: [...prev.users, newUser] }));
+                        alert('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ'); 
+                        setIsReg(false); 
+                        setForm({...form, lastName: '', position: 'IS', rh: '', zone: ''}); // Clear reg fields
+                    } catch (error) {
+                        console.error(error);
+                        setErr('เกิดข้อผิดพลาดในการลงทะเบียน กรุณาลองใหม่');
+                    }
+                    setIsSubmitting(false);
                 }
             };
 
             return (
-                <div className="flex-1 flex flex-col justify-center px-8 bg-surface w-full h-full relative overflow-hidden">
+                <div className="flex-1 flex flex-col justify-center px-8 bg-surface w-full h-full relative overflow-y-auto">
                     <div className="absolute top-[-100px] left-[-100px] w-64 h-64 bg-brandLight rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
-                    
-                    <div className="text-center mb-10 relative z-10">
+                    <div className="text-center mb-8 relative z-10 pt-10">
                         <div className="w-20 h-20 bg-brandBlue rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-6 shadow-soft-3d text-white transform rotate-3">🛡️</div>
                         <h1 className="text-3xl font-black text-brandNavy tracking-tight">Certification</h1>
                         <p className="text-brandBlue font-bold mt-2">US Multi-Asset Index 15/5</p>
                     </div>
                     
-                    {err && <div className="bg-red-50 text-danger p-4 rounded-[20px] mb-6 text-sm font-bold text-center border border-red-100 relative z-10">{err}</div>}
+                    {err && <div className="bg-red-50 text-danger p-4 rounded-[20px] mb-6 text-sm font-bold text-center border border-red-100 relative z-10 animate-pop">{err}</div>}
                     
-                    <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
-                        <input type="text" value={form.empId} onChange={e => setForm({...form, empId: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue outline-none font-bold text-textMain transition-all shadow-sm" placeholder="Employee ID" required />
-                        <input type="text" value={form.firstName} onChange={e => setForm({...form, firstName: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue outline-none font-bold text-textMain transition-all shadow-sm" placeholder="First Name (English)" required />
+                    <form onSubmit={handleSubmit} className="space-y-4 relative z-10 pb-10">
+                        <div>
+                            <input type="text" value={form.empId} onChange={e => setForm({...form, empId: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue outline-none font-bold text-textMain transition-all shadow-sm" placeholder="Employee ID" required />
+                        </div>
+                        <div>
+                            <input type="text" value={form.firstName} onChange={e => setForm({...form, firstName: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue outline-none font-bold text-textMain transition-all shadow-sm" placeholder="First Name (English)" required />
+                        </div>
                         
                         {isReg && (
-                            <div className="animate-fade-in space-y-4 pt-4 border-t border-gray-200">
-                                <input type="text" value={form.lastName} onChange={e => setForm({...form, lastName: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue outline-none font-bold text-textMain transition-all shadow-sm" placeholder="Last Name (English)" required />
-                                <div className="grid grid-cols-2 gap-4">
-                                    <select value={form.position} onChange={e => setForm({...form, position: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue shadow-sm outline-none font-bold text-textMain">{POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}</select>
-                                    <select value={form.rh} onChange={e => setForm({...form, rh: e.target.value, zone: ''})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue shadow-sm outline-none font-bold text-textMain" required><option value="">RH...</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}</select>
+                            <div className="animate-fade-in space-y-4 pt-2">
+                                <div>
+                                    <input type="text" value={form.lastName} onChange={e => setForm({...form, lastName: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue outline-none font-bold text-textMain transition-all shadow-sm" placeholder="Last Name (English)" required />
                                 </div>
-                                <select value={form.zone} onChange={e => setForm({...form, zone: e.target.value})} disabled={!form.rh} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue shadow-sm outline-none font-bold text-textMain disabled:opacity-50" required><option value="">Zone...</option>{form.rh && RH_ZONES[form.rh].map(z => <option key={z} value={z}>{z}</option>)}</select>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <select value={form.position} onChange={e => setForm({...form, position: e.target.value})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue outline-none font-bold text-textMain shadow-sm cursor-pointer">
+                                        {POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}
+                                    </select>
+                                    <select value={form.rh} onChange={e => setForm({...form, rh: e.target.value, zone: ''})} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue outline-none font-bold text-textMain shadow-sm cursor-pointer" required>
+                                        <option value="" disabled>Select RH...</option>
+                                        {Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <select value={form.zone} onChange={e => setForm({...form, zone: e.target.value})} disabled={!form.rh} className="w-full p-4 rounded-[20px] bg-white border-2 border-transparent focus:border-brandBlue outline-none font-bold text-textMain shadow-sm cursor-pointer disabled:opacity-50 disabled:bg-gray-50" required>
+                                        <option value="" disabled>Select Zone...</option>
+                                        {form.rh && RH_ZONES[form.rh].map(z => <option key={z} value={z}>{z}</option>)}
+                                    </select>
+                                </div>
                             </div>
                         )}
 
-                        <button type="submit" className="w-full bg-brandBlue text-white font-black py-4 rounded-[20px] btn-3d mt-6 text-lg tracking-wide uppercase">{isReg ? 'Create Account' : 'Login'}</button>
+                        <button type="submit" disabled={isSubmitting} className="w-full bg-brandBlue text-white font-black py-4 rounded-[20px] btn-3d mt-6 text-lg tracking-wide uppercase disabled:opacity-70 flex justify-center items-center">
+                            {isSubmitting ? <span className="animate-spin text-xl mr-2">⏳</span> : (isReg ? 'สร้างบัญชี (Register)' : 'Login')}
+                        </button>
                     </form>
-                    
-                    <div className="text-center mt-8 relative z-10">
-                        <button onClick={() => {setIsReg(!isReg); setErr('');}} className="text-textMuted hover:text-brandBlue font-bold text-sm transition-colors">{isReg ? 'Back to Login' : 'Register New Account'}</button>
+
+                    <div className="text-center pb-8 relative z-10 mt-auto">
+                        <button type="button" onClick={() => {setIsReg(!isReg); setErr('');}} className="text-textMuted hover:text-brandBlue font-bold text-sm transition-colors">
+                            {isReg ? 'มีบัญชีอยู่แล้ว? กลับไปหน้าเข้าสู่ระบบ' : 'พนักงานใหม่? ลงทะเบียนเข้าสอบที่นี่'}
+                        </button>
                     </div>
                 </div>
             );
         }
 
         // ==========================================
-        // 6. CANDIDATE APP (Pop-up Guide + Auto Navigate)
+        // 6. CANDIDATE APP (Dashboard & Logic)
         // ==========================================
         function CandidateApp({ user, db, updateSession, onLogout }) {
             const session = db.sessions[user.id] || {};
@@ -282,7 +330,7 @@
             const [showOnboarding, setShowOnboarding] = useState(!session.pk_passed && session.pk_attempts === 0 && session.pk_score === null);
 
             const handleRetake = () => {
-                if(confirm(`คุณต้องการสอบใหม่ใช่หรือไม่?\n(รอบที่ ${(session.pk_attempts || 0) + 2})`)) {
+                if(confirm(`คุณต้องการสอบใหม่ใช่หรือไม่?\n(นี่จะเป็นการสอบรอบที่ ${(session.pk_attempts || 0) + 2})`)) {
                     localStorage.removeItem(`ttb_exam_${user.id}`);
                     updateSession({ pk_passed: false, pk_score: null, pk_attempts: (session.pk_attempts || 0) + 1 });
                     setView('pk'); 
@@ -290,25 +338,19 @@
             };
 
             return (
-                <div className="flex-1 flex flex-col h-full overflow-hidden relative bg-surface">
-                    
-                    {/* Onboarding Pop-up */}
+                <div className="flex-1 flex flex-col h-full overflow-hidden relative">
                     {showOnboarding && (
                         <div className="absolute inset-0 bg-brandNavy/80 z-50 flex items-center justify-center p-6 backdrop-blur-sm animate-fade-in">
                             <div className="bg-white rounded-[32px] p-8 w-full max-w-sm shadow-2xl animate-pop text-center relative overflow-hidden">
                                 <div className="w-16 h-16 bg-brandLight text-brandBlue rounded-[20px] flex items-center justify-center text-3xl mx-auto mb-5 shadow-inner-soft">📋</div>
                                 <h2 className="text-2xl font-black text-brandNavy mb-2">คู่มือการทดสอบ</h2>
                                 <p className="text-textMuted font-bold text-sm mb-6">กรุณาอ่านกติกาให้ครบถ้วนก่อนเริ่มสอบ</p>
-                                
                                 <div className="space-y-4 text-left bg-surface p-5 rounded-[24px] mb-8 border border-blue-50">
-                                    <p className="flex items-center text-[13px] font-bold text-textMain"><span className="text-lg mr-3">📝</span> ระบบสุ่มข้อสอบทั้งหมด 30 ข้อ</p>
-                                    <p className="flex items-center text-[13px] font-bold text-textMain"><span className="text-lg mr-3">⏱️</span> ระยะเวลาในการทำ 60 นาที</p>
+                                    <p className="flex items-center text-[13px] font-bold text-textMain"><span className="text-lg mr-3">📝</span> ผู้สอบจะต้องทำการสอบทั้งหมด 30 ข้อ</p>
+                                    <p className="flex items-center text-[13px] font-bold text-textMain"><span className="text-lg mr-3">⏱️</span> มีระยะเวลาในการทำ 60 นาที</p>
                                     <p className="flex items-center text-[13px] font-bold text-textMain"><span className="text-lg mr-3">🎯</span> เกณฑ์การผ่าน 80%</p>
-                                    <p className="flex items-start text-xs font-bold text-accentOrange mt-3 pt-4 border-t border-gray-200">
-                                        <span className="mr-2 text-base">⚠️</span> หากไม่ผ่าน สามารถทำใหม่ได้หลายรอบ โดยระบบจะมีการบันทึกจำนวนครั้งที่ทำไว้
-                                    </p>
+                                    <p className="flex items-start text-xs font-bold text-accentOrange mt-3 pt-4 border-t border-gray-200"><span className="mr-2 text-base">⚠️</span> หากไม่ผ่าน สามารถทำใหม่ได้หลายรอบ แต่ระบบจะมีการบันทึกจำนวนรอบที่ทำไว้</p>
                                 </div>
-                                
                                 <button onClick={() => setShowOnboarding(false)} className="w-full bg-brandNavy text-white font-black py-4 rounded-[20px] hover:bg-gray-900 transition-colors uppercase tracking-widest text-sm">รับทราบและปิด</button>
                                 <p className="text-[10px] font-black text-gray-300 mt-6 tracking-widest uppercase">PRU ACADEMY [ttb training team]</p>
                             </div>
@@ -316,24 +358,14 @@
                     )}
 
                     {view === 'home' && <CandidateHome user={user} session={session} setView={setView} />}
-                    {view === 'pk' && <KnowledgeTest user={user} session={session} questions={db.questions} updateSession={updateSession} onRetake={handleRetake} setView={setView} />}
+                    {view === 'pk' && <KnowledgeTest user={user} session={session} questions={db.questions} updateSession={updateSession} setView={setView} />}
                     {view === 'result' && <ResultDashboard session={session} setView={setView} />}
                     
-                    {/* Bottom Navigation */}
                     {(view === 'home' || view === 'result') && (
                         <div className="bg-white border-t border-gray-100 px-10 py-5 flex justify-between items-center rounded-t-[40px] shadow-[0_-10px_40px_rgba(0,0,0,0.03)] z-20 mt-auto shrink-0 pb-8">
-                            <div className={`flex flex-col items-center cursor-pointer transition-colors ${view === 'home' ? 'text-brandBlue' : 'text-gray-400 hover:text-brandBlue'}`} onClick={() => setView('home')}>
-                                <FlatIcons.Home />
-                                <span className="text-[10px] font-black mt-1.5 uppercase tracking-widest">Home</span>
-                            </div>
-                            <div className={`flex flex-col items-center cursor-pointer transition-colors ${view === 'result' ? 'text-brandBlue' : 'text-gray-400 hover:text-brandBlue'}`} onClick={() => setView('result')}>
-                                <FlatIcons.Result />
-                                <span className="text-[10px] font-black mt-1.5 uppercase tracking-widest">Result</span>
-                            </div>
-                            <div className="flex flex-col items-center text-gray-400 hover:text-danger cursor-pointer transition-colors" onClick={onLogout}>
-                                <FlatIcons.Exit />
-                                <span className="text-[10px] font-black mt-1.5 uppercase tracking-widest">Exit</span>
-                            </div>
+                            <div className={`flex flex-col items-center cursor-pointer transition-colors ${view === 'home' ? 'text-brandBlue' : 'text-gray-300 hover:text-brandBlue'}`} onClick={() => setView('home')}><FlatIcons.Home /><span className="text-[10px] font-black mt-1.5 uppercase tracking-widest">Home</span></div>
+                            <div className={`flex flex-col items-center cursor-pointer transition-colors ${view === 'result' ? 'text-brandBlue' : 'text-gray-300 hover:text-brandBlue'}`} onClick={() => setView('result')}><FlatIcons.Result /><span className="text-[10px] font-black mt-1.5 uppercase tracking-widest">Result</span></div>
+                            <div className="flex flex-col items-center text-gray-300 hover:text-danger cursor-pointer transition-colors" onClick={onLogout}><FlatIcons.Exit /><span className="text-[10px] font-black mt-1.5 uppercase tracking-widest">Exit</span></div>
                         </div>
                     )}
                 </div>
@@ -344,68 +376,35 @@
             let prog = 0; if (session.pk_passed) prog += 50; if (session.trainer_passed) prog += 50;
             return (
                 <div className="flex-1 overflow-y-auto pb-6 animate-fade-in bg-surface">
-                    <div className="p-8 pb-6 flex items-center">
-                        <div className="w-16 h-16 bg-white rounded-[24px] flex items-center justify-center text-3xl mr-5 shadow-sm border border-gray-100 text-brandBlue">👨‍💼</div>
-                        <div><h1 className="text-textMain font-extrabold text-2xl leading-tight">Hi, {user.first_name_en}</h1><p className="text-textMuted text-sm font-bold mt-1">Ready for certification?</p></div>
-                    </div>
-
-                    <div className="mx-6 bg-brandNavy rounded-[36px] p-8 text-white shadow-card relative overflow-hidden mb-8">
-                        <div className="absolute right-[-30px] top-4 w-40 h-40 bg-brandBlue rounded-full opacity-60 blur-3xl"></div>
-                        <div className="absolute right-6 bottom-4 text-6xl opacity-90 drop-shadow-2xl">🏆</div>
-                        <div className="relative z-10">
-                            <span className="bg-white/20 px-4 py-2 rounded-xl text-[10px] font-black backdrop-blur-md inline-block mb-4 uppercase tracking-widest">Overall Progress</span>
-                            <h2 className="text-5xl font-black mb-2">{prog}%</h2>
-                            <p className="text-brandLight text-sm font-bold opacity-80">{prog === 100 ? 'Fully Certified 🎉' : 'In Progress... Keep going!'}</p>
-                        </div>
-                    </div>
-
-                    <div className="px-6 space-y-5">
-                        <h3 className="font-extrabold text-textMain text-xl mb-3">Required Modules</h3>
-                        {/* PK Test */}
-                        <div onClick={() => setView('pk')} className="card-3d p-6 relative overflow-hidden cursor-pointer transform transition-transform hover:scale-[1.02]">
-                            <div className="absolute right-[-10px] bottom-[-15px] text-[70px] opacity-10 drop-shadow-md">📘</div>
-                            <span className={`${session.pk_passed ? 'bg-success' : 'bg-brandBlue'} text-white px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm uppercase tracking-wider`}>{session.pk_passed ? 'Passed' : 'Start Test'}</span>
-                            <h4 className="font-black text-brandNavy mt-4 text-xl">Knowledge Test</h4>
-                            <p className="text-textMuted text-xs mt-2 font-bold w-2/3 leading-relaxed">30 Questions • 60 Mins<br/>Product mechanics & T&C.</p>
-                        </div>
-
-                        {/* Trainer Assessment */}
-                        <div onClick={() => setView('result')} className={`card-3d p-6 relative overflow-hidden ${!session.pk_passed ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:scale-[1.02] transform transition-transform'}`}>
-                            <div className="absolute right-0 bottom-[-5px] text-[70px] opacity-10 drop-shadow-md">👨‍🏫</div>
-                            <span className={`${!session.pk_passed ? 'bg-gray-300' : session.trainer_passed ? 'bg-success' : 'bg-accentOrange'} text-white px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm uppercase tracking-wider`}>{!session.pk_passed ? 'Locked' : session.trainer_passed ? 'Certified' : 'Pending Interview'}</span>
-                            <h4 className="font-black text-brandNavy mt-4 text-xl">Trainer Assessment</h4>
-                            <p className="text-textMuted text-xs mt-2 font-bold w-3/4 leading-relaxed">Live interview session with PRU Academy Trainer Specialist.</p>
-                        </div>
+                    <div className="p-8 pb-6 flex items-center"><div className="w-16 h-16 bg-white rounded-[24px] flex items-center justify-center text-3xl mr-5 shadow-sm border border-gray-100 text-brandBlue">👨‍💼</div><div><h1 className="text-textMain font-extrabold text-2xl leading-tight">Hi, {user.first_name_en}</h1><p className="text-textMuted text-sm font-bold mt-1">Ready for certification?</p></div></div>
+                    <div className="mx-6 bg-brandNavy rounded-[36px] p-8 text-white shadow-card relative overflow-hidden mb-8"><div className="absolute right-[-30px] top-4 w-40 h-40 bg-brandBlue rounded-full opacity-60 blur-3xl"></div><div className="absolute right-6 bottom-4 text-6xl opacity-90 drop-shadow-2xl">🏆</div><div className="relative z-10"><span className="bg-white/20 px-4 py-2 rounded-xl text-[10px] font-black backdrop-blur-md inline-block mb-4 uppercase tracking-widest">Overall Progress</span><h2 className="text-5xl font-black mb-2">{prog}%</h2><p className="text-brandLight text-sm font-bold opacity-80">{prog === 100 ? 'Fully Certified 🎉' : 'In Progress... Keep going!'}</p></div></div>
+                    <div className="px-6 space-y-5"><h3 className="font-extrabold text-textMain text-xl mb-3">Required Modules</h3>
+                        <div onClick={() => setView('pk')} className="card-3d p-6 relative overflow-hidden cursor-pointer transform transition-transform hover:scale-[1.02]"><div className="absolute right-[-10px] bottom-[-15px] text-[70px] opacity-10 drop-shadow-md">📘</div><span className={`${session.pk_passed ? 'bg-success' : 'bg-brandBlue'} text-white px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm uppercase tracking-wider`}>{session.pk_passed ? 'Passed' : 'Start Test'}</span><h4 className="font-black text-brandNavy mt-4 text-xl">Knowledge Test</h4><p className="text-textMuted text-xs mt-2 font-bold w-2/3 leading-relaxed">30 Questions • 60 Mins</p></div>
+                        <div onClick={() => setView('result')} className={`card-3d p-6 relative overflow-hidden ${!session.pk_passed ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:scale-[1.02] transform transition-transform'}`}><div className="absolute right-0 bottom-[-5px] text-[70px] opacity-10 drop-shadow-md">👨‍🏫</div><span className={`${!session.pk_passed ? 'bg-gray-300' : session.trainer_passed ? 'bg-success' : 'bg-accentOrange'} text-white px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm uppercase tracking-wider`}>{!session.pk_passed ? 'Locked' : session.trainer_passed ? 'Certified' : 'Pending Interview'}</span><h4 className="font-black text-brandNavy mt-4 text-xl">Trainer Assessment</h4><p className="text-textMuted text-xs mt-2 font-bold w-3/4 leading-relaxed">Live interview session with PRU Academy.</p></div>
                     </div>
                 </div>
             );
         }
 
-        // --- Knowledge Test (Timer, Auto-Nav, Deep Randomizer) ---
-        function KnowledgeTest({ user, session, questions, updateSession, onRetake, setView }) {
+        // --- Knowledge Test (Logic) ---
+        function KnowledgeTest({ user, session, questions, updateSession, setView }) {
             const [qIdx, setQIdx] = useState(0);
             const [answers, setAnswers] = useState({});
             const [started, setStarted] = useState(false);
             const [examQuestions, setExamQuestions] = useState([]); 
             const [timeLeft, setTimeLeft] = useState(3600);
-            
             const storageKey = `ttb_exam_${user.id}`;
 
             useEffect(() => {
                 if (session.pk_score === null) {
-                    const savedState = localStorage.getItem(storageKey);
-                    if (savedState) {
+                    const saved = localStorage.getItem(storageKey);
+                    if (saved) {
                         try {
-                            const parsed = JSON.parse(savedState);
-                            const now = Math.floor(Date.now() / 1000);
-                            const newTimeLeft = Math.max(0, parsed.timeLeft - (now - parsed.lastSaved));
-                            setExamQuestions(parsed.examQuestions);
-                            setAnswers(parsed.answers || {});
-                            setQIdx(parsed.qIdx || 0);
-                            setTimeLeft(newTimeLeft);
-                            setStarted(true);
-                            if (newTimeLeft <= 0) { autoSubmit(parsed.examQuestions, parsed.answers); }
-                        } catch (e) { console.error(e); }
+                            const p = JSON.parse(saved);
+                            const t = Math.max(0, p.timeLeft - (Math.floor(Date.now() / 1000) - p.lastSaved));
+                            setExamQuestions(p.examQuestions); setAnswers(p.answers||{}); setQIdx(p.qIdx||0); setTimeLeft(t); setStarted(true);
+                            if (t <= 0) autoSubmit(p.examQuestions, p.answers);
+                        } catch (e) {}
                     }
                 } else if (started) { setStarted(false); setExamQuestions([]); }
             }, [session.pk_score]);
@@ -415,103 +414,71 @@
                 if (started && timeLeft > 0 && session.pk_score === null) {
                     timer = setInterval(() => {
                         setTimeLeft(prev => {
-                            const newTime = prev - 1;
-                            localStorage.setItem(storageKey, JSON.stringify({ examQuestions, answers, qIdx, timeLeft: newTime, lastSaved: Math.floor(Date.now() / 1000) }));
-                            if (newTime <= 0) { clearInterval(timer); autoSubmit(examQuestions, answers); }
-                            return newTime;
+                            const nt = prev - 1;
+                            localStorage.setItem(storageKey, JSON.stringify({ examQuestions, answers, qIdx, timeLeft: nt, lastSaved: Math.floor(Date.now() / 1000) }));
+                            if (nt <= 0) { clearInterval(timer); autoSubmit(examQuestions, answers); }
+                            return nt;
                         });
                     }, 1000);
                 }
                 return () => clearInterval(timer);
             }, [started, timeLeft, examQuestions, answers, qIdx, session.pk_score]);
 
-            useEffect(() => {
-                if (started && session.pk_score === null) {
-                    localStorage.setItem(storageKey, JSON.stringify({ examQuestions, answers, qIdx, timeLeft, lastSaved: Math.floor(Date.now() / 1000) }));
-                }
-            }, [answers, qIdx]);
-
-            // Deep Randomizer
             const handleStartTest = () => {
                 if(questions.length === 0) return alert('ไม่พบคลังข้อสอบ');
-                const shuffleArray = (arr) => [...arr].sort(() => 0.5 - Math.random());
-                const selectedQs = shuffleArray(questions).slice(0, 30).map(q => {
-                    let opts = [];
-                    try { opts = JSON.parse(q.options); } catch(e) { opts = ["A", "B", "C", "D"]; }
-                    return { ...q, shuffledOptions: shuffleArray(opts) }; 
+                const shuffle = (arr) => [...arr].sort(() => 0.5 - Math.random());
+                const sq = shuffle(questions).slice(0, 30).map(q => {
+                    let opts = []; try { opts = JSON.parse(q.options); } catch(e) { opts = ["A", "B", "C", "D"]; }
+                    return { ...q, shuffledOptions: shuffle(opts) }; 
                 });
-                
-                setExamQuestions(selectedQs);
-                setAnswers({}); setQIdx(0); setTimeLeft(3600); setStarted(true);
-                localStorage.setItem(storageKey, JSON.stringify({ examQuestions: selectedQs, answers: {}, qIdx: 0, timeLeft: 3600, lastSaved: Math.floor(Date.now() / 1000) }));
+                setExamQuestions(sq); setAnswers({}); setQIdx(0); setTimeLeft(3600); setStarted(true);
+                localStorage.setItem(storageKey, JSON.stringify({ examQuestions: sq, answers: {}, qIdx: 0, timeLeft: 3600, lastSaved: Math.floor(Date.now() / 1000) }));
             };
 
-            const autoSubmit = async (qs, ans) => {
+            const autoSubmit = (qs, ans) => {
                 const correct = qs.filter((q, i) => ans[i] === q.answer).length;
                 const score = Math.round((correct / qs.length) * 100);
-                await updateSession({ pk_score: score, pk_passed: score >= 80, overall_status: 'IN_PROGRESS' });
+                updateSession({ pk_score: score, pk_passed: score >= 80, overall_status: 'IN_PROGRESS' });
                 localStorage.removeItem(storageKey);
-                setView('result'); // Auto Navigate To Result
+                setView('result'); 
             };
-
-            const formatTime = (secs) => { const m = Math.floor(secs / 60); const s = secs % 60; return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`; };
 
             if (!started) return (
                 <div className="flex-1 flex flex-col justify-center items-center px-8 animate-fade-in relative h-full bg-surface">
                     <button onClick={() => setView('home')} className="absolute top-8 left-6 text-textMain"><FlatIcons.ChevronLeft /></button>
                     <div className="w-32 h-32 bg-white rounded-[32px] flex items-center justify-center mb-8 shadow-sm border border-gray-100 transform rotate-3"><span className="text-6xl drop-shadow-md">⏱️</span></div>
                     <h3 className="text-3xl font-black text-brandNavy mb-4">Knowledge Test</h3>
-                    <div className="text-textMuted text-center font-bold leading-relaxed mb-10 bg-white p-6 rounded-[28px] border border-gray-100 w-full shadow-sm">
-                        <p className="mb-2">สุ่มข้อสอบ: <span className="text-brandBlue font-black text-xl">30 ข้อ</span></p>
-                        <p className="mb-2">เวลา: <span className="text-danger font-black text-xl">60 นาที</span></p>
-                        <p>เกณฑ์ผ่าน: <span className="text-success font-black text-xl">80%</span></p>
-                    </div>
+                    <div className="text-textMuted text-center font-bold leading-relaxed mb-10 bg-white p-6 rounded-[28px] border border-gray-100 w-full shadow-sm"><p className="mb-2">สุ่มข้อสอบ: <span className="text-brandBlue font-black text-xl">30 ข้อ</span></p><p className="mb-2">เวลา: <span className="text-danger font-black text-xl">60 นาที</span></p><p>เกณฑ์ผ่าน: <span className="text-success font-black text-xl">80%</span></p></div>
                     <button onClick={handleStartTest} className="w-full bg-brandBlue text-white font-black py-4 rounded-[24px] btn-3d text-lg tracking-widest uppercase">เริ่มจับเวลา</button>
                 </div>
             );
 
             const q = examQuestions[qIdx];
-            const isWarning = timeLeft < 300; 
-
             return (
                 <div className="flex-1 flex flex-col bg-surface animate-slide-up relative h-full overflow-hidden">
                     <div className="pt-8 pb-4 px-6 flex justify-between items-center z-10">
                         <button onClick={() => setView('home')} className="text-textMain"><FlatIcons.ChevronLeft /></button>
                         <h2 className="font-extrabold text-brandNavy text-lg">Question {qIdx + 1}/{examQuestions.length}</h2>
-                        <div className={`font-black text-sm px-4 py-1.5 rounded-xl shadow-sm border ${isWarning ? 'bg-red-50 text-danger border-red-200 animate-pulse' : 'bg-white text-brandBlue border-blue-100'}`}>
-                            {formatTime(timeLeft)}
-                        </div>
+                        <div className={`font-black text-sm px-4 py-1.5 rounded-xl shadow-sm border ${timeLeft < 300 ? 'bg-red-50 text-danger border-red-200 animate-pulse' : 'bg-white text-brandBlue border-blue-100'}`}>{`${Math.floor(timeLeft / 60).toString().padStart(2, '0')}:${(timeLeft % 60).toString().padStart(2, '0')}`}</div>
                     </div>
-
                     <div className="flex-1 bg-white rounded-t-[40px] px-6 pt-8 pb-28 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] flex flex-col overflow-hidden relative">
-                        <div className="flex space-x-1.5 mb-6">
-                            {[...Array(5)].map((_, i) => (
-                                <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${i < Math.ceil(((qIdx+1)/examQuestions.length)*5) ? 'bg-brandBlue' : 'bg-gray-100'}`}></div>
-                            ))}
-                        </div>
-
+                        <div className="flex space-x-1.5 mb-6">{[...Array(5)].map((_, i) => (<div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${i < Math.ceil(((qIdx+1)/examQuestions.length)*5) ? 'bg-brandBlue' : 'bg-gray-100'}`}></div>))}</div>
                         <div className="flex-1 overflow-y-auto pr-2 pb-4">
-                            <h3 className="text-[15px] font-extrabold text-brandNavy mb-6 leading-relaxed bg-surface p-5 rounded-[24px] border border-blue-50">
-                                {q.question}
-                            </h3>
-
+                            <h3 className="text-[15px] font-extrabold text-brandNavy mb-6 leading-relaxed bg-surface p-5 rounded-[24px] border border-blue-50">{q.question}</h3>
                             <div className="space-y-3">
                                 {q.shuffledOptions.map((opt, i) => {
-                                    const isSelected = answers[qIdx] === opt;
+                                    const sel = answers[qIdx] === opt;
                                     return (
-                                        <div key={i} onClick={() => setAnswers({...answers, [qIdx]: opt})} 
-                                            className={`flex items-center p-4 rounded-[24px] cursor-pointer transition-all duration-200 border-2 
-                                            ${isSelected ? 'border-brandBlue bg-brandLight/50 shadow-sm transform scale-[1.01]' : 'border-transparent bg-optGray hover:bg-gray-200'}`}>
-                                            <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center font-black mr-4 shadow-sm shrink-0 transition-colors ${isSelected ? 'bg-brandBlue text-white' : 'bg-white text-gray-400'}`}>{['A','B','C','D'][i]}</div>
-                                            <span className={`flex-1 font-bold text-[14px] leading-relaxed ${isSelected ? 'text-brandBlue' : 'text-textMain'}`}>{opt}</span>
-                                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ml-3 shrink-0 transition-colors ${isSelected ? 'border-brandBlue' : 'border-gray-300 bg-white'}`}>{isSelected && <div className="w-3 h-3 bg-brandBlue rounded-full"></div>}</div>
+                                        <div key={i} onClick={() => setAnswers({...answers, [qIdx]: opt})} className={`flex items-center p-4 rounded-[24px] cursor-pointer transition-all duration-200 border-2 ${sel ? 'border-brandBlue bg-brandLight/50 shadow-sm transform scale-[1.01]' : 'border-transparent bg-optGray hover:bg-gray-200'}`}>
+                                            <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center font-black mr-4 shadow-sm shrink-0 transition-colors ${sel ? 'bg-brandBlue text-white' : 'bg-white text-gray-400'}`}>{['A','B','C','D'][i]}</div>
+                                            <span className={`flex-1 font-bold text-[14px] leading-relaxed ${sel ? 'text-brandBlue' : 'text-textMain'}`}>{opt}</span>
+                                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ml-3 shrink-0 transition-colors ${sel ? 'border-brandBlue' : 'border-gray-300 bg-white'}`}>{sel && <div className="w-3 h-3 bg-brandBlue rounded-full"></div>}</div>
                                         </div>
                                     )
                                 })}
                             </div>
                         </div>
                     </div>
-
                     <div className="absolute bottom-0 w-full bg-white px-6 py-5 flex justify-between gap-4 border-t border-gray-50 z-20 pb-8">
                         <button onClick={() => setQIdx(qIdx-1)} disabled={qIdx === 0} className="w-1/3 py-4 bg-optGray text-textMuted font-black rounded-[20px] hover:bg-gray-200 disabled:opacity-30 transition-colors">กลับ</button>
                         {qIdx === examQuestions.length - 1 ? 
@@ -527,69 +494,25 @@
         function ResultDashboard({ session, setView }) {
             return (
                 <div className="flex-1 bg-surface animate-slide-up flex flex-col h-full overflow-y-auto">
-                    <div className="bg-brandNavy text-white pt-12 pb-16 px-8 rounded-b-[40px] shadow-card relative overflow-hidden shrink-0">
-                        <div className="absolute right-[-20px] top-6 w-40 h-40 bg-brandBlue rounded-full opacity-50 blur-3xl"></div>
-                        <button onClick={() => setView('home')} className="text-white mb-6"><FlatIcons.ChevronLeft /></button>
-                        <h2 className="text-3xl font-black mb-1">My Results</h2>
-                        <p className="text-brandLight font-bold text-sm opacity-80">Certification Summary</p>
-                    </div>
-
+                    <div className="bg-brandNavy text-white pt-12 pb-16 px-8 rounded-b-[40px] shadow-card relative overflow-hidden shrink-0"><div className="absolute right-[-20px] top-6 w-40 h-40 bg-brandBlue rounded-full opacity-50 blur-3xl"></div><button onClick={() => setView('home')} className="text-white mb-6"><FlatIcons.ChevronLeft /></button><h2 className="text-3xl font-black mb-1">My Results</h2><p className="text-brandLight font-bold text-sm opacity-80">Certification Summary</p></div>
                     <div className="px-6 -mt-10 space-y-4 pb-10 flex-1">
-                        <div className="card-3d p-6 flex items-center justify-between border border-gray-50">
-                            <div className="flex items-center">
-                                <div className="w-14 h-14 bg-brandLight text-brandBlue rounded-[20px] flex items-center justify-center text-2xl mr-4">📘</div>
-                                <div><h4 className="font-black text-brandNavy text-lg">Knowledge</h4><p className="text-[10px] text-textMuted font-black uppercase tracking-wider mt-1">Passing: 80%</p></div>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-2xl font-black text-brandNavy">{session.pk_score !== null ? `${session.pk_score}%` : '-'}</p>
-                                <span className={`text-[10px] font-black uppercase tracking-widest ${session.pk_passed ? 'text-success' : 'text-danger'}`}>{session.pk_score !== null ? (session.pk_passed ? 'Pass' : 'Fail') : 'Pending'}</span>
-                            </div>
-                        </div>
-
-                        <div className={`card-3d p-6 flex items-center justify-between border border-gray-50 ${!session.pk_passed ? 'opacity-60' : ''}`}>
-                            <div className="flex items-center">
-                                <div className="w-14 h-14 bg-pastelOrange text-accentOrange rounded-[20px] flex items-center justify-center text-2xl mr-4">👨‍🏫</div>
-                                <div><h4 className="font-black text-brandNavy text-lg">Trainer Check</h4><p className="text-[10px] text-textMuted font-black uppercase tracking-wider mt-1">Live Interview</p></div>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-2xl font-black text-brandNavy">{session.trainer_score !== null ? `${session.trainer_score}%` : '-'}</p>
-                                <span className={`text-[10px] font-black uppercase tracking-widest ${session.trainer_passed ? 'text-success' : 'text-danger'}`}>{session.trainer_score !== null ? (session.trainer_passed ? 'Pass' : 'Fail') : 'Pending'}</span>
-                            </div>
-                        </div>
+                        <div className="card-3d p-6 flex items-center justify-between border border-gray-50"><div className="flex items-center"><div className="w-14 h-14 bg-brandLight text-brandBlue rounded-[20px] flex items-center justify-center text-2xl mr-4">📘</div><div><h4 className="font-black text-brandNavy text-lg">Knowledge</h4><p className="text-[10px] text-textMuted font-black uppercase tracking-wider mt-1">Passing: 80%</p></div></div><div className="text-right"><p className="text-2xl font-black text-brandNavy">{session.pk_score !== null ? `${session.pk_score}%` : '-'}</p><span className={`text-[10px] font-black uppercase tracking-widest ${session.pk_passed ? 'text-success' : 'text-danger'}`}>{session.pk_score !== null ? (session.pk_passed ? 'Pass' : 'Fail') : 'Pending'}</span></div></div>
+                        <div className={`card-3d p-6 flex items-center justify-between border border-gray-50 ${!session.pk_passed ? 'opacity-60' : ''}`}><div className="flex items-center"><div className="w-14 h-14 bg-pastelOrange text-accentOrange rounded-[20px] flex items-center justify-center text-2xl mr-4">👨‍🏫</div><div><h4 className="font-black text-brandNavy text-lg">Trainer Check</h4><p className="text-[10px] text-textMuted font-black uppercase tracking-wider mt-1">Live Interview</p></div></div><div className="text-right"><p className="text-2xl font-black text-brandNavy">{session.trainer_score !== null ? `${session.trainer_score}%` : '-'}</p><span className={`text-[10px] font-black uppercase tracking-widest ${session.trainer_passed ? 'text-success' : 'text-danger'}`}>{session.trainer_score !== null ? (session.trainer_passed ? 'Pass' : 'Fail') : 'Pending'}</span></div></div>
                         
-                        {/* 🌟 ข้อความพิเศษเมื่อสอบผ่าน PK */}
                         {session.pk_passed && !session.trainer_passed && (
-                            <div className="mt-6 bg-pastelGreen border border-green-100 p-6 rounded-[24px] shadow-sm animate-pop">
-                                <div className="flex items-start">
-                                    <span className="text-2xl mr-3">🎉</span>
-                                    <div>
-                                        <h4 className="font-black text-green-800 text-sm mb-1">ยินดีด้วย! ท่านผ่าน Knowledge Test</h4>
-                                        <p className="text-green-700 text-xs font-bold leading-relaxed">
-                                            ต่อไปคือการสอบ Trainer Assessment ทุกท่านจะต้อง Role Play หรือตอบคำถาม กับ PRU Academy กรุณาติดต่อ Trainer specialist ประจำพื้นที่ของท่าน เพื่อนัดหมายการประเมิน
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+                            <div className="mt-6 bg-pastelGreen border border-green-100 p-6 rounded-[24px] shadow-sm animate-pop"><div className="flex items-start"><span className="text-2xl mr-3">🎉</span><div><h4 className="font-black text-green-800 text-sm mb-1">ยินดีด้วย! ท่านผ่าน Knowledge Test</h4><p className="text-green-700 text-xs font-bold leading-relaxed">ต่อไปคือการสอบ Trainer Assessment ท่านจะต้อง Role Play หรือตอบคำถาม กับ PRU Academy กรุณาติดต่อ Trainer specialist ประจำพื้นที่ของท่าน เพื่อนัดหมายการประเมินต่อไป</p></div></div></div>
                         )}
-
                         {!session.pk_passed && session.pk_score !== null && (
-                            <button onClick={() => setView('pk')} className="w-full mt-4 bg-white border-2 border-brandBlue text-brandBlue font-black py-4 rounded-[24px] hover:bg-brandLight transition-colors text-lg shadow-sm">
-                                สอบ Knowledge Test ใหม่อีกครั้ง
-                            </button>
+                            <button onClick={() => { if(confirm(`เริ่มทำ Knowledge Test ใหม่?\n(รอบที่ ${(session.pk_attempts || 0) + 2})`)) { localStorage.removeItem(`ttb_exam_`); setView('pk'); } }} className="w-full mt-4 bg-white border-2 border-brandBlue text-brandBlue font-black py-4 rounded-[24px] hover:bg-brandLight transition-colors text-lg shadow-sm">สอบ Knowledge Test ใหม่อีกครั้ง</button>
                         )}
-                        
-                        <div className={`mt-8 p-8 rounded-[36px] text-center shadow-card border border-gray-50 ${session.overall_status === 'CERTIFIED' ? 'bg-brandBlue text-white' : 'bg-white text-textMuted'}`}>
-                            <div className="text-5xl mb-4">{session.overall_status === 'CERTIFIED' ? '🎓' : '⏳'}</div>
-                            <h3 className={`font-black text-2xl mb-2 ${session.overall_status === 'CERTIFIED' ? 'text-white' : 'text-brandNavy'}`}>Status: {session.overall_status}</h3>
-                            <p className="text-[12px] font-bold opacity-80 leading-relaxed">Complete all modules to<br/>receive your certificate.</p>
-                        </div>
+                        <div className={`mt-8 p-8 rounded-[36px] text-center shadow-card border border-gray-50 ${session.overall_status === 'CERTIFIED' ? 'bg-brandBlue text-white' : 'bg-white text-textMuted'}`}><div className="text-5xl mb-4">{session.overall_status === 'CERTIFIED' ? '🎓' : '⏳'}</div><h3 className={`font-black text-2xl mb-2 ${session.overall_status === 'CERTIFIED' ? 'text-white' : 'text-brandNavy'}`}>Status: {session.overall_status}</h3><p className="text-[12px] font-bold opacity-80 leading-relaxed">Complete all modules to<br/>receive your certificate.</p></div>
                     </div>
                 </div>
             );
         }
 
         // ==========================================
-        // 9. TRAINER APP (Step-by-step Randomizer 1-10 Score)
+        // 9. TRAINER APP (With RAG AI Copilot)
         // ==========================================
         function TrainerApp({ trainer, db, updateSession }) {
             const [filterRH, setFilterRH] = useState('All');
@@ -608,75 +531,36 @@
                 });
             }
 
-            if (evalUser) return <TrainerEvalScreen candidate={evalUser} trainer={trainer} rubrics={db.trainer_rubrics} updateSession={updateSession} onBack={() => setEvalUser(null)} />;
+            if (evalUser) return <TrainerEvalScreen candidate={evalUser} trainer={trainer} rubrics={db.rubrics} updateSession={updateSession} onBack={() => setEvalUser(null)} />;
 
             return (
                 <div className="space-y-8 animate-fade-in pb-10 max-w-5xl mx-auto">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 sm:p-8 rounded-[32px] shadow-sm border border-gray-100">
-                        <div>
-                            <h2 className="text-2xl sm:text-3xl font-black text-brandNavy">Trainer Dashboard</h2>
-                            <p className="text-textMuted font-bold text-sm mt-1">Pending Evaluations Overview</p>
-                        </div>
-                        <div className="mt-4 md:mt-0 flex items-center bg-optGray p-2 rounded-2xl w-full md:w-auto">
-                            <span className="text-sm font-black text-gray-500 mr-3 ml-3 uppercase tracking-widest hidden sm:block">Filter RH:</span>
-                            <select value={filterRH} onChange={e => setFilterRH(e.target.value)} className="bg-white p-3 rounded-xl font-bold text-brandBlue outline-none border border-gray-100 cursor-pointer shadow-sm w-full md:w-auto">
-                                <option value="All">Overall Summary</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}
-                            </select>
-                        </div>
+                        <div><h2 className="text-2xl sm:text-3xl font-black text-brandNavy">Trainer Dashboard</h2><p className="text-textMuted font-bold text-sm mt-1">Pending Evaluations Overview</p></div>
+                        <div className="mt-4 md:mt-0 flex items-center bg-optGray p-2 rounded-2xl w-full md:w-auto"><span className="text-sm font-black text-gray-500 mr-3 ml-3 uppercase tracking-widest hidden sm:block">Filter RH:</span><select value={filterRH} onChange={e => setFilterRH(e.target.value)} className="bg-white p-3 rounded-xl font-bold text-brandBlue outline-none border border-gray-100 cursor-pointer shadow-sm w-full md:w-auto"><option value="All">Overall Summary</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}</select></div>
                     </div>
-
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-                        {[{t: "Total Candidates", v: filtered.length, bg: "bg-brandLight", text: "text-brandBlue"}, 
-                          {t: "PK In Progress", v: filtered.filter(c => !db.sessions[c.id].pk_passed).length, bg: "bg-optGray", text: "text-textMain"},
-                          {t: "Pending Interview", v: filtered.filter(c => db.sessions[c.id].pk_passed && !db.sessions[c.id].trainer_passed).length, bg: "bg-pastelOrange", text: "text-accentOrange"},
-                          {t: "Certified", v: filtered.filter(c => db.sessions[c.id].overall_status === 'CERTIFIED').length, bg: "bg-pastelGreen", text: "text-success"}
-                        ].map((s,i) => (
-                            <div key={i} className={`${s.bg} p-6 rounded-[28px] shadow-sm border border-white relative overflow-hidden`}>
-                                <p className="text-[10px] font-black text-gray-500 mb-2 uppercase tracking-widest relative z-10">{s.t}</p>
-                                <p className={`text-3xl sm:text-4xl font-black ${s.text} relative z-10`}>{s.v}</p>
-                            </div>
+                        {[{t: "Total Candidates", v: filtered.length, bg: "bg-brandLight", text: "text-brandBlue"}, {t: "PK In Progress", v: filtered.filter(c => !db.sessions[c.id].pk_passed).length, bg: "bg-optGray", text: "text-textMain"}, {t: "Pending Interview", v: filtered.filter(c => db.sessions[c.id].pk_passed && !db.sessions[c.id].trainer_passed).length, bg: "bg-pastelOrange", text: "text-accentOrange"}, {t: "Certified", v: filtered.filter(c => db.sessions[c.id].overall_status === 'CERTIFIED').length, bg: "bg-pastelGreen", text: "text-success"}].map((s,i) => (
+                            <div key={i} className={`${s.bg} p-6 rounded-[28px] shadow-sm border border-white relative overflow-hidden`}><p className="text-[10px] font-black text-gray-500 mb-2 uppercase tracking-widest relative z-10">{s.t}</p><p className={`text-3xl sm:text-4xl font-black ${s.text} relative z-10`}>{s.v}</p></div>
                         ))}
                     </div>
-
                     {filterRH !== 'All' && Object.keys(zoneStats).length > 0 && (
-                        <div className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 animate-slide-up">
-                            <h3 className="font-black text-brandNavy text-lg mb-4">Zone Breakdown ({filterRH})</h3>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {Object.entries(zoneStats).map(([zone, stats]) => (
-                                    <div key={zone} className="bg-optGray p-4 rounded-[20px] border border-gray-100">
-                                        <p className="font-bold text-brandBlue text-sm mb-2">{zone}</p>
-                                        <p className="text-xs font-bold text-textMuted">Pending: <span className="text-accentOrange">{stats.pending}</span></p>
-                                        <p className="text-xs font-bold text-textMuted">Passed: <span className="text-success">{stats.passed}</span></p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <div className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 animate-slide-up"><h3 className="font-black text-brandNavy text-lg mb-4">Zone Breakdown ({filterRH})</h3><div className="grid grid-cols-2 md:grid-cols-4 gap-4">{Object.entries(zoneStats).map(([zone, stats]) => (<div key={zone} className="bg-optGray p-4 rounded-[20px] border border-gray-100"><p className="font-bold text-brandBlue text-sm mb-2">{zone}</p><p className="text-xs font-bold text-textMuted">Pending: <span className="text-accentOrange">{stats.pending}</span></p><p className="text-xs font-bold text-textMuted">Passed: <span className="text-success">{stats.passed}</span></p></div>))}</div></div>
                     )}
-
                     <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
                         <div className="p-6 border-b border-gray-50 bg-[#F8F9FE]"><h3 className="font-black text-brandNavy text-lg">Candidates Pending Interview</h3></div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse min-w-[600px]">
-                                <thead className="bg-white text-textMuted text-[10px] uppercase tracking-widest border-b border-gray-100">
-                                    <tr><th className="p-6">Candidate</th><th className="p-6">Location</th><th className="p-6 text-center">PK Score</th><th className="p-6 text-center">Action</th></tr>
-                                </thead>
-                                <tbody>
-                                    {filtered.filter(c => db.sessions[c.id].pk_passed && !db.sessions[c.id].trainer_passed).map(c => (
-                                        <tr key={c.id} className="border-b border-gray-50 hover:bg-optGray transition-colors">
-                                            <td className="p-6"><p className="font-black text-textMain text-base">{c.first_name_en} {c.last_name_en}</p><p className="text-xs text-textMuted font-bold mt-1">{c.employee_id}</p></td>
-                                            <td className="p-6"><span className="font-black text-brandBlue bg-white border border-blue-100 px-3 py-1 rounded-lg shadow-sm">{c.rh}</span> <span className="text-xs text-gray-500 font-bold ml-2">{c.zone}</span></td>
-                                            <td className="p-6 text-center font-black text-success">{db.sessions[c.id].pk_score}%</td>
-                                            <td className="p-6 text-center"><button onClick={() => setEvalUser(c)} className="bg-brandBlue text-white font-black px-8 py-3 rounded-[16px] btn-3d text-sm uppercase tracking-widest">ประเมิน</button></td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                        <div className="overflow-x-auto"><table className="w-full text-left border-collapse min-w-[600px]"><thead className="bg-white text-textMuted text-[10px] uppercase tracking-widest border-b border-gray-100"><tr><th className="p-6">Candidate</th><th className="p-6">Location</th><th className="p-6 text-center">PK Score</th><th className="p-6 text-center">Action</th></tr></thead><tbody>
+                            {filtered.filter(c => db.sessions[c.id].pk_passed && !db.sessions[c.id].trainer_passed).map(c => (
+                                <tr key={c.id} className="border-b border-gray-50 hover:bg-optGray transition-colors"><td className="p-6"><p className="font-black text-textMain text-base">{c.first_name_en} {c.last_name_en}</p><p className="text-xs text-textMuted font-bold mt-1">{c.employee_id}</p></td><td className="p-6"><span className="font-black text-brandBlue bg-white border border-blue-100 px-3 py-1 rounded-lg shadow-sm">{c.rh}</span> <span className="text-xs text-gray-500 font-bold ml-2">{c.zone}</span></td><td className="p-6 text-center font-black text-success">{db.sessions[c.id].pk_score}%</td><td className="p-6 text-center"><button onClick={() => setEvalUser(c)} className="bg-brandBlue text-white font-black px-8 py-3 rounded-[16px] btn-3d text-sm uppercase tracking-widest">ประเมิน</button></td></tr>
+                            ))}
+                            {filtered.filter(c => db.sessions[c.id].pk_passed && !db.sessions[c.id].trainer_passed).length === 0 && <tr><td colSpan="4" className="text-center p-16 text-gray-400 font-black text-lg">No pending evaluations 🎉</td></tr>}
+                        </tbody></table></div>
                     </div>
                 </div>
             );
         }
 
+        // --- RAG Powered AI Copilot Evaluation Screen ---
         function TrainerEvalScreen({ candidate, trainer, rubrics, updateSession, onBack }) {
             const [step, setStep] = useState(0); 
             const [drawnQ, setDrawnQ] = useState(null); 
@@ -688,96 +572,85 @@
             const [showFinalPopup, setShowFinalPopup] = useState(false);
             const [totalCalculatedScore, setTotalCalculatedScore] = useState(0);
 
-            // Use DB Rubrics or fallback to NEW_TRAINER_RUBRICS if empty
-            const activeRubrics = rubrics && rubrics.length > 0 ? rubrics : NEW_TRAINER_RUBRICS;
-
             const drawQuestion = () => {
                 const cat = TRAINER_CATEGORIES[step];
-                const pool = activeRubrics.filter(r => r.category === cat);
-                if(pool.length === 0) return alert('ไม่พบคำถามในหมวดนี้');
+                const pool = rubrics && rubrics.length > 0 ? rubrics.filter(r => r.category === cat) : [];
+                if(pool.length === 0) return alert('ไม่พบข้อมูลคำถามในฐานข้อมูล กรุณาตรวจสอบตาราง trainer_rubrics');
                 const randomQ = pool[Math.floor(Math.random() * pool.length)];
                 setDrawnQ(randomQ);
             };
 
-            const handleScore = (val) => {
-                const newScores = [...scores]; newScores[step] = val; setScores(newScores);
-            };
-
+            const handleScore = (val) => { const newScores = [...scores]; newScores[step] = val; setScores(newScores); };
             const nextStep = () => {
-                if (scores[step] === null) return alert("กรุณาให้คะแนน 1-10 ก่อนไปข้อถัดไป");
-                const newSelectedQs = [...selectedQs];
-                newSelectedQs[step] = drawnQ;
-                setSelectedQs(newSelectedQs);
-                setDrawnQ(null);
-                setStep(step + 1);
+                if (scores[step] === null) return alert("กรุณาให้คะแนนก่อนไปข้อถัดไป");
+                const newSelectedQs = [...selectedQs]; newSelectedQs[step] = drawnQ; setSelectedQs(newSelectedQs);
+                setDrawnQ(null); setStep(step + 1);
             };
 
+            // 🔥 RAG AI Integration
             const askAiCopilot = async () => {
                 setLoadingAi(true);
                 try {
-                    const prompt = `ในฐานะผู้เชี่ยวชาญการขายผลิตภัณฑ์การลงทุนระดับมืออาชีพ คุณกำลังช่วยเทรนเนอร์เตรียมตัวประเมินพนักงานใน 3 คำถามดังนี้: 1. ${selectedQs[0].question} 2. ${selectedQs[1].question} 3. ${selectedQs[2].question}. 
-                    ให้คุณจำลอง "คำตอบที่สมบูรณ์แบบ" เป็นประโยคคำพูดที่มืออาชีพควรตอบลูกค้า, โครงสร้างการตอบ, และสิ่งที่ห้ามพูดเด็ดขาด (Red flags) โดยตอบกลับมาเป็น JSON Format เท่านั้น (ห้ามมี Markdown): 
-                    {"advice": [{"q_num": 1, "perfect_answer": "...", "structure": "...", "red_flags": ["...", "..."]}, ...]}`;
-                    
+                    const sysPrompt = `คุณคือหัวหน้าเทรนเนอร์ผู้เชี่ยวชาญผลิตภัณฑ์ 'ttb US Multi-Asset Index Principal Protect 15/5' 
+[ข้อมูลผลิตภัณฑ์เบื้องต้น]: ประกันชีวิตอิงดัชนี, คุ้มครองเงินต้น 100% เมื่อครบ 15 ปี, ไม่ป้องกันความเสี่ยงค่าเงิน (Unhedged FX), ใช้กลไก Volatility Target 8%, หัก Decrement 2% ต่อปี, ให้ PR สูงถึง 260%, ใช้ AI Nowcasting ของ QuantCube
+
+กฎเหล็กในการทำงาน:
+1. วิเคราะห์คำตอบจากข้อมูลผลิตภัณฑ์เบื้องต้น และค้นหาข้อมูลออนไลน์เพิ่มเติมได้
+2. ห้ามคาดเดาเอาเองเด็ดขาด หากไม่ทราบให้ตอบว่า 'ไม่พบข้อมูล'
+3. ลดการใช้ภาษาประกันหรือศัพท์การเงินที่เข้าใจยาก ให้ใช้ภาษาพูดที่คนทั่วไปเข้าใจง่าย
+4. **สำคัญที่สุด: ใน 'ideal_script' ทุกข้อ จะต้องอธิบายให้เห็นภาพด้วยการพูดว่า "ยกตัวอย่าง" หรือ "ตัวอย่างเช่น" เสมอ** - (ตัวอย่างเช่น: 'ยกตัวอย่างเช่น นำเงิน 90%-95% ของเบี้ยประกัน ไปลงทุนในตราสารหนี้ ซึ่งเมื่อผ่านไป 15 ปี จะเติบโตกลายเป็น 100% ทำให้เงินต้นอยู่ครบ ส่วนที่เหลือค่อยนำไปลงทุนในดัชนีเพื่อสร้างโอกาสรับผลตอบแทนเพิ่มเติม')
+5. ตอบกลับเป็นรูปแบบ JSON 100% เท่านั้น`;
+
+                    const userPrompt = `จงให้คำแนะนำแก่ Trainer สำหรับใช้ประเมินคำตอบใน 3 คำถามนี้:
+1. ${selectedQs[0]?.question}
+2. ${selectedQs[1]?.question}
+3. ${selectedQs[2]?.question}
+
+ตอบเป็น JSON format: {"advice": [{"q_num": 1, "ideal_script": "บทพูดที่แนะนำเป็นประโยคยาว อธิบายอย่างเป็นเหตุเป็นผล ภาษาเข้าใจง่าย และต้องมีประโยคยกตัวอย่างประกอบเสมอ", "red_flag": "สิ่งที่ไม่ควรพูดเด็ดขาด (Mis-selling) หรือข้อควรระวัง"}, ...]}`;
+
+                    const payload = {
+                        contents: [{ parts: [{ text: userPrompt }] }],
+                        systemInstruction: { parts: [{ text: sysPrompt }] },
+                        tools: [{ google_search: {} }],
+                        generationConfig: { responseMimeType: "application/json" }
+                    };
+
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`, {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } })
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
                     });
                     const data = await res.json();
-                    let text = data.candidates[0].content.parts[0].text;
-                    text = text.replace(/```json/g, '').replace(/```/g, ''); // Clean markdown if any
-                    let aiRes = JSON.parse(text);
+                    let aiRes = JSON.parse(data.candidates[0].content.parts[0].text);
                     setAiFeedback(aiRes.advice);
                 } catch(err) {
                     console.error("AI Error:", err);
-                    setAiFeedback([
-                        {q_num: 1, perfect_answer: "คำตอบสมบูรณ์: 'เงินต้นคุ้มครองโดยพันธบัตร ไม่เกี่ยวกับหุ้นครับ'", structure: "1. ยอมรับความจริง 2. อธิบายกลไก", red_flags: ["ห้ามบอกว่าเป็นเงินฝาก", "ห้ามการันตีกำไร"]},
-                        {q_num: 2, perfect_answer: "คำตอบสมบูรณ์: 'การกระจายความเสี่ยงช่วยให้พอร์ตมั่นคง'", structure: "1. เทียบข้อจำกัด 60/40 2. เสนอทางออกด้วย VT8", red_flags: ["หลีกเลี่ยงการโจมตีกองทุนอื่น"]},
-                        {q_num: 3, perfect_answer: "คำตอบสมบูรณ์: 'ไม่สามารถทำได้เนื่องจากโครงสร้างต้นทุนถูกล็อกไว้แล้วครับ'", structure: "1. ปฏิเสธอย่างสุภาพ 2. ให้เหตุผลทางวิศวกรรม", red_flags: ["ตอบปัดๆ ว่าธนาคารสั่งมา"]}
-                    ]);
+                    setAiFeedback([{q_num: 1, ideal_script: "เกิดข้อผิดพลาดในการดึงข้อมูลจาก AI กรุณาลองใหม่อีกครั้ง", red_flag: "-"}]);
                 }
                 setLoadingAi(false);
             };
 
             const submitFinal = async () => {
-                // คำนวณคะแนน: 3 ข้อ ข้อละ 10 คะแนน (เต็ม 30) แปลงเป็น 100%
-                const rawTotal = scores[0] + scores[1] + scores[2];
-                const finalScore = Math.round((rawTotal / 30) * 100);
+                const finalScore = Math.round(((scores[0] + scores[1] + scores[2]) / 15) * 100);
                 setTotalCalculatedScore(finalScore);
-
                 try {
-                    await updateSession(candidate.id, { 
-                        trainer_score: finalScore, 
-                        trainer_passed: finalScore >= 80, 
-                        overall_status: finalScore >= 80 ? 'CERTIFIED' : 'IN_PROGRESS' 
-                    });
+                    await updateSession(candidate.id, { trainer_score: finalScore, trainer_passed: finalScore >= 80, overall_status: finalScore >= 80 ? 'CERTIFIED' : 'IN_PROGRESS' });
                     setShowFinalPopup(true);
-                } catch(e) { alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่"); }
+                } catch(e) { alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล"); }
             };
 
-            if (showFinalPopup) {
-                return (
-                    <div className="absolute inset-0 bg-brandNavy/90 z-50 flex items-center justify-center p-6 backdrop-blur-sm animate-fade-in">
-                        <div className="bg-white rounded-[40px] p-8 text-center max-w-sm w-full shadow-2xl animate-pop relative overflow-hidden">
-                            <div className="absolute top-[-50px] right-[-50px] w-32 h-32 bg-brandLight rounded-full opacity-50 blur-2xl"></div>
-                            <div className="w-20 h-20 bg-surface rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner-soft">📋</div>
-                            <h2 className="text-2xl font-black text-brandNavy mb-6">สรุปผลการประเมิน</h2>
-                            
-                            <div className="space-y-3 mb-8">
-                                <div className="bg-optGray p-4 rounded-[20px] flex justify-between items-center border border-gray-100">
-                                    <span className="font-bold text-textMuted text-sm">Knowledge Test</span>
-                                    <span className="font-black text-brandNavy">{candidate.sessions?.pk_score || 0}% <span className="text-success text-xs ml-1">(Pass)</span></span>
-                                </div>
-                                <div className="bg-brandLight/30 p-4 rounded-[20px] flex justify-between items-center border border-blue-50">
-                                    <span className="font-bold text-brandBlue text-sm">Trainer Assessment</span>
-                                    <span className="font-black text-brandBlue">{totalCalculatedScore}% <span className={`text-xs ml-1 ${totalCalculatedScore >= 80 ? 'text-success' : 'text-danger'}`}>({totalCalculatedScore >= 80 ? 'Pass' : 'Fail'})</span></span>
-                                </div>
-                            </div>
-                            <button onClick={onBack} className="w-full bg-brandNavy text-white font-black py-4 rounded-[20px] btn-3d uppercase tracking-widest text-sm">กลับหน้า Home</button>
+            if (showFinalPopup) return (
+                <div className="absolute inset-0 bg-brandNavy/90 z-50 flex items-center justify-center p-6 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white rounded-[40px] p-8 text-center max-w-sm w-full shadow-2xl animate-pop relative overflow-hidden">
+                        <div className="absolute top-[-50px] right-[-50px] w-32 h-32 bg-brandLight rounded-full opacity-50 blur-2xl"></div>
+                        <div className="w-20 h-20 bg-surface rounded-[24px] flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner-soft">📋</div>
+                        <h2 className="text-2xl font-black text-brandNavy mb-6">สรุปผลการประเมิน</h2>
+                        <div className="space-y-3 mb-8">
+                            <div className="bg-optGray p-4 rounded-[20px] flex justify-between items-center border border-gray-100"><span className="font-bold text-textMuted text-sm">Knowledge Test</span><span className="font-black text-brandNavy">{candidate.sessions?.pk_score || 0}% <span className="text-success text-xs ml-1">(Pass)</span></span></div>
+                            <div className="bg-brandLight/30 p-4 rounded-[20px] flex justify-between items-center border border-blue-50"><span className="font-bold text-brandBlue text-sm">Trainer Assessment</span><span className="font-black text-brandBlue">{totalCalculatedScore}% <span className={`text-xs ml-1 ${totalCalculatedScore >= 80 ? 'text-success' : 'text-danger'}`}>({totalCalculatedScore >= 80 ? 'Pass' : 'Fail'})</span></span></div>
                         </div>
+                        <button onClick={onBack} className="w-full bg-brandNavy text-white font-black py-4 rounded-[20px] btn-3d uppercase tracking-widest text-sm">กลับหน้า Home</button>
                     </div>
-                );
-            }
+                </div>
+            );
 
             return (
                 <div className="space-y-6 animate-fade-in pb-10 max-w-4xl mx-auto">
@@ -785,11 +658,7 @@
                     
                     <div className="bg-brandNavy text-white p-8 rounded-[36px] flex flex-col md:flex-row justify-between items-start md:items-center shadow-card relative overflow-hidden">
                         <div className="absolute right-[-20px] top-6 w-40 h-40 bg-brandBlue rounded-full opacity-40 blur-3xl"></div>
-                        <div className="relative z-10">
-                            <p className="text-pastelOrange text-[10px] font-black uppercase tracking-widest mb-2">Live Interview Assessment</p>
-                            <h2 className="text-3xl sm:text-4xl font-black">{candidate.first_name_en} {candidate.last_name_en}</h2>
-                            <p className="text-brandLight font-bold mt-2 text-sm">{candidate.employee_id} | {candidate.rh} ({candidate.zone})</p>
-                        </div>
+                        <div className="relative z-10"><p className="text-pastelOrange text-[10px] font-black uppercase tracking-widest mb-2">Live Interview Assessment</p><h2 className="text-3xl sm:text-4xl font-black">{candidate.first_name_en} {candidate.last_name_en}</h2><p className="text-brandLight font-bold mt-2 text-sm">{candidate.employee_id} | {candidate.rh} ({candidate.zone})</p></div>
                     </div>
                     
                     <div className="bg-white p-6 sm:p-8 rounded-[32px] shadow-sm border border-gray-100 min-h-[400px]">
@@ -801,96 +670,52 @@
                         {step < 3 ? (
                             <div>
                                 {!drawnQ ? (
-                                    <div className="text-center py-20 bg-surface rounded-[28px] border border-gray-100">
-                                        <p className="text-textMuted font-bold mb-6">กดปุ่มด้านล่างเพื่อสุ่มคำถามในหมวด<br/><span className="text-brandBlue font-black text-lg">{TRAINER_CATEGORIES[step]}</span></p>
-                                        <button onClick={drawQuestion} className="bg-brandBlue text-white font-black py-4 px-10 rounded-[24px] btn-3d text-sm sm:text-lg uppercase tracking-widest">สุ่มคำถาม (Draw Question)</button>
-                                    </div>
+                                    <div className="text-center py-20 bg-surface rounded-[28px] border border-gray-100"><p className="text-textMuted font-bold mb-6">กดปุ่มด้านล่างเพื่อสุ่มคำถามในหมวด<br/><span className="text-brandBlue font-black text-lg">{TRAINER_CATEGORIES[step]}</span></p><button onClick={drawQuestion} className="bg-brandBlue text-white font-black py-4 px-10 rounded-[24px] btn-3d text-sm sm:text-lg uppercase tracking-widest">สุ่มคำถาม (Draw Question)</button></div>
                                 ) : (
                                     <div className="animate-slide-up space-y-6">
-                                        <div className="bg-brandLight/30 p-6 rounded-[24px] border border-blue-50 relative overflow-hidden">
-                                            <div className="absolute top-0 right-0 w-16 h-16 bg-white rounded-bl-full opacity-50"></div>
-                                            <p className="font-black text-brandNavy text-lg sm:text-xl leading-relaxed relative z-10">Q: {drawnQ.question}</p>
-                                        </div>
-                                        
-                                        {/* Detailed Rubrics (1-10 mapped to High/Mid/Low) */}
+                                        <div className="bg-brandLight/30 p-6 rounded-[24px] border border-blue-50 relative overflow-hidden"><div className="absolute top-0 right-0 w-16 h-16 bg-white rounded-bl-full opacity-50"></div><p className="font-black text-brandNavy text-lg sm:text-xl leading-relaxed relative z-10">Q: {drawnQ.question}</p></div>
                                         <div className="space-y-3">
                                             <p className="font-black text-textMuted text-[10px] uppercase tracking-widest mb-2">Scoring Rubrics</p>
-                                            <div className="bg-pastelGreen/50 p-4 sm:p-5 rounded-[20px] flex items-start border border-green-50 transition-transform hover:scale-[1.01]">
-                                                <div className="w-10 h-10 bg-success text-white rounded-[10px] flex items-center justify-center font-black shrink-0 mr-4 shadow-sm text-sm">9-10</div>
-                                                <p className="text-sm font-bold text-green-900 pt-1 leading-relaxed"><b className="text-[10px] uppercase tracking-widest block text-green-700 mb-1">Excellent (ครบถ้วน)</b>{drawnQ.score_high}</p>
-                                            </div>
-                                            <div className="bg-surface p-4 sm:p-5 rounded-[20px] flex items-start border border-gray-100 transition-transform hover:scale-[1.01]">
-                                                <div className="w-10 h-10 bg-gray-400 text-white rounded-[10px] flex items-center justify-center font-black shrink-0 mr-4 shadow-sm text-sm">5-8</div>
-                                                <p className="text-sm font-bold text-textMain pt-1 leading-relaxed"><b className="text-[10px] uppercase tracking-widest block text-gray-500 mb-1">Good (ขาดบางประเด็น)</b>{drawnQ.score_mid}</p>
-                                            </div>
-                                            <div className="bg-red-50 p-4 sm:p-5 rounded-[20px] flex items-start border border-red-100 transition-transform hover:scale-[1.01]">
-                                                <div className="w-10 h-10 bg-danger text-white rounded-[10px] flex items-center justify-center font-black shrink-0 mr-4 shadow-sm text-sm">1-4</div>
-                                                <p className="text-sm font-bold text-red-800 pt-1 leading-relaxed"><b className="text-[10px] uppercase tracking-widest block text-red-500 mb-1">Poor / Incorrect</b>{drawnQ.score_low}</p>
-                                            </div>
+                                            <div className="bg-pastelGreen/50 p-4 sm:p-5 rounded-[20px] flex items-start border border-green-50 transition-transform hover:scale-[1.01]"><div className="w-8 h-8 bg-success text-white rounded-[10px] flex items-center justify-center font-black shrink-0 mr-4 shadow-sm">5</div><p className="text-sm font-bold text-green-900 pt-1 leading-relaxed"><b className="text-[10px] uppercase tracking-widest block text-green-700 mb-1">Expected</b>{drawnQ.score5}</p></div>
+                                            <div className="bg-surface p-4 sm:p-5 rounded-[20px] flex items-start border border-gray-100 transition-transform hover:scale-[1.01]"><div className="w-8 h-8 bg-gray-400 text-white rounded-[10px] flex items-center justify-center font-black shrink-0 mr-4 shadow-sm">4</div><p className="text-sm font-bold text-textMain pt-1 leading-relaxed"><b className="text-[10px] uppercase tracking-widest block text-gray-500 mb-1">Good (Missed some point)</b>{drawnQ.score4}</p></div>
+                                            <div className="bg-red-50 p-4 sm:p-5 rounded-[20px] flex items-start border border-red-100 transition-transform hover:scale-[1.01]"><div className="w-8 h-8 bg-danger text-white rounded-[10px] flex items-center justify-center font-black shrink-0 mr-4 shadow-sm">1-3</div><p className="text-sm font-bold text-red-800 pt-1 leading-relaxed"><b className="text-[10px] uppercase tracking-widest block text-red-500 mb-1">Poor / Incorrect</b>{drawnQ.score123}</p></div>
                                         </div>
-
-                                        {/* Scoring UI (1-10) */}
                                         <div className="pt-8 border-t border-gray-100">
-                                            <p className="font-black text-brandBlue text-sm uppercase tracking-widest mb-4 text-center">Select Score (1-10)</p>
-                                            <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 sm:gap-3 mb-6">
-                                                {[1,2,3,4,5,6,7,8,9,10].map(v => (
-                                                    <button key={v} onClick={() => handleScore(v)} className={`rating-btn py-3 rounded-[16px] font-black text-lg sm:text-xl ${scores[step] === v ? 'selected' : 'bg-surface text-textMuted hover:border-brandBlue'}`}>
-                                                        {v}
-                                                    </button>
-                                                ))}
-                                            </div>
+                                            <p className="font-black text-brandBlue text-sm uppercase tracking-widest mb-4 text-center">Select Score</p>
+                                            <div className="flex gap-2 sm:gap-4 mb-6">{[1,2,3,4,5].map(v => (<button key={v} onClick={() => handleScore(v)} className={`rating-btn flex-1 py-4 rounded-[20px] font-black text-xl sm:text-2xl ${scores[step] === v ? 'selected' : 'bg-surface text-textMuted hover:border-brandBlue'}`}>{v}</button>))}</div>
                                             <textarea value={comments[step]} onChange={e => {const newC = [...comments]; newC[step] = e.target.value; setComments(newC);}} placeholder="Trainer Comment (Optional)..." className="w-full p-5 rounded-[24px] bg-surface border-2 border-transparent focus:bg-white focus:border-brandBlue outline-none font-bold text-sm transition-all resize-none h-24" />
                                         </div>
-
-                                        <button onClick={nextStep} disabled={scores[step] === null} className="w-full bg-brandNavy text-white font-black py-4 rounded-[24px] btn-3d mt-4 hover:bg-gray-900 disabled:opacity-50 disabled:shadow-none uppercase tracking-widest">
-                                            บันทึก & ถัดไป
-                                        </button>
+                                        <button onClick={nextStep} disabled={scores[step] === null} className="w-full bg-brandNavy text-white font-black py-4 rounded-[24px] btn-3d mt-4 hover:bg-gray-900 disabled:opacity-50 disabled:shadow-none uppercase tracking-widest">บันทึก & ถัดไป</button>
                                     </div>
                                 )}
                             </div>
                         ) : (
-                            // Step 3: Review & AI Copilot
                             <div className="animate-slide-up space-y-6">
                                 <div className="flex flex-col sm:flex-row justify-between items-center bg-surface p-6 rounded-[28px] border border-gray-100 gap-4">
-                                    <div className="text-center sm:text-left"><p className="font-black text-textMuted text-[10px] uppercase tracking-widest">Total Raw Score</p><p className="text-5xl font-black text-brandBlue">{scores[0]+scores[1]+scores[2]} <span className="text-2xl text-gray-300">/ 30</span></p></div>
-                                    <button onClick={askAiCopilot} disabled={loadingAi} className="w-full sm:w-auto flex items-center justify-center bg-accentOrange text-white px-8 py-4 rounded-[20px] font-black btn-3d">
-                                        {loadingAi ? <span className="animate-spin mr-2 text-xl">⏳</span> : <FlatIcons.Sparkles />}
-                                        <span className="ml-2 uppercase tracking-widest text-sm">{loadingAi ? 'AI Processing...' : 'Ask AI Copilot'}</span>
-                                    </button>
+                                    <div className="text-center sm:text-left"><p className="font-black text-textMuted text-[10px] uppercase tracking-widest">Total Raw Score</p><p className="text-5xl font-black text-brandBlue">{scores[0]+scores[1]+scores[2]} <span className="text-2xl text-gray-300">/ 15</span></p></div>
+                                    <button onClick={askAiCopilot} disabled={loadingAi} className="w-full sm:w-auto flex items-center justify-center bg-accentOrange text-white px-8 py-4 rounded-[20px] font-black btn-3d">{loadingAi ? <span className="animate-spin mr-2 text-xl">⏳</span> : <FlatIcons.Sparkles />}<span className="ml-2 uppercase tracking-widest text-sm">{loadingAi ? 'AI Processing...' : 'Ask AI Copilot'}</span></button>
                                 </div>
-
-                                {/* AI Feedback Display (New Format) */}
                                 {aiFeedback && (
-                                    <div className="space-y-6 animate-fade-in">
+                                    <div className="space-y-6 animate-fade-in mt-6">
                                         <h4 className="font-black text-brandNavy flex items-center text-lg"><FlatIcons.Sparkles /> <span className="ml-2">AI Copilot Insights</span></h4>
                                         {aiFeedback.map((fb, i) => (
-                                            <div key={i} className="bg-white p-6 rounded-[28px] border border-gray-100 shadow-sm">
-                                                <p className="font-bold text-sm text-textMain mb-4 leading-relaxed border-b border-gray-50 pb-3"><span className="bg-brandBlue text-white px-2 py-0.5 rounded-[8px] mr-2 shadow-sm">Q{fb.q_num}</span> {selectedQs[i].question}</p>
-                                                
+                                            <div key={i} className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
+                                                <p className="font-bold text-sm text-textMain mb-5 leading-relaxed"><span className="bg-brandBlue text-white px-2 py-0.5 rounded-[8px] mr-2 shadow-sm">Q{fb.q_num}</span> {selectedQs[i]?.question}</p>
                                                 <div className="space-y-4">
-                                                    <div className="bg-brandLight/20 p-4 rounded-[16px] border border-blue-50">
-                                                        <p className="text-[10px] font-black text-brandBlue uppercase tracking-widest mb-1">Perfect Answer (คำตอบที่สมบูรณ์แบบ)</p>
-                                                        <p className="text-sm font-extrabold text-brandNavy leading-relaxed">"{fb.perfect_answer}"</p>
+                                                    <div className="bg-pastelGreen/20 p-5 rounded-[20px] border border-green-100">
+                                                        <p className="text-[11px] font-black text-green-700 uppercase tracking-widest mb-2 flex items-center"><span className="text-lg mr-2">✅</span> Ideal Script (บทพูดที่แนะนำ)</p>
+                                                        <p className="text-[14px] font-bold text-green-900 leading-loose">{fb.ideal_script}</p>
                                                     </div>
-                                                    <div className="bg-pastelGreen/30 p-4 rounded-[16px] border border-green-50">
-                                                        <p className="text-[10px] font-black text-green-700 uppercase tracking-widest mb-1">Structure (โครงสร้างการตอบ)</p>
-                                                        <p className="text-xs font-bold text-green-900 leading-relaxed">{fb.structure}</p>
-                                                    </div>
-                                                    <div className="bg-red-50/50 p-4 rounded-[16px] border border-red-50">
-                                                        <p className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-1">Red Flags (สิ่งที่ไม่ควรพูด)</p>
-                                                        <ul className="text-xs font-bold text-red-900 leading-relaxed list-disc list-inside pl-2">
-                                                            {fb.red_flags.map((flag, idx) => <li key={idx}>{flag}</li>)}
-                                                        </ul>
+                                                    <div className="bg-red-50/50 p-5 rounded-[20px] border border-red-50">
+                                                        <p className="text-[11px] font-black text-red-600 uppercase tracking-widest mb-2 flex items-center"><span className="text-lg mr-2">🚨</span> Red Flags (ข้อควรระวัง)</p>
+                                                        <p className="text-[13px] font-bold text-red-900 leading-relaxed">{fb.red_flag}</p>
                                                     </div>
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                 )}
-
-                                <button onClick={submitFinal} className="w-full bg-success text-white font-black py-4 rounded-[24px] btn-3d mt-8 text-lg uppercase tracking-widest">
-                                    Submit Final Evaluation
-                                </button>
+                                <button onClick={submitFinal} className="w-full bg-success text-white font-black py-4 rounded-[24px] btn-3d mt-8 text-lg uppercase tracking-widest">Submit Final Evaluation</button>
                             </div>
                         )}
                     </div>
@@ -919,10 +744,8 @@
                 const data = filtered.map(u => ({ 
                     "Employee ID": u.employee_id, "Name": `${u.first_name_en} ${u.last_name_en}`, 
                     "RH": u.rh, "Zone": u.zone,
-                    "PK Score (%)": db.sessions[u.id]?.pk_score || '-', 
-                    "PK Attempts": db.sessions[u.id]?.pk_attempts || 0,
-                    "Trainer Score (%)": db.sessions[u.id]?.trainer_score || '-',
-                    "Overall Status": db.sessions[u.id]?.overall_status || 'NOT STARTED'
+                    "PK Score (%)": db.sessions[u.id]?.pk_score || '-', "PK Attempts": db.sessions[u.id]?.pk_attempts || 0,
+                    "Trainer Score (%)": db.sessions[u.id]?.trainer_score || '-', "Overall Status": db.sessions[u.id]?.overall_status || 'NOT STARTED'
                 }));
                 const ws = XLSX.utils.json_to_sheet(data);
                 const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Certification Report");
@@ -930,11 +753,10 @@
             };
 
             const resetUser = async (id, name) => {
-                if(confirm(`ยืนยันการล้างประวัติการสอบ (Reset) ของ ${name} ใช่หรือไม่?\nข้อมูลการสอบและจำนวนรอบจะกลับไปเริ่มใหม่ทั้งหมด`)) {
+                if(confirm(`ยืนยันการล้างประวัติการสอบ (Reset) ของ ${name} ใช่หรือไม่?`)) {
                     setDb(prev => { const s = {...prev.sessions}; delete s[id]; return {...prev, sessions: s}; });
                     await supabase.from('exam_sessions').delete().eq('user_id', id);
-                    localStorage.removeItem(`ttb_exam_${id}`);
-                    alert('รีเซ็ตข้อมูลสำเร็จ');
+                    localStorage.removeItem(`ttb_exam_${id}`); alert('รีเซ็ตข้อมูลสำเร็จ');
                 }
             };
 
@@ -948,68 +770,24 @@
             return (
                 <div className="space-y-8 animate-fade-in pb-10 max-w-6xl mx-auto">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 sm:p-8 rounded-[36px] shadow-sm border border-gray-100">
-                        <div>
-                            <h2 className="text-2xl sm:text-3xl font-black text-brandDark">System Administration</h2>
-                            <p className="text-textMuted font-bold text-sm mt-2">Manage users and export certification data.</p>
-                        </div>
-                        <div className="mt-6 md:mt-0 flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                            <select value={filterRH} onChange={e => setFilterRH(e.target.value)} className="bg-surface p-4 rounded-[20px] font-bold text-brandBlue outline-none cursor-pointer border border-gray-100 w-full sm:w-auto shadow-sm">
-                                <option value="All">All RH (Overall)</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}
-                            </select>
-                            <button onClick={exportData} className="bg-success hover:bg-green-600 text-white px-8 py-4 rounded-[20px] font-black flex justify-center items-center btn-3d uppercase tracking-widest text-sm w-full sm:w-auto"><FlatIcons.Download /> <span className="ml-2">Export Excel</span></button>
-                        </div>
+                        <div><h2 className="text-2xl sm:text-3xl font-black text-brandDark">System Administration</h2><p className="text-textMuted font-bold text-sm mt-2">Manage users and export certification data.</p></div>
+                        <div className="mt-6 md:mt-0 flex flex-col sm:flex-row gap-4 w-full md:w-auto"><select value={filterRH} onChange={e => setFilterRH(e.target.value)} className="bg-surface p-4 rounded-[20px] font-bold text-brandBlue outline-none cursor-pointer border border-gray-100 w-full sm:w-auto shadow-sm"><option value="All">All RH (Overall)</option>{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}</select><button onClick={exportData} className="bg-success hover:bg-green-600 text-white px-8 py-4 rounded-[20px] font-black flex justify-center items-center btn-3d uppercase tracking-widest text-sm w-full sm:w-auto"><FlatIcons.Download /> <span className="ml-2">Export Excel</span></button></div>
                     </div>
-                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="bg-white p-8 rounded-[32px] shadow-sm border border-gray-100 flex items-center justify-between"><div className="space-y-1"><p className="text-[10px] font-black text-textMuted uppercase tracking-widest">Total Registered</p><p className="text-5xl font-black text-brandNavy">{filtered.length}</p></div><div className="w-20 h-20 bg-brandLight rounded-[24px] flex items-center justify-center text-brandBlue"><FlatIcons.Users /></div></div>
                         <div className="bg-white p-8 rounded-[32px] shadow-sm border border-gray-100 flex items-center justify-between"><div className="space-y-1"><p className="text-[10px] font-black text-textMuted uppercase tracking-widest">Fully Certified</p><p className="text-5xl font-black text-success">{filtered.filter(c => db.sessions[c.id]?.overall_status === 'CERTIFIED').length}</p></div><div className="w-20 h-20 bg-pastelGreen rounded-[24px] flex items-center justify-center text-green-600 text-4xl">🎓</div></div>
                     </div>
-
                     {filterRH !== 'All' && Object.keys(zoneStats).length > 0 && (
-                        <div className="bg-white rounded-[32px] p-6 sm:p-8 shadow-sm border border-gray-100 animate-slide-up">
-                            <h3 className="font-black text-brandNavy text-xl mb-6">Zone Breakdown ({filterRH})</h3>
-                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                                {Object.entries(zoneStats).map(([zone, stats]) => (
-                                    <div key={zone} className="bg-surface p-5 rounded-[24px] border border-gray-100">
-                                        <p className="font-black text-brandBlue text-sm mb-3">{zone}</p>
-                                        <p className="text-[11px] font-black text-textMuted uppercase tracking-widest">Users: <span className="text-brandNavy">{stats.total}</span></p>
-                                        <p className="text-[11px] font-black text-success uppercase tracking-widest mt-1">Cert: <span className="text-success">{stats.passed}</span></p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <div className="bg-white rounded-[32px] p-6 sm:p-8 shadow-sm border border-gray-100 animate-slide-up"><h3 className="font-black text-brandNavy text-xl mb-6">Zone Breakdown ({filterRH})</h3><div className="grid grid-cols-2 md:grid-cols-5 gap-4">{Object.entries(zoneStats).map(([zone, stats]) => (<div key={zone} className="bg-surface p-5 rounded-[24px] border border-gray-100"><p className="font-black text-brandBlue text-sm mb-3">{zone}</p><p className="text-[11px] font-black text-textMuted uppercase tracking-widest">Users: <span className="text-brandNavy">{stats.total}</span></p><p className="text-[11px] font-black text-success uppercase tracking-widest mt-1">Cert: <span className="text-success">{stats.passed}</span></p></div>))}</div></div>
                     )}
-
                     <div className="bg-white rounded-[36px] shadow-sm border border-gray-100 overflow-hidden">
                         <div className="p-6 sm:p-8 border-b border-gray-50 bg-[#F8F9FE] flex justify-between items-center"><h3 className="font-black text-brandDark text-xl">Candidate Database</h3></div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm min-w-[800px]">
-                                <thead className="bg-white border-b border-gray-100">
-                                    <tr><th className="p-6 font-black text-textMuted text-[10px] uppercase tracking-widest">Candidate Info</th><th className="p-6 font-black text-textMuted text-[10px] uppercase tracking-widest text-center">Location</th><th className="p-6 font-black text-textMuted text-[10px] uppercase tracking-widest text-center">Overall Status</th><th className="p-6 font-black text-textMuted text-[10px] uppercase tracking-widest text-center">Manage</th></tr>
-                                </thead>
-                                <tbody className="font-medium">
-                                    {filtered.map(u => (
-                                    <tr key={u.id} className="border-b border-gray-50 hover:bg-surface transition-colors">
-                                        <td className="p-6"><p className="font-black text-textMain text-base">{u.first_name_en} {u.last_name_en}</p><p className="text-textMuted font-bold text-xs mt-1">{u.employee_id} <span className="bg-gray-200 text-gray-600 px-2 py-0.5 rounded text-[10px] ml-2">{u.position}</span></p></td>
-                                        <td className="p-6 text-center"><span className="font-black text-brandBlue bg-white border border-blue-50 px-3 py-1 rounded-lg text-xs shadow-sm">{u.rh}</span><div className="text-xs text-gray-500 mt-2 font-bold">{u.zone}</div></td>
-                                        <td className="p-6 text-center">
-                                            <span className={`px-4 py-2 rounded-[12px] text-[10px] font-black uppercase tracking-widest shadow-sm ${db.sessions[u.id]?.overall_status === 'CERTIFIED' ? 'bg-pastelGreen text-green-700' : db.sessions[u.id] ? 'bg-pastelOrange text-accentOrange' : 'text-gray-400 bg-gray-100'}`}>
-                                                {db.sessions[u.id]?.overall_status || 'PENDING'}
-                                            </span>
-                                            {db.sessions[u.id] && <div className="text-[10px] text-gray-400 font-bold mt-2">PK: {db.sessions[u.id].pk_score || '-'}% | TR: {db.sessions[u.id].trainer_score || '-'}%</div>}
-                                        </td>
-                                        <td className="p-6">
-                                            <div className="flex justify-center space-x-3">
-                                                <button onClick={() => resetUser(u.id, u.first_name_en)} className="text-accentOrange bg-pastelOrange hover:bg-accentOrange hover:text-white p-3 rounded-[14px] transition-colors shadow-sm" title="Reset Exam Data"><FlatIcons.Refresh /></button>
-                                                <button onClick={() => delUser(u.id, u.first_name_en)} className="text-danger bg-red-50 hover:bg-danger hover:text-white p-3 rounded-[14px] transition-colors shadow-sm" title="Delete Account"><FlatIcons.Trash /></button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {filtered.length === 0 && <tr><td colSpan="4" className="text-center p-12 text-gray-400 font-bold text-lg">No candidates found.</td></tr>}
-                                </tbody>
-                            </table>
-                        </div>
+                        <div className="overflow-x-auto"><table className="w-full text-left text-sm min-w-[800px]"><thead className="bg-white border-b border-gray-100"><tr><th className="p-6 font-black text-textMuted text-[10px] uppercase tracking-widest">Candidate Info</th><th className="p-6 font-black text-textMuted text-[10px] uppercase tracking-widest text-center">Location</th><th className="p-6 font-black text-textMuted text-[10px] uppercase tracking-widest text-center">Overall Status</th><th className="p-6 font-black text-textMuted text-[10px] uppercase tracking-widest text-center">Manage</th></tr></thead><tbody className="font-medium">
+                            {filtered.map(u => (
+                            <tr key={u.id} className="border-b border-gray-50 hover:bg-surface transition-colors"><td className="p-6"><p className="font-black text-textMain text-base">{u.first_name_en} {u.last_name_en}</p><p className="text-textMuted font-bold text-xs mt-1">{u.employee_id} <span className="bg-gray-200 text-gray-600 px-2 py-0.5 rounded text-[10px] ml-2">{u.position}</span></p></td><td className="p-6 text-center"><span className="font-black text-brandBlue bg-white border border-blue-50 px-3 py-1 rounded-lg text-xs shadow-sm">{u.rh}</span><div className="text-xs text-gray-500 mt-2 font-bold">{u.zone}</div></td><td className="p-6 text-center"><span className={`px-4 py-2 rounded-[12px] text-[10px] font-black uppercase tracking-widest shadow-sm ${db.sessions[u.id]?.overall_status === 'CERTIFIED' ? 'bg-pastelGreen text-green-700' : db.sessions[u.id] ? 'bg-pastelOrange text-accentOrange' : 'text-gray-400 bg-gray-100'}`}>{db.sessions[u.id]?.overall_status || 'PENDING'}</span>{db.sessions[u.id] && <div className="text-[10px] text-gray-400 font-bold mt-2">PK: {db.sessions[u.id].pk_score || '-'}% | TR: {db.sessions[u.id].trainer_score || '-'}%</div>}</td><td className="p-6"><div className="flex justify-center space-x-3"><button onClick={() => resetUser(u.id, u.first_name_en)} className="text-accentOrange bg-pastelOrange hover:bg-accentOrange hover:text-white p-3 rounded-[14px] transition-colors shadow-sm" title="Reset Exam Data"><FlatIcons.Refresh /></button><button onClick={() => delUser(u.id, u.first_name_en)} className="text-danger bg-red-50 hover:bg-danger hover:text-white p-3 rounded-[14px] transition-colors shadow-sm" title="Delete Account"><FlatIcons.Trash /></button></div></td></tr>
+                        ))}
+                        {filtered.length === 0 && <tr><td colSpan="4" className="text-center p-12 text-gray-400 font-bold text-lg">No candidates found in this region.</td></tr>}
+                        </tbody></table></div>
                     </div>
                 </div>
             );
