@@ -107,7 +107,6 @@
             Users: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
         };
 
-        // ✅ ฟุตเตอร์เครดิตสำหรับทุกหน้า
         function PoweredByFooter() {
             return (
                 <div className="text-center py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest w-full">
@@ -206,7 +205,7 @@
         }
 
         // ==========================================
-        // 5. AUTH SCREEN (WITH STRICT REGISTRATION)
+        // 5. AUTH SCREEN
         // ==========================================
         function AuthScreen({ onLogin, db, setDb }) {
             const [isReg, setIsReg] = useState(false);
@@ -309,11 +308,10 @@
                             {isSubmitting ? <span className="animate-spin text-xl mr-2">⏳</span> : (isReg ? 'สร้างบัญชี (Register)' : 'Login')}
                         </button>
                         
-                        {/* ✅ ย้ายลิงก์ลงทะเบียนมาอยู่ใต้ปุ่ม Login ทันที และแก้ไขข้อความ/สี */}
                         <div className="text-center mt-6">
                             <button type="button" onClick={() => {setIsReg(!isReg); setErr('');}} className="text-textMuted hover:text-brandBlue font-bold text-sm transition-colors">
-                                {isReg ? 'มีบัญชีอยู่แล้ว กลับไปหน้าเข้าสู่ระบบ' : (
-                                    <span>คลิ๊กที่นี่ เพื่อลงทะเบียนเข้าใช้งาน <span className="text-danger">เฉพาะครั้งแรก</span></span>
+                                {isReg ? 'มีบัญชีอยู่แล้ว? กลับไปหน้าเข้าสู่ระบบ' : (
+                                    <span>ลงทะเบียนเข้าใช้งานระบบ <span className="text-danger">เฉพาะครั้งแรก</span></span>
                                 )}
                             </button>
                         </div>
@@ -327,7 +325,7 @@
         }
 
         // ==========================================
-        // 6. CANDIDATE APP (Dashboard & Logic)
+        // 6. CANDIDATE APP
         // ==========================================
         function CandidateApp({ user, db, updateSession, onLogout }) {
             const session = db.sessions[user.id] || {};
@@ -427,11 +425,22 @@
 
             const handleStartTest = () => {
                 if(questions.length === 0) return alert('ไม่พบคลังข้อสอบ');
+                
                 const shuffle = (arr) => [...arr].sort(() => 0.5 - Math.random());
                 const sq = shuffle(questions).slice(0, 30).map(q => {
-                    let opts = []; try { opts = JSON.parse(q.options); } catch(e) { opts = ["A", "B", "C", "D"]; }
+                    let opts = [];
+                    // ✅ แก้ไข: ตรวจสอบ Format ก่อน Parse เพื่อรองรับข้อมูลทั้งจากเก่าและใหม่
+                    if (Array.isArray(q.options)) {
+                        opts = q.options;
+                    } else if (typeof q.options === 'string') {
+                        try { opts = JSON.parse(q.options); } catch(e) { console.error("Parse error", e); }
+                    }
+                    
+                    if(!Array.isArray(opts) || opts.length === 0) opts = ["A", "B", "C", "D"]; // Fallback สุดท้าย
+                    
                     return { ...q, shuffledOptions: shuffle(opts) }; 
                 });
+                
                 setExamQuestions(sq); setAnswers({}); setQIdx(0); setTimeLeft(3600); setStarted(true);
                 localStorage.setItem(storageKey, JSON.stringify({ examQuestions: sq, answers: {}, qIdx: 0, timeLeft: 3600, lastSaved: Math.floor(Date.now() / 1000) }));
             };
@@ -532,7 +541,7 @@
         }
 
         // ==========================================
-        // 9. TRAINER APP (With Re-evaluation Logic)
+        // 9. TRAINER APP
         // ==========================================
         function TrainerApp({ trainer, db, updateSession }) {
             const [filterRH, setFilterRH] = useState('All');
