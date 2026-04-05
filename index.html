@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ttb US Multi-Asset 15/5 - Knowledge Test</title>
+    <title>ttb Certification Hub</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,66 +12,63 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#2563EB',      
-                        primaryLight: '#DBEAFE', 
-                        brandNavy: '#0F172A',    
+                        brandDark: '#0A1128',    
+                        brandNavy: '#1C2541',    
+                        primary: '#3A86FF',      
+                        accent: '#00F5D4',       
                         surface: '#F8FAFC',      
-                        textMain: '#1E293B',     
-                        textMuted: '#64748B',    
-                        danger: '#EF4444',       
-                        success: '#10B981',      
-                        warning: '#F59E0B',
-                        purple: '#8B5CF6'
+                        danger: '#FF4757',       
+                        success: '#2ED573',      
+                        warning: '#FFA502',
+                        textMain: '#1E293B',
+                        textMuted: '#64748B',
                     },
                     fontFamily: { sans: ['Prompt', 'Nunito', 'sans-serif'] },
                     animation: {
                         'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'fade-in': 'fadeIn 0.3s ease-out forwards',
                         'pop-in': 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
-                        'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     },
                     keyframes: {
                         slideUp: { '0%': { opacity: 0, transform: 'translateY(20px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
                         fadeIn: { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
-                        popIn: { '0%': { opacity: 0, transform: 'scale(0.95)' }, '100%': { opacity: 1, transform: 'scale(1)' } },
-                        pulseGlow: { '0%, 100%': { opacity: 1 }, '50%': { opacity: .7, boxShadow: '0 0 15px rgba(37, 99, 235, 0.5)' } }
+                        popIn: { '0%': { opacity: 0, transform: 'scale(0.95)' }, '100%': { opacity: 1, transform: 'scale(1)' } }
+                    },
+                    boxShadow: {
+                        'soft-3d': '0 8px 20px -5px rgba(58, 134, 255, 0.15)',
+                        'neon': '0 0 20px rgba(58, 134, 255, 0.4)',
                     }
                 }
             }
         }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- React & Supabase -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        body { background-color: #E2E8F0; font-family: 'Nunito', 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; display: flex; justify-content: center; min-height: 100vh; min-height: 100dvh; margin: 0; }
+        body { background-color: #E2E8F0; font-family: 'Nunito', 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; display: flex; justify-content: center; min-height: 100vh; margin: 0; }
         .app-container { width: 100%; max-width: 480px; background-color: #F8FAFC; height: 100vh; height: 100dvh; position: relative; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); overflow: hidden; }
         @media (min-width: 640px) { body { padding: 20px 0; } .app-container { height: 90vh; border-radius: 40px; } }
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .shadow-soft-3d { box-shadow: 0 8px 20px -5px rgba(37, 99, 235, 0.15); }
         .btn-modern { transition: all 0.2s ease; } .btn-modern:active:not(:disabled) { transform: scale(0.97); }
-        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        ::-webkit-scrollbar { width: 4px; display: none; } 
     </style>
 </head>
 <body>
     <div id="root" class="w-full flex justify-center h-full"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
 
-        // ==========================================
-        // CONFIGURATION
-        // ==========================================
         const SUPABASE_URL = "https://lyfqqrofqbyfezwxwhph.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZnFxcm9mcWJ5ZmV6d3h3aHBoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0ODc3MTAsImV4cCI6MjA4OTA2MzcxMH0.U5rhRSSTplQbcXBL16odRMRL26dy1RCxC_6jkHjhaWA";
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // 💡 ลิงก์ปลายทางของระบบ Audio Exam และ FAQ
-        const AUDIO_EXAM_URL = "https://pltpdttb-jpg.github.io/Audiotest/";
-        const FAQ_EXAM_URL = "https://pltpdttb-jpg.github.io/us-faq/";
 
         const RH_ZONES = { 'RH1': ['จตุจักร', 'ธนบุรี', 'บางกะปิ', 'สาทร', 'สุขุมวิท'], 'RH2': ['ชลบุรี', 'บางนา', 'พัทยา', 'ระยอง'], 'RH3': ['เชียงใหม่', 'นครสวรรค์', 'นนทบุรี', 'พิษณุโลก', 'อยุธยา'], 'RH4': ['ดอนเมือง', 'นครราชสีมา', 'สระบุรี', 'อุดรธานี', 'อุบลราชธานี'], 'RH5': ['ภูเก็ต', 'ราชบุรี', 'สมุทรสาคร', 'สุราษฎร์ธานี', 'หาดใหญ่'] };
 
@@ -81,66 +78,78 @@
             Exit: () => <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>,
             Lock: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
             ChevronLeft: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>,
-            Award: () => <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>,
-            Mic: () => <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-        };
-
-        const sendCertificateEmail = async (email, name, pkScore, pkAttempts, audioScore, audioAttempts) => {
-            console.log(`📧 [SYSTEM] กำลังส่งอีเมลไปยัง: ${email}`);
-            return new Promise(resolve => setTimeout(resolve, 1500));
+            Mic: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>,
+            Stop: () => <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4" ry="4"></rect></svg>,
+            Check: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
+            User: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         };
 
         // ==========================================
         // MAIN APP COMPONENT
         // ==========================================
         function App() {
-            const [db, setDb] = useState({ users: [], sessions: {}, questions: [] });
+            const [db, setDb] = useState({ users: [], sessions: {}, questions: [], rubrics: [], audioSubs: [] });
             const [currentUser, setCurrentUser] = useState(null);
+            const [trainerName, setTrainerName] = useState("Trainer ประจำภูมิภาค");
             const [isLoading, setIsLoading] = useState(true);
 
-            useEffect(() => {
-                const fetchDatabase = async () => {
-                    try {
-                        const [resU, resS, resQ] = await Promise.all([ supabase.from('users').select('*'), supabase.from('exam_sessions').select('*'), supabase.from('questions').select('*') ]);
-                        const sessMap = {}; if(resS.data) resS.data.forEach(s => sessMap[s.user_id] = s);
-                        setDb({ users: resU.data || [], sessions: sessMap, questions: resQ.data || [] });
-                        
-                        // AUTO LOGIN
-                        const savedUser = localStorage.getItem('ttb_candidate_user');
-                        if (savedUser) {
-                            const parsedUser = JSON.parse(savedUser);
-                            const userExists = (resU.data || []).find(u => u.employee_id === parsedUser.employee_id);
-                            if(userExists) {
-                                setCurrentUser(userExists);
-                                if (!sessMap[userExists.id]) {
-                                    setDb(prev => ({ ...prev, sessions: { ...prev.sessions, [userExists.id]: { pk_passed: false, pk_score: null, pk_attempts: 0, trainer_passed: false, trainer_score: null, trainer_attempts: 0, overall_status: 'NOT_STARTED', cert_sent: false } }}));
-                                }
-                            } else {
-                                localStorage.removeItem('ttb_candidate_user');
+            const fetchDatabase = async () => {
+                try {
+                    // 💡 เพิ่มการดึงข้อมูล audio_submissions เพื่อเช็กว่าส่งไฟล์เสียงหรือยัง
+                    const [resU, resS, resQ, resR, resA] = await Promise.all([ 
+                        supabase.from('users').select('*'), 
+                        supabase.from('exam_sessions').select('*'), 
+                        supabase.from('questions').select('*'),
+                        supabase.from('trainer_rubrics').select('*'),
+                        supabase.from('audio_submissions').select('employee_id') 
+                    ]);
+                    const sessMap = {}; if(resS.data) resS.data.forEach(s => sessMap[s.user_id] = s);
+                    setDb({ users: resU.data || [], sessions: sessMap, questions: resQ.data || [], rubrics: resR.data || [], audioSubs: resA.data || [] });
+                    
+                    const savedUser = localStorage.getItem('ttb_candidate_unified');
+                    if (savedUser) {
+                        const parsedUser = JSON.parse(savedUser);
+                        const userExists = (resU.data || []).find(u => u.employee_id === parsedUser.employee_id);
+                        if(userExists) {
+                            setCurrentUser(userExists);
+                            if (!sessMap[userExists.id]) {
+                                setDb(prev => ({ ...prev, sessions: { ...prev.sessions, [userExists.id]: { pk_passed: false, pk_score: null, pk_attempts: 0, trainer_passed: false, trainer_score: null, trainer_attempts: 0, overall_status: 'NOT_STARTED', cert_sent: false } }}));
                             }
+                            // หาชื่อ Trainer ประจำภาค
+                            const trainers = resU.data.filter(u => u.role === 'Trainer' && u.rh === userExists.rh);
+                            if(trainers.length > 0) setTrainerName(`${trainers[0].first_name_en} ${trainers[0].last_name_en}`);
+                        } else {
+                            localStorage.removeItem('ttb_candidate_unified');
                         }
-                    } catch (err) { console.error(err); }
-                    setIsLoading(false);
-                };
+                    }
+                } catch (err) { console.error(err); }
+                setIsLoading(false);
+            };
+
+            useEffect(() => {
                 fetchDatabase();
             }, []);
 
             const handleLogin = (user) => {
-                if (user.role !== 'Candidate') { alert('สงวนสิทธิ์สำหรับผู้เข้าสอบเท่านั้น'); return; }
+                if (user.role !== 'Candidate') return alert('สงวนสิทธิ์สำหรับผู้เข้าสอบเท่านั้น'); 
                 setCurrentUser(user);
-                localStorage.setItem('ttb_candidate_user', JSON.stringify(user));
+                localStorage.setItem('ttb_candidate_unified', JSON.stringify(user));
+                
+                const trainers = db.users.filter(u => u.role === 'Trainer' && u.rh === user.rh);
+                if(trainers.length > 0) setTrainerName(`${trainers[0].first_name_en} ${trainers[0].last_name_en}`);
 
                 if (!db.sessions[user.id]) { setDb(prev => ({ ...prev, sessions: { ...prev.sessions, [user.id]: { pk_passed: false, pk_score: null, pk_attempts: 0, trainer_passed: false, trainer_score: null, trainer_attempts: 0, overall_status: 'NOT_STARTED', cert_sent: false } }})); }
             };
 
             const handleLogout = () => {
                 setCurrentUser(null);
-                localStorage.removeItem('ttb_candidate_user');
+                localStorage.removeItem('ttb_candidate_unified');
             };
 
             const updateSession = async (userId, data) => {
                 setDb(prev => ({ ...prev, sessions: { ...prev.sessions, [userId]: { ...prev.sessions[userId], ...data } } }));
                 await supabase.from('exam_sessions').upsert({ user_id: userId, ...data });
+                fetchDatabase(); // ดึงข้อมูลใหม่เพื่อเช็กสถานะล่าสุดเสมอ
             };
 
             const updateUserEmailLocally = (userId, newEmail) => {
@@ -153,7 +162,7 @@
 
             return (
                 <div className="app-container">
-                    {!currentUser ? <AuthScreen onLogin={handleLogin} db={db} setDb={setDb} /> : <CandidateApp user={currentUser} db={db} updateSession={(data) => updateSession(currentUser.id, data)} updateUserEmailLocally={updateUserEmailLocally} onLogout={handleLogout} />}
+                    {!currentUser ? <AuthScreen onLogin={handleLogin} db={db} setDb={setDb} /> : <CandidateApp user={currentUser} db={db} trainerName={trainerName} updateSession={(data) => updateSession(currentUser.id, data)} updateUserEmailLocally={updateUserEmailLocally} onLogout={handleLogout} refreshData={fetchDatabase} />}
                 </div>
             );
         }
@@ -167,8 +176,6 @@
             const [err, setErr] = useState('');
             const [isSubmitting, setIsSubmitting] = useState(false);
 
-            const handleRhChange = (e) => { const newRh = e.target.value; setForm({ ...form, rh: newRh, zone: RH_ZONES[newRh][0] }); };
-
             const handleSubmit = async (e) => {
                 e.preventDefault(); setErr(''); setIsSubmitting(true);
                 if (!isReg) {
@@ -176,13 +183,12 @@
                     if (u) onLogin(u); else setErr('รหัสพนักงาน หรือ ชื่อ ไม่ถูกต้อง');
                     setIsSubmitting(false);
                 } else {
-                    if (db.users.find(x => x.employee_id === form.empId)) { setErr('Employee ID นี้ถูกใช้งานแล้ว กรุณาเข้าสู่ระบบ'); setIsSubmitting(false); return; }
+                    if (db.users.find(x => x.employee_id === form.empId)) { setErr('Employee ID นี้ถูกใช้งานแล้ว'); setIsSubmitting(false); return; }
                     const newUser = { id: form.empId, employee_id: form.empId, email: form.email, first_name_en: form.firstName, last_name_en: form.lastName, role: 'Candidate', position: form.position, rh: form.rh, zone: form.zone };
                     try {
                         const { error } = await supabase.from('users').insert([newUser]);
                         if(error) throw error;
                         setDb(prev => ({ ...prev, users: [...prev.users, newUser] }));
-                        alert('ลงทะเบียนสำเร็จ! ระบบกำลังนำคุณเข้าสู่ Dashboard'); 
                         onLogin(newUser);
                     } catch (error) { setErr("การเชื่อมต่อล้มเหลว กรุณาลองใหม่"); }
                     setIsSubmitting(false);
@@ -190,37 +196,37 @@
             };
 
             return (
-                <div className="flex-1 flex flex-col bg-surface overflow-y-auto custom-scrollbar relative">
-                    <div className="bg-gradient-to-br from-brandNavy to-primary h-48 w-full rounded-b-[32px] absolute top-0 left-0 z-0"></div>
+                <div className="flex-1 flex flex-col bg-brandNavy overflow-y-auto custom-scrollbar relative text-white">
+                    <div className="absolute top-[-20%] right-[-10%] w-[400px] h-[400px] bg-primary/30 rounded-full blur-[100px] pointer-events-none"></div>
                     <div className="relative z-10 p-6 pt-12 text-center">
-                        <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-white/30">📘</div>
-                        <h1 className="text-2xl font-extrabold text-white mb-6">Certification Hub</h1>
-                        <form onSubmit={handleSubmit} className="glass-card p-6 rounded-3xl space-y-4 shadow-soft-3d text-left animate-slide-up border border-slate-100">
-                            <h2 className="text-center font-black text-brandNavy mb-2">{isReg ? 'ลงทะเบียนเข้าสอบ' : 'เข้าสู่ระบบ (Login)'}</h2>
-                            {err && <div className="bg-red-50 text-danger p-3 rounded-xl text-xs font-bold text-center border border-red-100">{err}</div>}
+                        <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-neon">🚀</div>
+                        <h1 className="text-2xl font-extrabold mb-6">Certification Hub</h1>
+                        <form onSubmit={handleSubmit} className="bg-white/10 backdrop-blur-xl p-6 rounded-3xl space-y-4 text-left border border-white/10">
+                            <h2 className="text-center font-black mb-2">{isReg ? 'ลงทะเบียนเข้าสอบ' : 'เข้าสู่ระบบ (Login)'}</h2>
+                            {err && <div className="bg-danger/20 border border-danger/50 text-danger p-3 rounded-xl text-xs font-bold text-center">{err}</div>}
                             
-                            <div><label className="text-[10px] font-bold text-slate-500 uppercase">Employee ID</label><input type="text" placeholder="เช่น 000123" value={form.empId} onChange={e=>setForm({...form, empId:e.target.value})} className="w-full p-3.5 rounded-xl border border-slate-200 bg-slate-50 font-bold outline-none focus:border-primary text-sm" required /></div>
+                            <div><label className="text-[10px] font-bold text-primaryLight uppercase block mb-1">Employee ID</label><input type="text" placeholder="e.g. 000123" value={form.empId} onChange={e=>setForm({...form, empId:e.target.value})} className="w-full p-3.5 rounded-xl bg-brandDark/50 border border-white/10 font-bold outline-none focus:border-primary text-sm" required /></div>
                             
                             <div className="grid grid-cols-2 gap-3">
-                                <div><label className="text-[10px] font-bold text-slate-500 uppercase">First Name <span className="text-danger lowercase">(EN)</span></label><input type="text" placeholder="Somchai" value={form.firstName} onChange={e=>setForm({...form, firstName:e.target.value})} className="w-full p-3.5 rounded-xl border border-slate-200 bg-slate-50 font-bold outline-none focus:border-primary text-sm" required /></div>
-                                {isReg && <div><label className="text-[10px] font-bold text-slate-500 uppercase">Last Name <span className="text-danger lowercase">(EN)</span></label><input type="text" placeholder="Rakdee" value={form.lastName} onChange={e=>setForm({...form, lastName:e.target.value})} className="w-full p-3.5 rounded-xl border border-slate-200 bg-slate-50 font-bold outline-none focus:border-primary text-sm" required /></div>}
+                                <div><label className="text-[10px] font-bold text-primaryLight uppercase block mb-1">First Name (EN)</label><input type="text" placeholder="Somchai" value={form.firstName} onChange={e=>setForm({...form, firstName:e.target.value})} className="w-full p-3.5 rounded-xl bg-brandDark/50 border border-white/10 font-bold outline-none focus:border-primary text-sm" required /></div>
+                                {isReg && <div><label className="text-[10px] font-bold text-primaryLight uppercase block mb-1">Last Name (EN)</label><input type="text" placeholder="Rakdee" value={form.lastName} onChange={e=>setForm({...form, lastName:e.target.value})} className="w-full p-3.5 rounded-xl bg-brandDark/50 border border-white/10 font-bold outline-none focus:border-primary text-sm" required /></div>}
                             </div>
                             
                             {isReg && (
                                 <div className="space-y-4 pt-2 animate-fade-in">
-                                    <div><label className="text-[10px] font-bold text-slate-500 uppercase">Email <span className="text-danger lowercase">(เพื่อส่งใบเซอร์)</span></label><input type="email" placeholder="example@ttbbank.com" value={form.email} onChange={e=>setForm({...form, email:e.target.value})} className="w-full p-3.5 rounded-xl border border-slate-200 bg-slate-50 font-bold outline-none focus:border-primary text-sm" required /></div>
+                                    <div><label className="text-[10px] font-bold text-primaryLight uppercase block mb-1">Email</label><input type="email" placeholder="example@ttbbank.com" value={form.email} onChange={e=>setForm({...form, email:e.target.value})} className="w-full p-3.5 rounded-xl bg-brandDark/50 border border-white/10 font-bold outline-none focus:border-primary text-sm" required /></div>
                                     <div className="grid grid-cols-2 gap-3">
-                                        <div><label className="text-[10px] font-bold text-slate-500 uppercase">Region (RH)</label><select value={form.rh} onChange={handleRhChange} className="w-full p-3.5 rounded-xl border border-slate-200 bg-slate-50 font-bold outline-none cursor-pointer text-sm">{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}</select></div>
-                                        <div><label className="text-[10px] font-bold text-slate-500 uppercase">Zone</label><select value={form.zone} onChange={e=>setForm({...form, zone:e.target.value})} className="w-full p-3.5 rounded-xl border border-slate-200 bg-slate-50 font-bold outline-none cursor-pointer text-sm">{RH_ZONES[form.rh].map(z => <option key={z} value={z}>{z}</option>)}</select></div>
+                                        <div><label className="text-[10px] font-bold text-primaryLight uppercase block mb-1">Region (RH)</label><select value={form.rh} onChange={e=>setForm({...form, rh:e.target.value, zone:RH_ZONES[e.target.value][0]})} className="w-full p-3.5 rounded-xl bg-brandDark/50 border border-white/10 font-bold outline-none focus:border-primary text-sm"><option value="RH1">RH1</option><option value="RH2">RH2</option><option value="RH3">RH3</option><option value="RH4">RH4</option><option value="RH5">RH5</option></select></div>
+                                        <div><label className="text-[10px] font-bold text-primaryLight uppercase block mb-1">Zone</label><select value={form.zone} onChange={e=>setForm({...form, zone:e.target.value})} className="w-full p-3.5 rounded-xl bg-brandDark/50 border border-white/10 font-bold outline-none focus:border-primary text-sm">{RH_ZONES[form.rh].map(z=><option key={z} value={z}>{z}</option>)}</select></div>
                                     </div>
                                 </div>
                             )}
-                            <button type="submit" disabled={isSubmitting} className="w-full bg-primary hover:bg-blue-700 text-white font-black py-4 rounded-xl mt-2 shadow-md transition-colors uppercase tracking-widest text-sm btn-modern disabled:opacity-70 flex items-center justify-center">
-                                {isSubmitting ? <span className="animate-spin text-lg mr-2">⏳</span> : (isReg ? 'ลงทะเบียน (Register)' : 'เข้าสู่ระบบ (Log In)')}
+                            <button type="submit" disabled={isSubmitting} className="w-full bg-primary text-white font-black py-4 rounded-xl mt-2 transition-colors uppercase tracking-widest text-sm btn-modern shadow-neon disabled:opacity-50">
+                                {isSubmitting ? 'Processing...' : (isReg ? 'ลงทะเบียน (Register)' : 'เข้าสู่ระบบ (Sign In)')}
                             </button>
-                            <div className="text-center mt-2 pt-4 border-t border-slate-100">
-                                <button type="button" onClick={() => {setIsReg(!isReg); setErr('');}} className="text-slate-500 hover:text-primary font-bold text-xs transition-colors">
-                                    {isReg ? 'มีบัญชีแล้ว กลับไปเข้าสู่ระบบ' : <span>พนักงานใหม่? <span className="text-danger underline">ลงทะเบียนที่นี่</span></span>}
+                            <div className="text-center mt-2 pt-4 border-t border-white/10">
+                                <button type="button" onClick={() => {setIsReg(!isReg); setErr('');}} className="text-primaryLight hover:text-white font-bold text-xs transition-colors">
+                                    {isReg ? 'มีบัญชีแล้ว? กลับไปเข้าสู่ระบบ' : <span>พนักงานใหม่? <span className="underline">ลงทะเบียนที่นี่</span></span>}
                                 </button>
                             </div>
                         </form>
@@ -235,7 +241,6 @@
         function EmailPromptModal({ user, session, updateSession, updateUserEmailLocally }) {
             const [email, setEmail] = useState('');
             const [isProcessing, setIsProcessing] = useState(false);
-            
             const isCertified = session?.overall_status === 'CERTIFIED';
 
             const handleSubmit = async (e) => {
@@ -243,41 +248,26 @@
                 try {
                     await supabase.from('users').update({ email: email }).eq('id', user.id);
                     updateUserEmailLocally(user.id, email);
-                    
                     if (isCertified) {
-                        await sendCertificateEmail(email, user.first_name_en, session.pk_score, session.pk_attempts || 1, session.trainer_score, session.trainer_attempts || 1);
                         await updateSession({ cert_sent: true });
                         alert('✅ บันทึกข้อมูลและจัดส่งใบ Certificate ไปยังอีเมลเรียบร้อยแล้ว!');
                     } else {
-                        alert('✅ บันทึกข้อมูลอีเมลเข้าสู่ระบบเรียบร้อยแล้ว!\n(ระบบจะใช้ส่งใบ Certificate ให้ท่านเมื่อสอบผ่าน)');
+                        alert('✅ บันทึกข้อมูลอีเมลเข้าสู่ระบบเรียบร้อยแล้ว!');
                     }
-                } catch (err) { 
-                    alert('เกิดข้อผิดพลาด: ' + err.message); 
-                } finally { 
-                    setIsProcessing(false); 
-                }
+                } catch (err) { alert('เกิดข้อผิดพลาด: ' + err.message); } finally { setIsProcessing(false); }
             };
 
             return (
-                <div className="absolute inset-0 bg-brandNavy/80 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-fade-in">
+                <div className="absolute inset-0 bg-brandNavy/90 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-fade-in">
                     <div className="bg-white rounded-[32px] p-8 w-full max-w-sm shadow-2xl animate-pop-in text-center relative overflow-hidden">
-                        <div className="w-16 h-16 bg-blue-50 text-primary rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 relative z-10 border border-blue-100">
-                            {isCertified ? '🎓' : '✉️'}
-                        </div>
-                        <h2 className="text-xl font-extrabold text-textMain mb-2 relative z-10">
-                            {isCertified ? 'ยินดีด้วยคุณสอบผ่าน!' : 'อัปเดตข้อมูลติดต่อ'}
-                        </h2>
-                        <p className="text-xs font-bold text-slate-500 mb-6 leading-relaxed relative z-10">
-                            {isCertified 
-                                ? <>กรุณาระบุอีเมลเพื่อรับ <b>ใบ Certificate</b> ครับ</>
-                                : <>กรุณาระบุ <b>อีเมลบริษัท</b> เพื่อใช้รับใบ Certificate<br/>เมื่อท่านสอบผ่านการประเมินครับ</>
-                            }
+                        <div className="w-16 h-16 bg-blue-50 text-primary rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-blue-100">{isCertified ? '🎓' : '✉️'}</div>
+                        <h2 className="text-xl font-extrabold text-textMain mb-2">{isCertified ? 'ยินดีด้วยคุณสอบผ่าน!' : 'อัปเดตข้อมูลติดต่อ'}</h2>
+                        <p className="text-xs font-bold text-slate-500 mb-6 leading-relaxed">
+                            {isCertified ? <>กรุณาระบุอีเมลเพื่อรับ <b>ใบ Certificate</b> ครับ</> : <>กรุณาระบุ <b>อีเมลบริษัท</b> เพื่อใช้รับใบ Certificate เมื่อท่านสอบผ่านครับ</>}
                         </p>
-                        <form onSubmit={handleSubmit} className="relative z-10">
+                        <form onSubmit={handleSubmit}>
                             <input type="email" required placeholder="example@ttbbank.com" value={email} onChange={e => setEmail(e.target.value)} className="w-full p-4 mb-4 bg-surface border border-slate-200 rounded-2xl focus:border-primary outline-none font-bold text-sm text-center" />
-                            <button type="submit" disabled={isProcessing} className="w-full bg-primary text-white font-bold py-3.5 rounded-xl btn-modern disabled:opacity-50 shadow-soft-3d">
-                                {isProcessing ? 'กำลังดำเนินการ...' : (isCertified ? 'บันทึกและส่งใบ Certificate' : 'บันทึกข้อมูล')}
-                            </button>
+                            <button type="submit" disabled={isProcessing} className="w-full bg-primary text-white font-bold py-3.5 rounded-xl btn-modern disabled:opacity-50 shadow-soft-3d">บันทึกข้อมูล</button>
                         </form>
                     </div>
                 </div>
@@ -285,41 +275,148 @@
         }
 
         // ==========================================
-        // CANDIDATE APP ROUTER
+        // UNIFIED ROUTER & STATE MANAGEMENT
         // ==========================================
-        function CandidateApp({ user, db, updateSession, updateUserEmailLocally, onLogout }) {
+        function CandidateApp({ user, db, trainerName, updateSession, updateUserEmailLocally, onLogout, refreshData }) {
             const session = db.sessions[user.id] || {};
             const [view, setView] = useState('home'); 
+            const [examQuestions, setExamQuestions] = useState([]); 
+            const [showAudioRules, setShowAudioRules] = useState(false);
+
+            // 💡 ตัวตรวจจับไฟล์เสียง: เช็กว่ามีไฟล์เสียงของคนนี้อยู่แล้วหรือไม่?
+            const hasAudioSubmitted = db.audioSubs.some(s => s.employee_id === user.employee_id);
+
+            // 💡 ประเมินสถานะการแสดงผลสำหรับกล่อง Step 2
+            const isPassedPK = session.pk_passed === true;
+            const isAudioFailed = session.overall_status === 'FAILED';
+            const isAudioCertified = session.overall_status === 'CERTIFIED';
+            const isLockedLive = session.eval_lock_mode === 'LIVE';
+
+            // State Logic
+            const audioState = !isPassedPK ? 'LOCKED' :
+                               isAudioCertified ? 'CERTIFIED' :
+                               isLockedLive ? 'LIVE' :
+                               isAudioFailed ? 'FAILED_WAITING' :
+                               hasAudioSubmitted ? 'PENDING_REVIEW' : 'READY';
+
+            const triggerAudioExam = () => {
+                if(audioState === 'LOCKED') return alert("กรุณาสอบผ่านทฤษฎีก่อน");
+                if(audioState === 'FAILED_WAITING') return alert('⚠️ สอบไม่ผ่านเกณฑ์ กรุณารอ Trainer พิจารณาอนุมัติสิทธิ์สอบซ่อม');
+                if(audioState === 'LIVE') return alert(`⚠️ คุณถูกกำหนดให้สัมภาษณ์สด กรุณาติดต่อ Trainer: ${trainerName}`);
+                if(audioState === 'PENDING_REVIEW') return alert('⏳ คุณได้อัดเสียงส่งไปแล้ว กรุณารอ Trainer ประเมินผล');
+                if(audioState === 'CERTIFIED') return alert('🏆 คุณสอบผ่านเรียบร้อยแล้ว');
+                
+                // If Ready -> โชว์กติกา 60s/3m
+                setShowAudioRules(true);
+            };
+
+            const confirmAndStartAudio = async () => {
+                setShowAudioRules(false);
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    stream.getTracks().forEach(track => track.stop()); 
+                    
+                    // ป้องกันความผิดพลาด: เคลียร์ไฟล์เสียงเดิมซ้ำอีกรอบก่อนสุ่มใหม่
+                    try { await supabase.from('audio_submissions').delete().eq('employee_id', user.employee_id); } catch(e) {}
+
+                    const pkQs = db.rubrics.filter(r => r.category === 'Product Knowledge');
+                    const invQs = db.rubrics.filter(r => r.category === 'Investment Knowledge');
+                    const objQs = db.rubrics.filter(r => r.category === 'Objection Handling');
+                    
+                    if(pkQs.length===0 || invQs.length===0 || objQs.length===0) return alert("คลังคำถามปฏิบัติไม่สมบูรณ์");
+
+                    const q1 = pkQs[Math.floor(Math.random() * pkQs.length)];
+                    const q2 = invQs[Math.floor(Math.random() * invQs.length)];
+                    const q3 = objQs[Math.floor(Math.random() * objQs.length)];
+
+                    await updateSession({ eval_lock_mode: 'AUDIO' });
+                    setExamQuestions([q1, q2, q3]);
+                    setView('audio_exam');
+                } catch (err) { alert("กรุณาอนุญาตการใช้งานไมโครโฟนเพื่อเริ่มสอบ"); }
+            };
             
             return (
                 <div className="flex-1 flex flex-col h-full overflow-hidden relative bg-surface">
-                    
                     {(!user.email || user.email.trim() === '') && (
                         <EmailPromptModal user={user} session={session} updateSession={updateSession} updateUserEmailLocally={updateUserEmailLocally} />
                     )}
 
-                    {view === 'home' && <CandidateHome user={user} session={session} setView={setView} />}
+                    {/* AUDIO RULES MODAL */}
+                    {showAudioRules && (
+                        <div className="absolute inset-0 z-[60] flex items-center justify-center p-6 bg-brandNavy/90 backdrop-blur-md animate-fade-in">
+                            <div className="bg-white rounded-[32px] p-8 max-w-sm w-full shadow-soft-3d animate-pop-in text-center">
+                                <div className="w-16 h-16 bg-blue-50 text-primary rounded-full flex items-center justify-center text-3xl mx-auto mb-4"><Icons.Mic/></div>
+                                <h2 className="text-xl font-black text-brandNavy mb-6">ข้อกำหนดการสอบอัดเสียง</h2>
+                                <div className="bg-surface p-5 rounded-2xl border border-slate-200 mb-6 text-left">
+                                    <p className="text-sm font-bold text-slate-700 leading-relaxed">
+                                        "คุณมีเวลา <span className="text-danger font-black">60 วินาที</span> สำหรับเตรียมตัวก่อนเริ่มบันทึกเสียง 
+                                        โดยเวลานี้เป็นเพียงช่วงเตรียมตัว <span className="underline">ไม่ใช่เวลาจำกัดในการตอบ</span><br/><br/>
+                                        เมื่อเริ่มบันทึกแล้ว สามารถตอบได้ <span className="text-primary font-black">สูงสุด 3 นาที</span>"
+                                    </p>
+                                    <p className="text-xs font-bold text-danger mt-4 pt-4 border-t border-slate-200">
+                                        ⚠️ หมายเหตุ: การสอบในแต่ละข้อ สามารถบันทึกและส่งได้เพียงครั้งเดียวเท่านั้น ไม่สามารถอัดใหม่ได้
+                                    </p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <button onClick={() => setShowAudioRules(false)} className="w-1/3 bg-slate-100 text-slate-500 font-bold py-3.5 rounded-xl btn-modern">ยกเลิก</button>
+                                    <button onClick={confirmAndStartAudio} className="w-2/3 bg-primary text-white font-black py-3.5 rounded-xl btn-modern shadow-soft-3d">เริ่มสุ่มข้อสอบ</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {view === 'home' && (
+                        <Dashboard 
+                            user={user} session={session} trainerName={trainerName} audioState={audioState}
+                            onStartPK={() => setView('pk')} 
+                            onStartAudio={triggerAudioExam} 
+                        />
+                    )}
                     {view === 'pk' && <KnowledgeTest user={user} session={session} questions={db.questions} updateSession={updateSession} setView={setView} />}
+                    {view === 'audio_exam' && <AudioRecordingFlow user={user} questions={examQuestions} updateSession={updateSession} setView={setView} session={session} refreshData={refreshData} />}
                     {view === 'result' && <ResultDashboard session={session} setView={setView} user={user} />}
                     
-                    <div className="bg-white border-t border-slate-200 px-8 py-4 flex justify-between items-center rounded-t-[32px] z-20 mt-auto shrink-0 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] pb-6 sm:pb-4">
-                        <div className={`flex flex-col items-center cursor-pointer transition-colors ${view === 'home' ? 'text-primary' : 'text-slate-400 hover:text-primary'}`} onClick={() => setView('home')}><Icons.Home /><span className="text-[9px] font-black mt-1 uppercase tracking-widest">Home</span></div>
-                        <div className={`flex flex-col items-center cursor-pointer transition-colors ${view === 'result' ? 'text-primary' : 'text-slate-400 hover:text-primary'}`} onClick={() => setView('result')}><Icons.Result /><span className="text-[9px] font-black mt-1 uppercase tracking-widest">Result</span></div>
-                        <div className="flex flex-col items-center text-slate-400 hover:text-danger cursor-pointer transition-colors" onClick={onLogout}><Icons.Exit /><span className="text-[9px] font-black mt-1 uppercase tracking-widest">Exit</span></div>
-                    </div>
+                    {view !== 'audio_exam' && view !== 'pk' && (
+                        <div className="bg-white border-t border-slate-200 px-8 py-4 flex justify-between items-center rounded-t-[32px] z-20 mt-auto shrink-0 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] pb-6 sm:pb-4">
+                            <div className={`flex flex-col items-center cursor-pointer transition-colors ${view === 'home' ? 'text-primary' : 'text-slate-400 hover:text-primary'}`} onClick={() => setView('home')}><Icons.Home /><span className="text-[9px] font-black mt-1 uppercase tracking-widest">Home</span></div>
+                            <div className={`flex flex-col items-center cursor-pointer transition-colors ${view === 'result' ? 'text-primary' : 'text-slate-400 hover:text-primary'}`} onClick={() => setView('result')}><Icons.Result /><span className="text-[9px] font-black mt-1 uppercase tracking-widest">Result</span></div>
+                            <div className="flex flex-col items-center text-slate-400 hover:text-danger cursor-pointer transition-colors" onClick={onLogout}><Icons.Exit /><span className="text-[9px] font-black mt-1 uppercase tracking-widest">Exit</span></div>
+                        </div>
+                    )}
                 </div>
             );
         }
 
         // ==========================================
-        // SMART DASHBOARD 
+        // UNIFIED DASHBOARD
         // ==========================================
-        function CandidateHome({ user, session, setView }) {
+        function Dashboard({ user, session, trainerName, audioState, onStartPK, onStartAudio }) {
             let prog = 0; if (session.pk_passed) prog += 50; if (session.trainer_passed) prog += 50;
-            
-            const handleAudioRedirect = () => {
-                // 💡 นำทางไปยัง URL ปลายทางที่กำหนด พร้อมแนบ UID
-                window.location.href = `${AUDIO_EXAM_URL}?uid=${user.employee_id}`;
+
+            const isPassedPK = audioState !== 'LOCKED';
+
+            // 💡 Dynamic UI สำหรับกล่อง Step 2 ตามคำสั่งของ Trainer
+            const getAudioCardStyle = () => {
+                switch(audioState) {
+                    case 'LOCKED': return 'opacity-50 grayscale pointer-events-none';
+                    case 'LIVE': return 'border-blue-300 bg-blue-50 shadow-md transform hover:scale-[1.02] cursor-pointer';
+                    case 'FAILED_WAITING': return 'border-red-200 bg-red-50 shadow-md transform hover:scale-[1.02] cursor-pointer';
+                    case 'PENDING_REVIEW': return 'border-orange-200 bg-orange-50/50 shadow-md transform hover:scale-[1.02] cursor-pointer';
+                    case 'CERTIFIED': return 'border-emerald-200 bg-emerald-50/50 shadow-md cursor-default';
+                    case 'READY': return 'border-slate-200 bg-white shadow-sm transform hover:scale-[1.02] cursor-pointer';
+                    default: return 'border-slate-200 bg-white';
+                }
+            };
+
+            const getAudioBadge = () => {
+                switch(audioState) {
+                    case 'LOCKED': return <span className="bg-slate-500 text-white px-3 py-1.5 rounded-full text-[9px] font-black shadow-sm uppercase flex items-center"><Icons.Lock className="w-3 h-3 mr-1"/> Locked</span>;
+                    case 'LIVE': return <span className="bg-primary text-white px-3 py-1.5 rounded-full text-[9px] font-black shadow-sm uppercase flex items-center"><Icons.User className="w-3 h-3 mr-1"/> Live Test</span>;
+                    case 'FAILED_WAITING': return <span className="bg-danger text-white px-3 py-1.5 rounded-full text-[9px] font-black shadow-sm uppercase flex items-center">🚨 สอบตก (รอพิจารณา)</span>;
+                    case 'PENDING_REVIEW': return <span className="bg-warning text-white px-3 py-1.5 rounded-full text-[9px] font-black shadow-sm uppercase flex items-center">⏳ รอตรวจผล</span>;
+                    case 'CERTIFIED': return <span className="bg-success text-white px-3 py-1.5 rounded-full text-[9px] font-black shadow-sm uppercase flex items-center">🏆 ผ่านการประเมิน</span>;
+                    case 'READY': return <span className="bg-primary text-white px-3 py-1.5 rounded-full text-[9px] font-black shadow-sm uppercase flex items-center">Start Audio</span>;
+                }
             };
 
             return (
@@ -345,34 +442,66 @@
                     <div className="px-5 space-y-4 flex-1">
                         <h3 className="font-extrabold text-textMain text-base mb-2">Assessment Modules</h3>
                         
-                        <div onClick={() => { if(!session.pk_passed) setView('pk'); }} className={`bg-white rounded-2xl border border-slate-200 p-5 relative overflow-hidden ${session.pk_passed ? 'opacity-80 cursor-default' : 'cursor-pointer hover:shadow-md transform transition-all hover:scale-[1.02] shadow-sm'}`}>
+                        {/* STEP 1: THEORY TEST */}
+                        <div onClick={!isPassedPK ? onStartPK : undefined} className={`bg-white rounded-2xl border border-slate-200 p-5 relative overflow-hidden ${isPassedPK ? 'opacity-80 cursor-default' : 'cursor-pointer hover:shadow-md transform transition-all hover:scale-[1.02] shadow-sm'}`}>
                             <div className="absolute right-[-10px] bottom-[-15px] text-[50px] opacity-10 drop-shadow-md">📘</div>
                             <div className="flex justify-between items-start">
-                                <span className={`${session.pk_passed ? 'bg-success' : 'bg-primary'} text-white px-3 py-1.5 rounded-full text-[9px] font-black shadow-sm uppercase tracking-wider`}>
-                                    {session.pk_passed ? '✓ Completed' : 'Start Test'}
+                                <span className={`${isPassedPK ? 'bg-success' : 'bg-primary'} text-white px-3 py-1.5 rounded-full text-[9px] font-black shadow-sm uppercase tracking-wider`}>
+                                    {isPassedPK ? '✓ Passed' : 'Start Test'}
                                 </span>
                             </div>
                             <h4 className="font-black text-brandNavy mt-3 text-lg">Step 1: Theory Test</h4>
                             <p className="text-slate-500 text-[11px] mt-1.5 font-bold w-2/3 leading-relaxed">แบบทดสอบทฤษฎี 30 ข้อ (60 นาที)</p>
                         </div>
 
-                        <div onClick={session.pk_passed ? handleAudioRedirect : undefined} 
-                             className={`bg-white rounded-2xl border border-slate-200 p-5 relative overflow-hidden transition-all duration-300
-                             ${!session.pk_passed ? 'opacity-50 grayscale pointer-events-none' : 'cursor-pointer hover:shadow-md transform hover:scale-[1.02] shadow-sm'}`}>
-                            
+                        {/* 💡 STEP 2: AUDIO INTERVIEW (SMART DYNAMIC UI) */}
+                        <div onClick={onStartAudio} className={`rounded-2xl border p-5 relative overflow-hidden transition-all duration-300 ${getAudioCardStyle()}`}>
                             <div className="absolute right-0 bottom-[-5px] text-[50px] opacity-10 drop-shadow-md">🎤</div>
                             
                             <div className="flex justify-between items-start">
-                                <span className={`${!session.pk_passed ? 'bg-slate-500' : session.trainer_passed ? 'bg-success' : 'bg-primary'} text-white px-3 py-1.5 rounded-full text-[9px] font-black shadow-sm uppercase tracking-wider flex items-center`}>
-                                    {!session.pk_passed && <span className="mr-1.5"><Icons.Lock /></span>}
-                                    {!session.pk_passed ? 'Locked' : session.trainer_passed ? '✓ Certified' : 'Pending Action'}
-                                </span>
+                                {getAudioBadge()}
                             </div>
                             
-                            <h4 className={`font-black mt-3 text-lg ${!session.pk_passed ? 'text-slate-500' : 'text-brandNavy'}`}>Step 2: Audio Exam</h4>
-                            <p className="text-slate-500 text-[11px] mt-1.5 font-bold w-3/4 leading-relaxed">
-                                {!session.pk_passed ? 'ต้องสอบผ่าน Step 1 ก่อน จึงจะปลดล็อกด่านนี้ได้' : 'สัมภาษณ์สด หรืออัดเสียงส่งให้เทรนเนอร์ประเมิน'}
-                            </p>
+                            <h4 className={`font-black mt-3 text-lg ${audioState === 'LOCKED' ? 'text-slate-500' : audioState === 'LIVE' ? 'text-primary' : audioState === 'FAILED_WAITING' ? 'text-danger' : 'text-brandNavy'}`}>
+                                Step 2: {audioState === 'LIVE' ? 'Live Interview' : 'Audio Exam'}
+                            </h4>
+                            
+                            <div className="mt-2 min-h-[40px] relative z-10">
+                                {audioState === 'LOCKED' && <p className="text-slate-500 text-[11px] font-bold w-3/4 leading-relaxed">ต้องสอบผ่าน Step 1 ก่อน จึงจะปลดล็อกด่านนี้ได้</p>}
+                                
+                                {audioState === 'LIVE' && (
+                                    <div className="bg-white/60 p-3 rounded-xl border border-blue-100 mt-1">
+                                        <p className="text-brandNavy text-[10px] font-black mb-1">คุณถูกกำหนดให้สัมภาษณ์สด</p>
+                                        <p className="text-slate-600 text-[11px] font-bold">ติดต่อ Trainer: <span className="text-primary font-black">{trainerName}</span></p>
+                                    </div>
+                                )}
+
+                                {audioState === 'FAILED_WAITING' && (
+                                    <div className="bg-white/60 p-3 rounded-xl border border-red-100 mt-1">
+                                        <p className="text-danger text-[10px] font-black">คะแนนไม่ผ่านเกณฑ์</p>
+                                        <p className="text-red-700 text-[11px] font-bold mt-1">กรุณารอ Trainer พิจารณาอนุมัติให้สิทธิ์สอบใหม่</p>
+                                    </div>
+                                )}
+
+                                {audioState === 'PENDING_REVIEW' && (
+                                    <div className="bg-white/60 p-3 rounded-xl border border-orange-100 mt-1">
+                                        <p className="text-orange-600 text-[11px] font-bold">ไฟล์เสียงของคุณถูกส่งเข้าระบบเรียบร้อยแล้ว<br/>โปรดรอ Trainer พจารณาให้คะแนน</p>
+                                    </div>
+                                )}
+
+                                {audioState === 'CERTIFIED' && <p className="text-success text-[11px] font-bold">ยอดเยี่ยม! คุณประเมินผ่านเรียบร้อย</p>}
+
+                                {audioState === 'READY' && (
+                                    <div>
+                                        <p className="text-slate-500 text-[11px] font-bold w-3/4 leading-relaxed">สุ่มคำถามและบันทึกเสียงตอบส่ง Trainer</p>
+                                        {session.trainer_attempts > 0 && (
+                                            <span className="mt-3 inline-block bg-red-50 text-danger px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border border-red-100">
+                                                การสอบซ่อมรอบที่ {session.trainer_attempts + 1}
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -380,11 +509,11 @@
         }
 
         // ==========================================
-        // KNOWLEDGE TEST
+        // KNOWLEDGE TEST (STEP 1)
         // ==========================================
         function KnowledgeTest({ user, session, questions, updateSession, setView }) {
             const [qIdx, setQIdx] = useState(0); const [answers, setAnswers] = useState({}); const [started, setStarted] = useState(false); const [examQuestions, setExamQuestions] = useState([]); const [timeLeft, setTimeLeft] = useState(3600); 
-            const storageKey = `ttb_exam_${user.id}`;
+            const storageKey = `ttb_exam_unified_${user.id}`;
 
             useEffect(() => {
                 if (!session.pk_passed) { const saved = localStorage.getItem(storageKey); if (saved) { try { const p = JSON.parse(saved); const t = Math.max(0, p.timeLeft - (Math.floor(Date.now() / 1000) - p.lastSaved)); setExamQuestions(p.examQuestions); setAnswers(p.answers||{}); setQIdx(p.qIdx||0); setTimeLeft(t); setStarted(true); if (t <= 0) autoSubmit(p.examQuestions, p.answers); } catch (e) {} } }
@@ -403,7 +532,7 @@
 
             const autoSubmit = async (qs, ans) => {
                 const correct = qs.filter((q, i) => ans[i] === q.answer).length; const score = Math.round((correct / qs.length) * 100);
-                await updateSession({ pk_score: score, pk_passed: score >= 80, pk_attempts: (session.pk_attempts || 0) + 1, overall_status: 'IN_PROGRESS' });
+                await updateSession({ pk_score: score, pk_passed: score >= 80, pk_attempts: (session.pk_attempts || 0) + 1 });
                 localStorage.removeItem(storageKey); setView('result'); 
             };
 
@@ -422,36 +551,185 @@
         }
 
         // ==========================================
+        // AUDIO RECORDING FLOW (STEP 2 - STRICT RULES)
+        // ==========================================
+        function AudioRecordingFlow({ user, questions, updateSession, setView, session, refreshData }) {
+            const [step, setStep] = useState(0); 
+            
+            const handleNextQuestion = async () => {
+                if (step < 2) {
+                    setStep(step + 1);
+                } else {
+                    const currentAttempts = (session?.trainer_attempts || 0) + 1;
+                    await updateSession({ eval_lock_mode: 'AVAILABLE', overall_status: 'IN_PROGRESS', trainer_attempts: currentAttempts });
+                    await refreshData(); // บังคับอัปเดต state ตัวตรวจจับไฟล์เสียงให้เปลี่ยนเป็น PENDING ทันที
+                    setView('result'); 
+                }
+            };
+
+            return <StrictAudioRecorder key={step} user={user} question={questions[step]} step={step} onNext={handleNextQuestion} />;
+        }
+
+        function StrictAudioRecorder({ user, question, step, onNext }) {
+            const [status, setStatus] = useState('prep'); 
+            const [prepTime, setPrepTime] = useState(60); 
+            const [recordTime, setRecordTime] = useState(180); 
+            const [errorMsg, setErrorMsg] = useState('');
+            
+            const mediaRecorder = useRef(null);
+            const audioChunks = useRef([]);
+            const mimeType = useRef('');
+
+            useEffect(() => {
+                let pTimer;
+                if (status === 'prep' && prepTime > 0) pTimer = setInterval(() => setPrepTime(p => p - 1), 1000);
+                else if (status === 'prep' && prepTime <= 0) handleNoAnswer(); 
+                return () => clearInterval(pTimer);
+            }, [status, prepTime]);
+
+            useEffect(() => {
+                let rTimer;
+                if (status === 'recording' && recordTime > 0) rTimer = setInterval(() => setRecordTime(r => r - 1), 1000);
+                else if (status === 'recording' && recordTime <= 0) stopRecordingAndSubmit();
+                return () => clearInterval(rTimer);
+            }, [status, recordTime]);
+
+            const formatTime = (secs) => { const m = Math.floor(secs / 60).toString().padStart(2, '0'); const s = (secs % 60).toString().padStart(2, '0'); return `${m}:${s}`; };
+
+            const handleNoAnswer = async () => {
+                setStatus('processing');
+                try {
+                    await supabase.from('audio_submissions').insert([{ employee_id: user.employee_id, first_name_en: user.first_name_en, question: question.question, category: question.category, audio_url: null, transcript: "[ ไม่มีการตอบคำถาม - หมดเวลาเตรียมตัว 60 วินาที ]" }]);
+                    setStatus('done');
+                } catch (err) { setStatus('prep'); } 
+            };
+
+            const startRecording = async () => {
+                setErrorMsg('');
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    const types = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm', 'audio/aac'];
+                    for (let type of types) { if (MediaRecorder.isTypeSupported(type)) { mimeType.current = type; break; } }
+                    if(!mimeType.current) mimeType.current = 'audio/webm'; 
+
+                    mediaRecorder.current = new MediaRecorder(stream, { mimeType: mimeType.current });
+                    audioChunks.current = [];
+                    mediaRecorder.current.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.current.push(e.data); };
+                    
+                    mediaRecorder.current.onstop = () => {
+                        const audioBlob = new Blob(audioChunks.current, { type: mimeType.current });
+                        if (audioBlob.size < 1024) { handleNoAnswer(); return; }
+                        processAndSubmit(audioBlob); 
+                    };
+
+                    mediaRecorder.current.start(200);
+                    setStatus('recording'); 
+                } catch (err) { handleNoAnswer(); }
+            };
+
+            const stopRecordingAndSubmit = () => {
+                if (mediaRecorder.current && status === 'recording') {
+                    mediaRecorder.current.stop();
+                    mediaRecorder.current.stream.getTracks().forEach(track => track.stop()); 
+                    setStatus('processing'); 
+                }
+            };
+
+            const processAndSubmit = async (audioBlob) => {
+                try {
+                    const fileName = `${user.employee_id}_${Date.now()}.${mimeType.current.includes('mp4') ? 'mp4' : 'webm'}`;
+                    await supabase.storage.from('exam_audios').upload(fileName, audioBlob, { contentType: mimeType.current });
+                    const publicUrl = supabase.storage.from('exam_audios').getPublicUrl(fileName).data.publicUrl;
+                    await supabase.from('audio_submissions').insert([{ employee_id: user.employee_id, first_name_en: user.first_name_en, question: question.question, category: question.category, audio_url: publicUrl, transcript: "[ ส่งไฟล์เสียงสำเร็จ - รอ Trainer ประเมินผล ]" }]);
+                    setStatus('done');
+                } catch (err) { setStatus('done'); }
+            };
+
+            let prepStyles = "text-brandNavy border-slate-200 bg-white";
+            if (prepTime <= 10) prepStyles = "text-red-500 border-red-500 bg-red-50 animate-pulse-fast";
+
+            if (status === 'done') {
+                return (
+                    <div className="flex-1 flex flex-col bg-surface animate-slide-up relative overflow-hidden z-50">
+                        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center mt-10">
+                            <div className="w-24 h-24 bg-success/20 text-success rounded-full flex items-center justify-center mx-auto mb-6"><Icons.Check/></div>
+                            <h2 className="text-3xl font-black text-brandNavy mb-2">บันทึกสำเร็จ</h2>
+                            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Question {step + 1} / 3 Completed</p>
+                        </div>
+                        <div className="p-6 bg-white border-t border-slate-100 pb-10">
+                            <button onClick={onNext} className="w-full bg-primary text-white font-black py-4 rounded-xl btn-modern shadow-soft-3d uppercase tracking-widest text-sm">
+                                {step === 2 ? 'ส่งข้อสอบทั้งหมด' : 'ดำเนินการต่อข้อถัดไป'}
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="flex-1 flex flex-col bg-brandDark relative overflow-hidden animate-slide-up z-50">
+                    <div className="pt-10 px-6 pb-20 relative shrink-0 text-center text-white">
+                        <span className="bg-white/10 text-primary px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border border-white/10">{question.category}</span>
+                        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-4">Question {step + 1} of 3</h2>
+                    </div>
+
+                    <div className="flex-1 bg-surface -mt-10 rounded-t-[40px] shadow-[0_-20px_50px_rgba(0,0,0,0.3)] relative z-10 flex flex-col p-6">
+                        <div className="bg-white p-6 rounded-[24px] shadow-sm border border-slate-100 mb-6 text-center">
+                            <p className="font-bold text-brandNavy text-base leading-relaxed">{question.question}</p>
+                        </div>
+                        
+                        <div className="mt-auto mb-6 flex flex-col items-center justify-center w-full">
+                            {status === 'prep' && (
+                                <div className="text-center w-full animate-fade-in">
+                                    <div className={`mb-6 flex flex-col justify-center items-center py-4 px-8 rounded-[24px] border-2 mx-auto w-fit shadow-sm transition-colors ${prepStyles}`}>
+                                        <span className="text-[10px] font-black uppercase tracking-widest mb-1 opacity-60">เวลาเตรียมตัว</span>
+                                        <span className="text-4xl font-black">{formatTime(prepTime)}</span>
+                                    </div>
+                                    <button onClick={startRecording} className="w-24 h-24 bg-primary text-white rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(58,134,255,0.4)] btn-modern mx-auto"><Icons.Mic/></button>
+                                    <p className="text-danger text-[10px] font-black mt-6 uppercase tracking-widest bg-red-50 px-3 py-1.5 rounded-full inline-block">⚠️ กดเพื่อเริ่มบันทึกเสียง (บันทึกได้ครั้งเดียว)</p>
+                                </div>
+                            )}
+
+                            {status === 'recording' && (
+                                <div className="text-center w-full animate-fade-in">
+                                    <div className="mb-6 flex flex-col justify-center items-center">
+                                        <span className="text-[10px] font-black uppercase tracking-widest mb-1 text-slate-400">เวลาอัดเสียงคงเหลือ</span>
+                                        <div className="flex items-center gap-3 text-danger">
+                                            <div className="w-3 h-3 bg-danger rounded-full animate-pulse-fast shadow-[0_0_15px_rgba(255,71,87,0.5)]"></div>
+                                            <span className="text-5xl font-black font-mono tracking-tighter">{formatTime(recordTime)}</span>
+                                        </div>
+                                    </div>
+                                    <button onClick={stopRecordingAndSubmit} className="w-24 h-24 bg-danger text-white rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,71,87,0.4)] btn-modern mx-auto"><Icons.Stop/></button>
+                                    <p className="text-slate-500 text-[10px] font-black mt-6 uppercase tracking-widest">กดเพื่อยืนยันการส่งคำตอบ</p>
+                                </div>
+                            )}
+
+                            {status === 'processing' && (
+                                <div className="text-center w-full animate-fade-in">
+                                    <div className="w-16 h-16 border-4 border-slate-200 border-t-primary rounded-full animate-spin mx-auto mb-6"></div>
+                                    <h3 className="font-black text-brandNavy text-lg mb-1">กำลังบันทึกข้อมูล...</h3>
+                                    <p className="text-xs font-bold text-slate-500">ห้ามปิดหน้าจอ กรุณารอสักครู่</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ==========================================
         // RESULT DASHBOARD
         // ==========================================
         function ResultDashboard({ session, setView, user }) {
-            
-            // 💡 นำทางไปยัง URL ปลายทางที่กำหนด พร้อมแนบ UID
-            const goToAudioExam = () => window.location.href = `${AUDIO_EXAM_URL}?uid=${user.employee_id}`;
-            const goToFAQ = () => window.location.href = `${FAQ_EXAM_URL}?uid=${user.employee_id}`;
-
             return (
                 <div className="flex-1 bg-surface animate-slide-up flex flex-col h-full overflow-y-auto pb-8">
-                    <div className="bg-brandNavy text-white pt-8 pb-12 px-6 rounded-b-[32px] shadow-lg relative overflow-hidden shrink-0"><div className="absolute right-[-20px] top-4 w-32 h-32 bg-primary rounded-full opacity-50 blur-3xl"></div><button onClick={() => setView('home')} className="text-white/70 hover:text-white mb-5 transition-colors"><Icons.ChevronLeft /></button><h2 className="text-2xl font-black mb-1">My Results</h2><p className="text-primaryLight font-bold text-[10px] uppercase tracking-widest opacity-80">Certification Summary</p></div>
+                    <div className="bg-brandNavy text-white pt-8 pb-12 px-6 rounded-b-[32px] shadow-lg relative overflow-hidden shrink-0"><div className="absolute right-[-20px] top-4 w-32 h-32 bg-primary rounded-full opacity-50 blur-3xl"></div><h2 className="text-2xl font-black mb-1">My Results</h2><p className="text-primaryLight font-bold text-[10px] uppercase tracking-widest opacity-80">Certification Summary</p></div>
 
                     <div className="px-5 -mt-8 space-y-4 flex-1 flex flex-col">
                         <div className="glass-card p-5 flex items-center justify-between rounded-2xl"><div className="flex items-center"><div className="w-10 h-10 bg-blue-50 text-primary rounded-xl flex items-center justify-center text-xl mr-3 border border-blue-100">📘</div><div><h4 className="font-black text-brandNavy text-base">Theory Test</h4><p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-0.5">Passing: 80%</p></div></div><div className="text-right"><p className="text-xl font-black text-brandNavy">{session.pk_score !== null ? `${session.pk_score}%` : '-'}</p><span className={`text-[9px] font-black uppercase tracking-widest ${session.pk_passed ? 'text-success' : 'text-danger'}`}>{session.pk_score !== null ? (session.pk_passed ? 'Pass' : 'Fail') : 'Pending'}</span></div></div>
                         <div className="glass-card p-5 flex items-center justify-between rounded-2xl"><div className="flex items-center"><div className="w-10 h-10 bg-blue-50 text-primary rounded-xl flex items-center justify-center text-xl mr-3 border border-blue-100">🎤</div><div><h4 className="font-black text-brandNavy text-base">Audio Exam</h4><p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-0.5">Evaluation</p></div></div><div className="text-right"><p className="text-xl font-black text-brandNavy">{session.trainer_score !== null ? `${session.trainer_score}%` : '-'}</p><span className={`text-[9px] font-black uppercase tracking-widest ${session.overall_status === 'CERTIFIED' ? 'text-success' : session.overall_status === 'FAILED' ? 'text-danger' : 'text-warning'}`}>{session.overall_status || 'NOT STARTED'}</span></div></div>
                         
-                        {session.pk_passed && !session.trainer_passed && (
-                            <div className="mt-4 space-y-3 animate-pop-in">
-                                <button onClick={goToFAQ} className="w-full bg-purple text-white p-4 rounded-2xl font-black shadow-md transition-transform hover:scale-[1.02] flex items-center justify-between btn-modern relative overflow-hidden group">
-                                    <div className="absolute inset-0 bg-white/20 w-full h-full transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
-                                    <div className="flex flex-col text-left relative z-10"><span className="text-[10px] uppercase tracking-widest opacity-80 mb-0.5">ตัวเลือกเสริม (Optional)</span><span className="text-sm">ทำแบบทดสอบ FAQ 100%</span></div><Icons.Award />
-                                </button>
-                                <button onClick={goToAudioExam} className="w-full bg-primary text-white p-4 rounded-2xl font-black shadow-lg transition-transform hover:scale-[1.02] flex items-center justify-between btn-modern">
-                                    <div className="flex flex-col text-left"><span className="text-[10px] uppercase tracking-widest opacity-80 mb-0.5">ดำเนินการต่อ</span><span className="text-sm">เข้าสอบอัดเสียง (Audio Exam)</span></div><Icons.Mic />
-                                </button>
-                            </div>
-                        )}
-
                         {!session.pk_passed && session.pk_score !== null && (
-                            <div className="mt-4 text-center"><p className="text-danger text-[11px] font-bold mb-3">คุณยังไม่ผ่านเกณฑ์ 80% กรุณาทบทวนและสอบใหม่อีกครั้ง</p><button onClick={() => { if(confirm(`เริ่มทำใหม่? (รอบที่ ${(session.pk_attempts || 0) + 1})`)) { localStorage.removeItem(`ttb_exam_${user.id}`); setView('pk'); } }} className="w-full bg-white border-2 border-danger text-danger font-black py-3.5 rounded-xl hover:bg-red-50 transition-colors text-[13px] shadow-sm btn-modern">สอบใหม่อีกครั้ง (Retake)</button></div>
+                            <div className="mt-4 text-center"><p className="text-danger text-[11px] font-bold mb-3">คุณยังไม่ผ่านเกณฑ์ 80% กรุณาทบทวนและสอบใหม่อีกครั้ง</p><button onClick={() => { if(confirm(`เริ่มทำใหม่? (รอบที่ ${(session.pk_attempts || 0) + 1})`)) { localStorage.removeItem(`ttb_exam_unified_${user.id}`); setView('pk'); } }} className="w-full bg-white border-2 border-danger text-danger font-black py-3.5 rounded-xl hover:bg-red-50 transition-colors text-[13px] shadow-sm btn-modern">สอบทฤษฎีใหม่อีกครั้ง (Retake)</button></div>
                         )}
                         {session.overall_status === 'CERTIFIED' && <div className="mt-4 bg-brandNavy text-white p-6 rounded-[28px] text-center shadow-soft-3d border border-blue-900 animate-pop-in"><div className="text-4xl mb-3">🎓</div><h3 className="font-black text-xl mb-1 text-white">CERTIFIED</h3><p className="text-[11px] font-bold text-blue-200 leading-relaxed">ยินดีด้วย! คุณผ่านการประเมิน ttb US Multi-Asset 15/5 เรียบร้อยแล้ว</p></div>}
                     </div>
@@ -459,8 +737,7 @@
             );
         }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        const root = ReactDOM.createRoot(document.getElementById('root')); root.render(<App />);
     </script>
 </body>
 </html>
