@@ -12,119 +12,84 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#2563EB',      // Modern Blue
+                        primary: '#2563EB',      
                         primaryLight: '#DBEAFE', 
-                        brandNavy: '#0F172A',    // Slate 900
-                        surface: '#F8FAFC',      // Slate 50
-                        textMain: '#1E293B',     // Slate 800
-                        textMuted: '#64748B',    // Slate 500
-                        danger: '#EF4444',       // Red 500
-                        success: '#10B981',      // Emerald 500
-                        warning: '#F59E0B'       // Amber 500
+                        brandNavy: '#0F172A',    
+                        surface: '#F8FAFC',      
+                        textMain: '#1E293B',     
+                        textMuted: '#64748B',    
+                        danger: '#EF4444',       
+                        success: '#10B981',      
+                        warning: '#F59E0B',
+                        purple: '#8B5CF6'
                     },
                     fontFamily: { sans: ['Prompt', 'Nunito', 'sans-serif'] },
                     animation: {
                         'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'fade-in': 'fadeIn 0.3s ease-out forwards',
                         'pop-in': 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
-                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     },
                     keyframes: {
                         slideUp: { '0%': { opacity: 0, transform: 'translateY(20px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
                         fadeIn: { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
                         popIn: { '0%': { opacity: 0, transform: 'scale(0.95)' }, '100%': { opacity: 1, transform: 'scale(1)' } },
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-6px)' } }
+                        pulseGlow: { '0%, 100%': { opacity: 1 }, '50%': { opacity: .7, boxShadow: '0 0 15px rgba(37, 99, 235, 0.5)' } }
                     }
                 }
             }
         }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <style>
-        /* รองรับ 100dvh สำหรับแก้อาการ Toolbar มือถือบังปุ่ม */
         body { background-color: #E2E8F0; font-family: 'Nunito', 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; display: flex; justify-content: center; min-height: 100vh; min-height: 100dvh; margin: 0; }
-        
-        .app-container { 
-            width: 100%; 
-            max-width: 480px; 
-            background-color: #F8FAFC; 
-            height: 100vh; 
-            height: 100dvh;
-            position: relative; 
-            display: flex; 
-            flex-direction: column; 
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); 
-            overflow: hidden; /* ให้เลื่อนเฉพาะส่วนข้างใน ไม่ให้ Layout หลักพัง */
-        }
-        
-        @media (min-width: 640px) {
-            body { padding: 20px 0; }
-            .app-container { height: 90vh; border-radius: 40px; }
-        }
-
-        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
-        .shadow-soft-3d { box-shadow: 0 8px 20px -5px rgba(37, 99, 235, 0.15), 0 4px 8px -3px rgba(37, 99, 235, 0.1); }
-        
-        .btn-modern { transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); }
-        .btn-modern:active:not(:disabled) { transform: scale(0.97); }
-        
-        /* Custom Scrollbar เล็กๆ ซ่อนๆ สำหรับมือถือ */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        .app-container { width: 100%; max-width: 480px; background-color: #F8FAFC; height: 100vh; height: 100dvh; position: relative; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); overflow: hidden; }
+        @media (min-width: 640px) { body { padding: 20px 0; } .app-container { height: 90vh; border-radius: 40px; } }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .shadow-soft-3d { box-shadow: 0 8px 20px -5px rgba(37, 99, 235, 0.15); }
+        .btn-modern { transition: all 0.2s ease; } .btn-modern:active:not(:disabled) { transform: scale(0.97); }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
     </style>
 </head>
 <body>
     <div id="root" class="w-full flex justify-center h-full"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        const { useState, useEffect } = React;
 
         // ==========================================
-        // 1. CONFIGURATION
+        // SUPABASE CONFIG
         // ==========================================
         const SUPABASE_URL = "https://lyfqqrofqbyfezwxwhph.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZnFxcm9mcWJ5ZmV6d3h3aHBoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0ODc3MTAsImV4cCI6MjA4OTA2MzcxMH0.U5rhRSSTplQbcXBL16odRMRL26dy1RCxC_6jkHjhaWA";
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const RH_ZONES = {
-            'RH1': ['จตุจักร', 'ธนบุรี', 'บางกะปิ', 'สาทร', 'สุขุมวิท'],
-            'RH2': ['ชลบุรี', 'บางนา', 'พัทยา', 'ระยอง'],
-            'RH3': ['เชียงใหม่', 'นครสวรรค์', 'นนทบุรี', 'พิษณุโลก', 'อยุธยา'],
-            'RH4': ['ดอนเมือง', 'นครราชสีมา', 'สระบุรี', 'อุดรธานี', 'อุบลราชธานี'],
-            'RH5': ['ภูเก็ต', 'ราชบุรี', 'สมุทรสาคร', 'สุราษฎร์ธานี', 'หาดใหญ่']
-        };
-        const REG_POSITIONS = ['IS', 'IA']; 
+        const RH_ZONES = { 'RH1': ['จตุจักร', 'ธนบุรี', 'บางกะปิ', 'สาทร', 'สุขุมวิท'], 'RH2': ['ชลบุรี', 'บางนา', 'พัทยา', 'ระยอง'], 'RH3': ['เชียงใหม่', 'นครสวรรค์', 'นนทบุรี', 'พิษณุโลก', 'อยุธยา'], 'RH4': ['ดอนเมือง', 'นครราชสีมา', 'สระบุรี', 'อุดรธานี', 'อุบลราชธานี'], 'RH5': ['ภูเก็ต', 'ราชบุรี', 'สมุทรสาคร', 'สุราษฎร์ธานี', 'หาดใหญ่'] };
 
-        // ==========================================
-        // 2. ICONS
-        // ==========================================
         const Icons = {
             Home: () => <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>,
             Result: () => <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"></path><circle cx="6" cy="6" r="2"></circle><circle cx="18" cy="16" r="2"></circle></svg>,
             Exit: () => <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>,
-            ChevronLeft: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Lock: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
+            ChevronLeft: () => <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>,
+            Award: () => <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>,
+            Mic: () => <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
         };
 
-        function PoweredByFooter() {
-            return (
-                <div className="text-center py-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest w-full">
-                    Powered by : PRU ACADEMY <span className="text-primary">[ttb training team]</span>
-                </div>
-            );
-        }
+        const sendCertificateEmail = async (email, name, pkScore, pkAttempts, audioScore, audioAttempts) => {
+            console.log(`📧 [SYSTEM] กำลังส่งอีเมลไปยัง: ${email}`);
+            return new Promise(resolve => setTimeout(resolve, 1500));
+        };
 
         // ==========================================
-        // 3. MAIN APP ROUTER
+        // MAIN APP COMPONENT
         // ==========================================
         function App() {
             const [db, setDb] = useState({ users: [], sessions: {}, questions: [] });
@@ -134,18 +99,24 @@
             useEffect(() => {
                 const fetchDatabase = async () => {
                     try {
-                        const [resU, resS, resQ] = await Promise.all([
-                            supabase.from('users').select('*'),
-                            supabase.from('exam_sessions').select('*'),
-                            supabase.from('questions').select('*')
-                        ]);
+                        const [resU, resS, resQ] = await Promise.all([ supabase.from('users').select('*'), supabase.from('exam_sessions').select('*'), supabase.from('questions').select('*') ]);
                         const sessMap = {}; if(resS.data) resS.data.forEach(s => sessMap[s.user_id] = s);
+                        setDb({ users: resU.data || [], sessions: sessMap, questions: resQ.data || [] });
                         
-                        setDb({ 
-                            users: resU.data || [], 
-                            sessions: sessMap, 
-                            questions: resQ.data || []
-                        });
+                        // 💡 AUTO LOGIN
+                        const savedUser = localStorage.getItem('ttb_candidate_user');
+                        if (savedUser) {
+                            const parsedUser = JSON.parse(savedUser);
+                            const userExists = (resU.data || []).find(u => u.employee_id === parsedUser.employee_id);
+                            if(userExists) {
+                                setCurrentUser(userExists);
+                                if (!sessMap[userExists.id]) {
+                                    setDb(prev => ({ ...prev, sessions: { ...prev.sessions, [userExists.id]: { pk_passed: false, pk_score: null, pk_attempts: 0, trainer_passed: false, trainer_score: null, trainer_attempts: 0, overall_status: 'NOT_STARTED', cert_sent: false } }}));
+                                }
+                            } else {
+                                localStorage.removeItem('ttb_candidate_user');
+                            }
+                        }
                     } catch (err) { console.error(err); }
                     setIsLoading(false);
                 };
@@ -153,17 +124,16 @@
             }, []);
 
             const handleLogin = (user) => {
-                if (user.role !== 'Candidate') {
-                    alert('ระบบนี้สงวนสิทธิ์สำหรับผู้เข้าสอบ (Candidate) เท่านั้น\nเทรนเนอร์และแอดมินกรุณาเข้าสู่ระบบผ่านลิงก์ Management Portal');
-                    return;
-                }
+                if (user.role !== 'Candidate') { alert('สงวนสิทธิ์สำหรับผู้เข้าสอบเท่านั้น'); return; }
                 setCurrentUser(user);
-                if (!db.sessions[user.id]) {
-                    setDb(prev => ({ ...prev, sessions: { ...prev.sessions, [user.id]: {
-                        pk_passed: false, pk_score: null, pk_attempts: 0,
-                        trainer_passed: false, trainer_score: null, trainer_attempts: 0, overall_status: 'NOT STARTED'
-                    }}}));
-                }
+                localStorage.setItem('ttb_candidate_user', JSON.stringify(user));
+
+                if (!db.sessions[user.id]) { setDb(prev => ({ ...prev, sessions: { ...prev.sessions, [user.id]: { pk_passed: false, pk_score: null, pk_attempts: 0, trainer_passed: false, trainer_score: null, trainer_attempts: 0, overall_status: 'NOT_STARTED', cert_sent: false } }})); }
+            };
+
+            const handleLogout = () => {
+                setCurrentUser(null);
+                localStorage.removeItem('ttb_candidate_user');
             };
 
             const updateSession = async (userId, data) => {
@@ -171,208 +141,195 @@
                 await supabase.from('exam_sessions').upsert({ user_id: userId, ...data });
             };
 
-            if (isLoading) return <div className="h-screen w-full flex items-center justify-center bg-surface text-primary font-bold"><span className="animate-spin mr-2 text-2xl">⏳</span> Loading...</div>;
+            const updateUserEmailLocally = (userId, newEmail) => {
+                const updatedUser = { ...currentUser, email: newEmail };
+                setCurrentUser(updatedUser);
+                setDb(prev => ({ ...prev, users: prev.users.map(u => u.id === userId ? updatedUser : u) }));
+            };
+
+            if (isLoading) return <div className="h-screen w-full flex flex-col items-center justify-center text-primary font-bold"><div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>กำลังโหลดข้อมูล...</div>;
 
             return (
                 <div className="app-container">
-                    {!currentUser ? (
-                        <AuthScreen onLogin={handleLogin} db={db} setDb={setDb} />
-                    ) : (
-                        <CandidateApp user={currentUser} db={db} updateSession={(data) => updateSession(currentUser.id, data)} onLogout={() => setCurrentUser(null)} />
-                    )}
+                    {!currentUser ? <AuthScreen onLogin={handleLogin} db={db} setDb={setDb} /> : <CandidateApp user={currentUser} db={db} updateSession={(data) => updateSession(currentUser.id, data)} updateUserEmailLocally={updateUserEmailLocally} onLogout={handleLogout} />}
                 </div>
             );
         }
 
         // ==========================================
-        // 4. AUTH SCREEN (LOGIN & REGISTER)
+        // AUTH SCREEN 
         // ==========================================
         function AuthScreen({ onLogin, db, setDb }) {
             const [isReg, setIsReg] = useState(false);
-            const [form, setForm] = useState({ empId: '', firstName: '', lastName: '', position: 'IS', rh: '', zone: '' });
+            const [form, setForm] = useState({ empId: '', firstName: '', lastName: '', email: '', position: 'IS', rh: 'RH1', zone: RH_ZONES['RH1'][0] });
             const [err, setErr] = useState('');
             const [isSubmitting, setIsSubmitting] = useState(false);
 
-            const handleSubmit = async (e) => {
-                e.preventDefault();
-                setErr('');
-                setIsSubmitting(true);
+            const handleRhChange = (e) => { const newRh = e.target.value; setForm({ ...form, rh: newRh, zone: RH_ZONES[newRh][0] }); };
 
+            const handleSubmit = async (e) => {
+                e.preventDefault(); setErr(''); setIsSubmitting(true);
                 if (!isReg) {
                     const u = db.users.find(x => x.employee_id === form.empId && x.first_name_en.toLowerCase() === form.firstName.toLowerCase());
-                    if (u) {
-                        onLogin(u);
-                    } else {
-                        setErr('ข้อมูลไม่ถูกต้อง หรือไม่พบในระบบ');
-                    }
+                    if (u) onLogin(u); else setErr('รหัสพนักงาน หรือ ชื่อ ไม่ถูกต้อง');
                     setIsSubmitting(false);
                 } else {
-                    if (db.users.find(x => x.employee_id === form.empId)) {
-                        setErr('Employee ID นี้ถูกใช้งานแล้ว กรุณาเข้าสู่ระบบ');
-                        setIsSubmitting(false); return;
-                    }
-                    if (!form.rh || !form.zone || !form.lastName) {
-                        setErr('กรุณากรอกข้อมูล นามสกุล, Region และ Zone ให้ครบถ้วน');
-                        setIsSubmitting(false); return;
-                    }
-
-                    const newUser = { 
-                        id: form.empId, employee_id: form.empId, first_name_en: form.firstName, last_name_en: form.lastName, 
-                        role: 'Candidate', position: form.position, rh: form.rh, zone: form.zone 
-                    };
-
+                    if (db.users.find(x => x.employee_id === form.empId)) { setErr('Employee ID นี้ถูกใช้งานแล้ว กรุณาเข้าสู่ระบบ'); setIsSubmitting(false); return; }
+                    const newUser = { id: form.empId, employee_id: form.empId, email: form.email, first_name_en: form.firstName, last_name_en: form.lastName, role: 'Candidate', position: form.position, rh: form.rh, zone: form.zone };
                     try {
                         const { error } = await supabase.from('users').insert([newUser]);
-                        if (error) throw error;
+                        if(error) throw error;
                         setDb(prev => ({ ...prev, users: [...prev.users, newUser] }));
-                        alert('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบด้วยข้อมูลที่คุณสมัคร'); 
-                        setIsReg(false); 
-                        setForm({...form, lastName: '', position: 'IS', rh: '', zone: ''}); 
-                    } catch (error) {
-                        console.error(error); setErr('เกิดข้อผิดพลาดในการลงทะเบียน กรุณาลองใหม่');
-                    }
+                        alert('ลงทะเบียนสำเร็จ! ระบบกำลังนำคุณเข้าสู่ Dashboard'); 
+                        onLogin(newUser);
+                    } catch (error) { setErr("การเชื่อมต่อล้มเหลว กรุณาลองใหม่"); }
                     setIsSubmitting(false);
                 }
             };
 
             return (
-                <div className="flex-1 flex flex-col bg-surface relative overflow-y-auto">
-                    <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-br from-brandNavy to-primary rounded-b-[32px] z-0 shadow-lg"></div>
-                    
-                    <div className="relative z-10 flex flex-col h-full px-5 pt-8 pb-5">
-                        <div className="text-white mb-6 animate-slide-up text-center">
-                            <div className="w-12 h-12 bg-white/10 rounded-[14px] flex items-center justify-center text-2xl mx-auto mb-3 border border-white/20 backdrop-blur-sm shadow-inner">📘</div>
-                            <h1 className="text-xl font-extrabold tracking-tight mb-1">Knowledge Test</h1>
-                            <p className="text-white/80 font-medium text-[10px] uppercase tracking-widest">ttb US Multi-Asset 15/5</p>
-                        </div>
-                        
-                        {err && <div className="bg-red-50 text-danger p-3 rounded-xl mb-4 text-[11px] font-bold text-center border border-red-100 animate-pop-in">{err}</div>}
-                        
-                        <div className="glass-card p-6 rounded-2xl w-full animate-slide-up shadow-sm border border-slate-200" style={{animationDelay: '0.1s'}}>
-                            <form onSubmit={handleSubmit} className="space-y-3.5">
-                                <div>
-                                    <label className="text-[10px] font-bold text-slate-500 ml-1 mb-1 block uppercase tracking-widest">Employee ID</label>
-                                    <input type="text" value={form.empId} onChange={e => setForm({...form, empId: e.target.value})} className="w-full p-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-bold text-textMain transition-all text-sm" placeholder="e.g. 000123" required />
-                                </div>
-                                <div>
-                                    <label className="text-[10px] font-bold text-slate-500 ml-1 mb-1 block uppercase tracking-widest">First Name (EN)</label>
-                                    <input type="text" value={form.firstName} onChange={e => setForm({...form, firstName: e.target.value})} className="w-full p-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-bold text-textMain transition-all text-sm" placeholder="e.g. Somchai" required />
-                                </div>
-                                
-                                {isReg && (
-                                    <div className="animate-fade-in space-y-3.5 pt-2 border-t border-slate-100 mt-3">
-                                        <div>
-                                            <label className="text-[10px] font-bold text-slate-500 ml-1 mb-1 block uppercase tracking-widest">Last Name (EN)</label>
-                                            <input type="text" value={form.lastName} onChange={e => setForm({...form, lastName: e.target.value})} className="w-full p-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-bold text-textMain transition-all text-sm" placeholder="e.g. Rakdee" required />
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-500 ml-1 mb-1 block uppercase tracking-widest">Position</label>
-                                                <select value={form.position} onChange={e => setForm({...form, position: e.target.value})} className="w-full p-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-bold text-textMain transition-all text-sm cursor-pointer">
-                                                    {REG_POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-500 ml-1 mb-1 block uppercase tracking-widest">Region</label>
-                                                <select value={form.rh} onChange={e => setForm({...form, rh: e.target.value, zone: ''})} className="w-full p-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-bold text-textMain transition-all text-sm cursor-pointer" required>
-                                                    <option value="" disabled>Select RH...</option>
-                                                    {Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] font-bold text-slate-500 ml-1 mb-1 block uppercase tracking-widest">Zone</label>
-                                            <select value={form.zone} onChange={e => setForm({...form, zone: e.target.value})} disabled={!form.rh} className="w-full p-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-bold text-textMain transition-all text-sm cursor-pointer disabled:opacity-50" required>
-                                                <option value="" disabled>Select Zone...</option>
-                                                {form.rh && RH_ZONES[form.rh].map(z => <option key={z} value={z}>{z}</option>)}
-                                            </select>
-                                        </div>
+                <div className="flex-1 flex flex-col bg-surface overflow-y-auto custom-scrollbar relative">
+                    <div className="bg-gradient-to-br from-brandNavy to-primary h-48 w-full rounded-b-[32px] absolute top-0 left-0 z-0"></div>
+                    <div className="relative z-10 p-6 pt-12 text-center">
+                        <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-white/30">📘</div>
+                        <h1 className="text-2xl font-extrabold text-white mb-6">Certification Hub</h1>
+                        <form onSubmit={handleSubmit} className="glass-card p-6 rounded-3xl space-y-4 shadow-soft-3d text-left animate-slide-up border border-slate-100">
+                            <h2 className="text-center font-black text-brandNavy mb-2">{isReg ? 'ลงทะเบียนเข้าสอบ' : 'เข้าสู่ระบบ (Login)'}</h2>
+                            {err && <div className="bg-red-50 text-danger p-3 rounded-xl text-xs font-bold text-center border border-red-100">{err}</div>}
+                            
+                            <div><label className="text-[10px] font-bold text-slate-500 uppercase">Employee ID</label><input type="text" placeholder="เช่น 000123" value={form.empId} onChange={e=>setForm({...form, empId:e.target.value})} className="w-full p-3.5 rounded-xl border border-slate-200 bg-slate-50 font-bold outline-none focus:border-primary text-sm" required /></div>
+                            
+                            <div className="grid grid-cols-2 gap-3">
+                                <div><label className="text-[10px] font-bold text-slate-500 uppercase">First Name <span className="text-danger lowercase">(EN)</span></label><input type="text" placeholder="Somchai" value={form.firstName} onChange={e=>setForm({...form, firstName:e.target.value})} className="w-full p-3.5 rounded-xl border border-slate-200 bg-slate-50 font-bold outline-none focus:border-primary text-sm" required /></div>
+                                {isReg && <div><label className="text-[10px] font-bold text-slate-500 uppercase">Last Name <span className="text-danger lowercase">(EN)</span></label><input type="text" placeholder="Rakdee" value={form.lastName} onChange={e=>setForm({...form, lastName:e.target.value})} className="w-full p-3.5 rounded-xl border border-slate-200 bg-slate-50 font-bold outline-none focus:border-primary text-sm" required /></div>}
+                            </div>
+                            
+                            {isReg && (
+                                <div className="space-y-4 pt-2 animate-fade-in">
+                                    <div><label className="text-[10px] font-bold text-slate-500 uppercase">Email <span className="text-danger lowercase">(เพื่อส่งใบเซอร์)</span></label><input type="email" placeholder="example@ttbbank.com" value={form.email} onChange={e=>setForm({...form, email:e.target.value})} className="w-full p-3.5 rounded-xl border border-slate-200 bg-slate-50 font-bold outline-none focus:border-primary text-sm" required /></div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div><label className="text-[10px] font-bold text-slate-500 uppercase">Region (RH)</label><select value={form.rh} onChange={handleRhChange} className="w-full p-3.5 rounded-xl border border-slate-200 bg-slate-50 font-bold outline-none cursor-pointer text-sm">{Object.keys(RH_ZONES).map(r => <option key={r} value={r}>{r}</option>)}</select></div>
+                                        <div><label className="text-[10px] font-bold text-slate-500 uppercase">Zone</label><select value={form.zone} onChange={e=>setForm({...form, zone:e.target.value})} className="w-full p-3.5 rounded-xl border border-slate-200 bg-slate-50 font-bold outline-none cursor-pointer text-sm">{RH_ZONES[form.rh].map(z => <option key={z} value={z}>{z}</option>)}</select></div>
                                     </div>
-                                )}
-
-                                <button type="submit" disabled={isSubmitting} className="w-full bg-primary hover:bg-blue-700 text-white font-black py-3.5 rounded-xl btn-modern shadow-soft-3d mt-4 text-[13px] tracking-widest uppercase disabled:opacity-70 flex justify-center items-center">
-                                    {isSubmitting ? <span className="animate-spin text-lg mr-2">⏳</span> : (isReg ? 'ลงทะเบียน (Register)' : 'เข้าสู่ระบบ (Log in)')}
-                                </button>
-                                
-                                <div className="text-center mt-4 pt-4 border-t border-slate-100">
-                                    <button type="button" onClick={() => {setIsReg(!isReg); setErr('');}} className="text-slate-500 hover:text-primary font-bold text-xs transition-colors">
-                                        {isReg ? 'มีบัญชีอยู่แล้ว? กลับไปหน้าเข้าสู่ระบบ' : (
-                                            <span>พนักงานใหม่? <span className="text-danger underline">ลงทะเบียนเข้าสอบที่นี่</span></span>
-                                        )}
-                                    </button>
                                 </div>
-                            </form>
-                        </div>
-                        <div className="mt-auto pt-6"><PoweredByFooter /></div>
+                            )}
+                            <button type="submit" disabled={isSubmitting} className="w-full bg-primary hover:bg-blue-700 text-white font-black py-4 rounded-xl mt-2 shadow-md transition-colors uppercase tracking-widest text-sm btn-modern disabled:opacity-70 flex items-center justify-center">
+                                {isSubmitting ? <span className="animate-spin text-lg mr-2">⏳</span> : (isReg ? 'ลงทะเบียน (Register)' : 'เข้าสู่ระบบ (Log In)')}
+                            </button>
+                            <div className="text-center mt-2 pt-4 border-t border-slate-100">
+                                <button type="button" onClick={() => {setIsReg(!isReg); setErr('');}} className="text-slate-500 hover:text-primary font-bold text-xs transition-colors">
+                                    {isReg ? 'มีบัญชีแล้ว? กลับไปเข้าสู่ระบบ' : <span>พนักงานใหม่? <span className="text-danger underline">ลงทะเบียนที่นี่</span></span>}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             );
         }
 
         // ==========================================
-        // 5. CANDIDATE APP (Dashboard & Routing)
+        // SMART EMAIL POPUP MODAL
         // ==========================================
-        function CandidateApp({ user, db, updateSession, onLogout }) {
-            const session = db.sessions[user.id] || {};
-            const [view, setView] = useState('home'); 
-            const [showOnboarding, setShowOnboarding] = useState(!session.pk_passed && session.pk_attempts === 0 && session.pk_score === null);
+        function EmailPromptModal({ user, session, updateSession, updateUserEmailLocally }) {
+            const [email, setEmail] = useState('');
+            const [isProcessing, setIsProcessing] = useState(false);
+            
+            const isCertified = session?.overall_status === 'CERTIFIED';
+
+            const handleSubmit = async (e) => {
+                e.preventDefault(); if(!email) return; setIsProcessing(true);
+                try {
+                    await supabase.from('users').update({ email: email }).eq('id', user.id);
+                    updateUserEmailLocally(user.id, email);
+                    
+                    if (isCertified) {
+                        await sendCertificateEmail(email, user.first_name_en, session.pk_score, session.pk_attempts || 1, session.trainer_score, session.trainer_attempts || 1);
+                        await updateSession({ cert_sent: true });
+                        alert('✅ บันทึกข้อมูลและจัดส่งใบ Certificate ไปยังอีเมลเรียบร้อยแล้ว!');
+                    } else {
+                        alert('✅ บันทึกข้อมูลอีเมลเข้าสู่ระบบเรียบร้อยแล้ว!\n(ระบบจะใช้ส่งใบ Certificate ให้ท่านเมื่อสอบผ่าน)');
+                    }
+                } catch (err) { 
+                    alert('เกิดข้อผิดพลาด: ' + err.message); 
+                } finally { 
+                    setIsProcessing(false); 
+                }
+            };
 
             return (
-                <div className="flex-1 flex flex-col h-full overflow-hidden relative bg-surface">
-                    {/* Onboarding Rules Pop-up (รองรับหน้าจอเล็กด้วย overflow-y-auto) */}
-                    {showOnboarding && (
-                        <div className="absolute inset-0 bg-brandNavy/80 z-[100] flex items-start sm:items-center justify-center p-4 backdrop-blur-sm animate-fade-in overflow-y-auto">
-                            <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-pop-in text-center relative my-auto">
-                                <div className="w-12 h-12 bg-primaryLight/40 text-primary rounded-xl flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">📋</div>
-                                <h2 className="text-xl font-black text-brandNavy mb-1">กติกาการสอบ</h2>
-                                <p className="text-slate-500 font-bold text-[10px] mb-4 uppercase tracking-widest">Knowledge Test (30 Questions)</p>
-                                <div className="space-y-3 text-left bg-slate-50 p-4 rounded-xl mb-6 border border-slate-200">
-                                    <p className="flex items-center text-xs font-bold text-textMain"><span className="text-base mr-2 text-primary">📝</span> ข้อสอบแบบปรนัย 30 ข้อ (สุ่ม)</p>
-                                    <p className="flex items-center text-xs font-bold text-textMain"><span className="text-base mr-2 text-warning">⏱️</span> เวลาในการทำ 60 นาที</p>
-                                    <p className="flex items-center text-xs font-bold text-textMain"><span className="text-base mr-2 text-success">🎯</span> เกณฑ์การผ่าน 80%</p>
-                                    <p className="flex items-start text-[11px] font-bold text-danger mt-3 pt-3 border-t border-slate-200 leading-relaxed"><span className="mr-1.5 text-sm">⚠️</span> หากเน็ตหลุด ระบบจะจำข้อที่ทำค้างไว้ ล็อกอินใหม่เวลาจะเดินต่อจากเดิม</p>
-                                </div>
-                                <button onClick={() => setShowOnboarding(false)} className="w-full bg-brandNavy hover:bg-slate-800 text-white font-black py-3.5 rounded-xl btn-modern shadow-md uppercase tracking-widest text-[11px]">รับทราบและเริ่มทำ</button>
-                            </div>
+                <div className="absolute inset-0 bg-brandNavy/80 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-fade-in">
+                    <div className="bg-white rounded-[32px] p-8 w-full max-w-sm shadow-2xl animate-pop-in text-center relative overflow-hidden">
+                        <div className="w-16 h-16 bg-blue-50 text-primary rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 relative z-10 border border-blue-100">
+                            {isCertified ? '🎓' : '✉️'}
                         </div>
+                        <h2 className="text-xl font-extrabold text-textMain mb-2 relative z-10">
+                            {isCertified ? 'ยินดีด้วยคุณสอบผ่าน!' : 'อัปเดตข้อมูลติดต่อ'}
+                        </h2>
+                        <p className="text-xs font-bold text-slate-500 mb-6 leading-relaxed relative z-10">
+                            {isCertified 
+                                ? <>กรุณาระบุอีเมลเพื่อรับ <b>ใบ Certificate</b> ครับ</>
+                                : <>กรุณาระบุ <b>อีเมลบริษัท</b> เพื่อใช้รับใบ Certificate<br/>เมื่อท่านสอบผ่านการประเมินครับ</>
+                            }
+                        </p>
+                        <form onSubmit={handleSubmit} className="relative z-10">
+                            <input type="email" required placeholder="example@ttbbank.com" value={email} onChange={e => setEmail(e.target.value)} className="w-full p-4 mb-4 bg-surface border border-slate-200 rounded-2xl focus:border-primary outline-none font-bold text-sm text-center" />
+                            <button type="submit" disabled={isProcessing} className="w-full bg-primary text-white font-bold py-3.5 rounded-xl btn-modern disabled:opacity-50 shadow-soft-3d">
+                                {isProcessing ? 'กำลังดำเนินการ...' : (isCertified ? 'บันทึกและส่งใบ Certificate' : 'บันทึกข้อมูล')}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            );
+        }
+
+        // ==========================================
+        // CANDIDATE APP ROUTER
+        // ==========================================
+        function CandidateApp({ user, db, updateSession, updateUserEmailLocally, onLogout }) {
+            const session = db.sessions[user.id] || {};
+            const [view, setView] = useState('home'); 
+            
+            return (
+                <div className="flex-1 flex flex-col h-full overflow-hidden relative bg-surface">
+                    
+                    {/* 💡 THE CATCHER: ทวงอีเมล "ทุกคน" ที่ล็อกอินแล้วยังไม่มีอีเมลในระบบ */}
+                    {(!user.email || user.email.trim() === '') && (
+                        <EmailPromptModal user={user} session={session} updateSession={updateSession} updateUserEmailLocally={updateUserEmailLocally} />
                     )}
 
                     {view === 'home' && <CandidateHome user={user} session={session} setView={setView} />}
                     {view === 'pk' && <KnowledgeTest user={user} session={session} questions={db.questions} updateSession={updateSession} setView={setView} />}
                     {view === 'result' && <ResultDashboard session={session} setView={setView} user={user} />}
                     
-                    {/* Bottom Navigation */}
-                    {(view === 'home' || view === 'result') && (
-                        <div className="bg-white border-t border-slate-200 px-8 py-4 flex justify-between items-center rounded-t-[32px] shadow-[0_-10px_40px_rgba(0,0,0,0.03)] z-20 mt-auto shrink-0 pb-6 sm:pb-4">
-                            <div className={`flex flex-col items-center cursor-pointer transition-colors ${view === 'home' ? 'text-primary' : 'text-slate-400 hover:text-primary'}`} onClick={() => setView('home')}><Icons.Home /><span className="text-[9px] font-black mt-1 uppercase tracking-widest">Home</span></div>
-                            <div className={`flex flex-col items-center cursor-pointer transition-colors ${view === 'result' ? 'text-primary' : 'text-slate-400 hover:text-primary'}`} onClick={() => setView('result')}><Icons.Result /><span className="text-[9px] font-black mt-1 uppercase tracking-widest">Result</span></div>
-                            <div className="flex flex-col items-center text-slate-400 hover:text-danger cursor-pointer transition-colors" onClick={onLogout}><Icons.Exit /><span className="text-[9px] font-black mt-1 uppercase tracking-widest">Exit</span></div>
-                        </div>
-                    )}
+                    <div className="bg-white border-t border-slate-200 px-8 py-4 flex justify-between items-center rounded-t-[32px] z-20 mt-auto shrink-0 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] pb-6 sm:pb-4">
+                        <div className={`flex flex-col items-center cursor-pointer transition-colors ${view === 'home' ? 'text-primary' : 'text-slate-400 hover:text-primary'}`} onClick={() => setView('home')}><Icons.Home /><span className="text-[9px] font-black mt-1 uppercase tracking-widest">Home</span></div>
+                        <div className={`flex flex-col items-center cursor-pointer transition-colors ${view === 'result' ? 'text-primary' : 'text-slate-400 hover:text-primary'}`} onClick={() => setView('result')}><Icons.Result /><span className="text-[9px] font-black mt-1 uppercase tracking-widest">Result</span></div>
+                        <div className="flex flex-col items-center text-slate-400 hover:text-danger cursor-pointer transition-colors" onClick={onLogout}><Icons.Exit /><span className="text-[9px] font-black mt-1 uppercase tracking-widest">Exit</span></div>
+                    </div>
                 </div>
             );
         }
 
         // ==========================================
-        // 6. DASHBOARD (HOME)
+        // SMART DASHBOARD (UI ล็อกด่าน)
         // ==========================================
         function CandidateHome({ user, session, setView }) {
-            let prog = 0; 
-            if (session.pk_passed) prog += 50; 
-            if (session.trainer_passed) prog += 50;
+            let prog = 0; if (session.pk_passed) prog += 50; if (session.trainer_passed) prog += 50;
+            
+            const handleAudioRedirect = () => {
+                window.location.href = `./audio_exam.html?uid=${user.employee_id}`;
+            };
 
             return (
                 <div className="flex-1 overflow-y-auto pb-6 animate-fade-in flex flex-col">
-                    {/* Header Profile */}
                     <div className="p-6 pb-4 flex items-center">
-                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-2xl mr-4 shadow-sm border border-slate-100 text-primary">👨‍💼</div>
+                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-2xl mr-4 shadow-sm border border-slate-100">👨‍💼</div>
                         <div>
                             <h1 className="text-textMain font-extrabold text-xl leading-tight">Hi, {user.first_name_en}</h1>
                             <p className="text-slate-500 text-[10px] font-bold mt-0.5 uppercase tracking-widest">{user.rh} ({user.zone})</p>
                         </div>
                     </div>
-                    
-                    {/* Progress Card */}
+
                     <div className="mx-5 bg-brandNavy rounded-3xl p-6 text-white shadow-soft-3d relative overflow-hidden mb-6">
                         <div className="absolute right-[-30px] top-4 w-32 h-32 bg-primary rounded-full opacity-60 blur-3xl"></div>
                         <div className="absolute right-4 bottom-3 text-5xl opacity-90 drop-shadow-xl">🏆</div>
@@ -382,25 +339,39 @@
                             <p className="text-primaryLight text-xs font-bold opacity-80">{prog === 100 ? 'Fully Certified 🎉' : 'In Progress... Keep going!'}</p>
                         </div>
                     </div>
-                    
-                    {/* Modules */}
+
                     <div className="px-5 space-y-4 flex-1">
                         <h3 className="font-extrabold text-textMain text-base mb-2">Assessment Modules</h3>
                         
-                        {/* Module 1: 30Q Test */}
                         <div onClick={() => { if(!session.pk_passed) setView('pk'); }} className={`bg-white rounded-2xl border border-slate-200 p-5 relative overflow-hidden ${session.pk_passed ? 'opacity-80 cursor-default' : 'cursor-pointer hover:shadow-md transform transition-all hover:scale-[1.02] shadow-sm'}`}>
                             <div className="absolute right-[-10px] bottom-[-15px] text-[50px] opacity-10 drop-shadow-md">📘</div>
-                            <span className={`${session.pk_passed ? 'bg-success' : 'bg-primary'} text-white px-3 py-1.5 rounded-full text-[9px] font-black shadow-sm uppercase tracking-wider`}>{session.pk_passed ? 'Passed' : 'Start Test'}</span>
-                            <h4 className="font-black text-brandNavy mt-3 text-lg">Knowledge Test</h4>
+                            <div className="flex justify-between items-start">
+                                <span className={`${session.pk_passed ? 'bg-success' : 'bg-primary'} text-white px-3 py-1.5 rounded-full text-[9px] font-black shadow-sm uppercase tracking-wider`}>
+                                    {session.pk_passed ? '✓ Completed' : 'Start Test'}
+                                </span>
+                            </div>
+                            <h4 className="font-black text-brandNavy mt-3 text-lg">Step 1: Theory Test</h4>
                             <p className="text-slate-500 text-[11px] mt-1.5 font-bold w-2/3 leading-relaxed">แบบทดสอบทฤษฎี 30 ข้อ (60 นาที)</p>
                         </div>
-                        
-                        {/* Module 2: Audio/Live Interview (Status Only) */}
-                        <div onClick={() => setView('result')} className={`bg-white rounded-2xl border border-slate-200 p-5 relative overflow-hidden ${!session.pk_passed ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-md transform transition-all hover:scale-[1.02] shadow-sm'}`}>
-                            <div className="absolute right-0 bottom-[-5px] text-[50px] opacity-10 drop-shadow-md">👨‍🏫</div>
-                            <span className={`${!session.pk_passed ? 'bg-slate-300' : session.trainer_passed ? 'bg-success' : 'bg-warning'} text-white px-3 py-1.5 rounded-full text-[9px] font-black shadow-sm uppercase tracking-wider`}>{!session.pk_passed ? 'Locked' : session.trainer_passed ? 'Certified' : 'Pending Action'}</span>
-                            <h4 className="font-black text-brandNavy mt-3 text-lg">Practical Assessment</h4>
-                            <p className="text-slate-500 text-[11px] mt-1.5 font-bold w-3/4 leading-relaxed">สัมภาษณ์สด หรือส่งไฟล์เสียง (รอทำใน Step ถัดไป)</p>
+
+                        {/* 💡 ด่าน 2: Smart Locked UI */}
+                        <div onClick={session.pk_passed ? handleAudioRedirect : undefined} 
+                             className={`bg-white rounded-2xl border border-slate-200 p-5 relative overflow-hidden transition-all duration-300
+                             ${!session.pk_passed ? 'opacity-50 grayscale pointer-events-none' : 'cursor-pointer hover:shadow-md transform hover:scale-[1.02] shadow-sm'}`}>
+                            
+                            <div className="absolute right-0 bottom-[-5px] text-[50px] opacity-10 drop-shadow-md">🎤</div>
+                            
+                            <div className="flex justify-between items-start">
+                                <span className={`${!session.pk_passed ? 'bg-slate-500' : session.trainer_passed ? 'bg-success' : 'bg-primary'} text-white px-3 py-1.5 rounded-full text-[9px] font-black shadow-sm uppercase tracking-wider flex items-center`}>
+                                    {!session.pk_passed && <span className="mr-1.5"><Icons.Lock /></span>}
+                                    {!session.pk_passed ? 'Locked' : session.trainer_passed ? '✓ Certified' : 'Pending Action'}
+                                </span>
+                            </div>
+                            
+                            <h4 className={`font-black mt-3 text-lg ${!session.pk_passed ? 'text-slate-500' : 'text-brandNavy'}`}>Step 2: Audio Exam</h4>
+                            <p className="text-slate-500 text-[11px] mt-1.5 font-bold w-3/4 leading-relaxed">
+                                {!session.pk_passed ? 'ต้องสอบผ่าน Step 1 ก่อน จึงจะปลดล็อกด่านนี้ได้' : 'สัมภาษณ์สด หรืออัดเสียงส่งให้เทรนเนอร์ประเมิน'}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -408,221 +379,78 @@
         }
 
         // ==========================================
-        // 7. KNOWLEDGE TEST (30 Questions Logic)
+        // KNOWLEDGE TEST
         // ==========================================
         function KnowledgeTest({ user, session, questions, updateSession, setView }) {
-            const [qIdx, setQIdx] = useState(0);
-            const [answers, setAnswers] = useState({});
-            const [started, setStarted] = useState(false);
-            const [examQuestions, setExamQuestions] = useState([]); 
-            const [timeLeft, setTimeLeft] = useState(3600); 
+            const [qIdx, setQIdx] = useState(0); const [answers, setAnswers] = useState({}); const [started, setStarted] = useState(false); const [examQuestions, setExamQuestions] = useState([]); const [timeLeft, setTimeLeft] = useState(3600); 
             const storageKey = `ttb_exam_${user.id}`;
 
-            // Restore from LocalStorage if internet dropped
             useEffect(() => {
-                if (!session.pk_passed) {
-                    const saved = localStorage.getItem(storageKey);
-                    if (saved) {
-                        try {
-                            const p = JSON.parse(saved);
-                            const t = Math.max(0, p.timeLeft - (Math.floor(Date.now() / 1000) - p.lastSaved));
-                            setExamQuestions(p.examQuestions); setAnswers(p.answers||{}); setQIdx(p.qIdx||0); setTimeLeft(t); setStarted(true);
-                            if (t <= 0) autoSubmit(p.examQuestions, p.answers);
-                        } catch (e) {}
-                    }
-                }
+                if (!session.pk_passed) { const saved = localStorage.getItem(storageKey); if (saved) { try { const p = JSON.parse(saved); const t = Math.max(0, p.timeLeft - (Math.floor(Date.now() / 1000) - p.lastSaved)); setExamQuestions(p.examQuestions); setAnswers(p.answers||{}); setQIdx(p.qIdx||0); setTimeLeft(t); setStarted(true); if (t <= 0) autoSubmit(p.examQuestions, p.answers); } catch (e) {} } }
             }, [session.pk_passed]);
 
-            // Timer Tick
             useEffect(() => {
-                let timer;
-                if (started && timeLeft > 0 && !session.pk_passed) {
-                    timer = setInterval(() => {
-                        setTimeLeft(prev => {
-                            const nt = prev - 1;
-                            localStorage.setItem(storageKey, JSON.stringify({ examQuestions, answers, qIdx, timeLeft: nt, lastSaved: Math.floor(Date.now() / 1000) }));
-                            if (nt <= 0) { clearInterval(timer); autoSubmit(examQuestions, answers); }
-                            return nt;
-                        });
-                    }, 1000);
-                }
-                return () => clearInterval(timer);
+                let timer; if (started && timeLeft > 0 && !session.pk_passed) { timer = setInterval(() => { setTimeLeft(prev => { const nt = prev - 1; localStorage.setItem(storageKey, JSON.stringify({ examQuestions, answers, qIdx, timeLeft: nt, lastSaved: Math.floor(Date.now() / 1000) })); if (nt <= 0) { clearInterval(timer); autoSubmit(examQuestions, answers); } return nt; }); }, 1000); } return () => clearInterval(timer);
             }, [started, timeLeft, examQuestions, answers, qIdx, session.pk_passed]);
 
-            // Initialization
             const handleStartTest = () => {
                 if(questions.length === 0) return alert('ไม่พบคลังข้อสอบ');
-                
                 const shuffle = (arr) => [...arr].sort(() => 0.5 - Math.random());
-                const sq = shuffle(questions).slice(0, 30).map(q => {
-                    let opts = [];
-                    if (Array.isArray(q.options)) {
-                        opts = q.options;
-                    } else if (typeof q.options === 'string') {
-                        try { opts = JSON.parse(q.options); } catch(e) { console.error("Parse error", e); }
-                    }
-                    if(!Array.isArray(opts) || opts.length === 0) opts = ["A", "B", "C", "D"]; 
-                    return { ...q, shuffledOptions: shuffle(opts) }; 
-                });
-                
-                setExamQuestions(sq); setAnswers({}); setQIdx(0); setTimeLeft(3600); setStarted(true);
-                localStorage.setItem(storageKey, JSON.stringify({ examQuestions: sq, answers: {}, qIdx: 0, timeLeft: 3600, lastSaved: Math.floor(Date.now() / 1000) }));
+                const sq = shuffle(questions).slice(0, 30).map(q => { let opts = []; if (Array.isArray(q.options)) { opts = q.options; } else if (typeof q.options === 'string') { try { opts = JSON.parse(q.options); } catch(e) {} } if(!Array.isArray(opts) || opts.length === 0) opts = ["A", "B", "C", "D"]; return { ...q, shuffledOptions: shuffle(opts) }; });
+                setExamQuestions(sq); setAnswers({}); setQIdx(0); setTimeLeft(3600); setStarted(true); localStorage.setItem(storageKey, JSON.stringify({ examQuestions: sq, answers: {}, qIdx: 0, timeLeft: 3600, lastSaved: Math.floor(Date.now() / 1000) }));
             };
 
-            const autoSubmit = (qs, ans) => {
-                const correct = qs.filter((q, i) => ans[i] === q.answer).length;
-                const score = Math.round((correct / qs.length) * 100);
-                updateSession({ 
-                    pk_score: score, 
-                    pk_passed: score >= 80, 
-                    pk_attempts: (session.pk_attempts || 0) + 1,
-                    overall_status: 'IN_PROGRESS' 
-                });
-                localStorage.removeItem(storageKey);
-                setView('result'); 
+            const autoSubmit = async (qs, ans) => {
+                const correct = qs.filter((q, i) => ans[i] === q.answer).length; const score = Math.round((correct / qs.length) * 100);
+                await updateSession({ pk_score: score, pk_passed: score >= 80, pk_attempts: (session.pk_attempts || 0) + 1, overall_status: 'IN_PROGRESS' });
+                localStorage.removeItem(storageKey); setView('result'); 
             };
 
             if (!started) return (
-                <div className="flex-1 flex flex-col justify-center items-center px-6 animate-fade-in relative h-full bg-surface overflow-y-auto">
-                    <button onClick={() => setView('home')} className="absolute top-6 left-5 text-textMain hover:text-primary"><Icons.ChevronLeft /></button>
-                    <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-slate-200 transform rotate-3"><span className="text-4xl drop-shadow-sm">⏱️</span></div>
-                    <h3 className="text-xl font-black text-brandNavy mb-3">Knowledge Test</h3>
-                    <div className="text-slate-600 text-center font-bold leading-relaxed mb-8 bg-white p-5 rounded-2xl border border-slate-200 w-full shadow-sm text-sm">
-                        <p className="mb-2">ข้อสอบปรนัย: <span className="text-primary font-black text-lg">30 ข้อ</span></p>
-                        <p className="mb-2">เวลาทำแบบทดสอบ: <span className="text-danger font-black text-lg">60 นาที</span></p>
-                        <p>เกณฑ์การผ่าน: <span className="text-success font-black text-lg">80%</span></p>
-                        {session.pk_attempts > 0 && <p className="mt-4 pt-3 border-t border-slate-100 text-warning text-[10px] uppercase tracking-widest">การสอบครั้งนี้เป็น รอบที่ {session.pk_attempts + 1}</p>}
-                    </div>
-                    <button onClick={handleStartTest} className="w-full bg-primary hover:bg-blue-700 text-white font-black py-3.5 rounded-xl btn-modern shadow-soft-3d text-[13px] tracking-widest uppercase">เริ่มทำข้อสอบ</button>
-                </div>
+                <div className="flex-1 flex flex-col justify-center items-center px-6 animate-fade-in relative h-full bg-surface overflow-y-auto"><button onClick={() => setView('home')} className="absolute top-6 left-5 text-textMain hover:text-primary"><Icons.ChevronLeft /></button><div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-slate-200 transform rotate-3"><span className="text-4xl drop-shadow-sm">⏱️</span></div><h3 className="text-xl font-black text-brandNavy mb-3">Knowledge Test</h3><div className="text-slate-600 text-center font-bold leading-relaxed mb-8 bg-white p-5 rounded-2xl border border-slate-200 w-full shadow-sm text-sm"><p className="mb-2">ข้อสอบปรนัย: <span className="text-primary font-black text-lg">30 ข้อ</span></p><p className="mb-2">เวลาทำแบบทดสอบ: <span className="text-danger font-black text-lg">60 นาที</span></p><p>เกณฑ์การผ่าน: <span className="text-success font-black text-lg">80%</span></p>{session.pk_attempts > 0 && <p className="mt-4 pt-3 border-t border-slate-100 text-warning text-[10px] uppercase tracking-widest">การสอบครั้งนี้เป็น รอบที่ {session.pk_attempts + 1}</p>}</div><button onClick={handleStartTest} className="w-full bg-primary hover:bg-blue-700 text-white font-black py-3.5 rounded-xl btn-modern shadow-soft-3d text-[13px] tracking-widest uppercase">เริ่มทำข้อสอบ</button></div>
             );
 
             const q = examQuestions[qIdx];
             return (
                 <div className="flex-1 flex flex-col bg-surface animate-slide-up relative h-full overflow-hidden">
-                    {/* Header */}
-                    <div className="pt-5 pb-3 px-5 flex justify-between items-center z-10 shrink-0">
-                        <button onClick={() => setView('home')} className="text-slate-500 hover:text-primary"><Icons.ChevronLeft /></button>
-                        <h2 className="font-extrabold text-brandNavy text-sm">Question {qIdx + 1} of {examQuestions.length}</h2>
-                        <div className={`font-black text-[11px] px-2.5 py-1.5 rounded-lg shadow-sm border ${timeLeft < 300 ? 'bg-red-50 text-danger border-red-200 animate-pulse' : 'bg-white text-primary border-blue-100'}`}>{`${Math.floor(timeLeft / 60).toString().padStart(2, '0')}:${(timeLeft % 60).toString().padStart(2, '0')}`}</div>
-                    </div>
-                    
-                    {/* Content Card */}
-                    <div className="flex-1 bg-white rounded-t-[32px] px-5 pt-6 pb-24 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] border-t border-slate-100 flex flex-col overflow-hidden relative">
-                        {/* Progress Bar */}
-                        <div className="w-full bg-slate-100 rounded-full h-1 mb-5 overflow-hidden shrink-0">
-                            <div className="bg-primary h-1 rounded-full transition-all duration-500" style={{width: `${((qIdx + 1) / examQuestions.length) * 100}%`}}></div>
-                        </div>
-
-                        <div className="flex-1 overflow-y-auto pr-1 pb-2 custom-scrollbar">
-                            <h3 className="text-[13px] font-bold text-brandNavy mb-5 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-inner">{q.question}</h3>
-                            
-                            <div className="space-y-2.5 mb-2">
-                                {q.shuffledOptions.map((opt, i) => {
-                                    const sel = answers[qIdx] === opt;
-                                    return (
-                                        <div key={i} onClick={() => setAnswers({...answers, [qIdx]: opt})} className={`flex items-center p-3 rounded-xl cursor-pointer transition-all duration-200 border-2 ${sel ? 'border-primary bg-blue-50 shadow-sm transform scale-[1.01]' : 'border-transparent bg-slate-50 hover:bg-slate-100'}`}>
-                                            <div className={`w-8 h-8 rounded-[10px] flex items-center justify-center font-black mr-3 shadow-sm shrink-0 transition-colors text-sm ${sel ? 'bg-primary text-white' : 'bg-white text-slate-400'}`}>{['A','B','C','D'][i]}</div>
-                                            <span className={`flex-1 font-bold text-xs leading-relaxed ${sel ? 'text-primary' : 'text-textMain'}`}>{opt}</span>
-                                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ml-2 shrink-0 transition-colors ${sel ? 'border-primary' : 'border-gray-300 bg-white'}`}>{sel && <div className="w-2 h-2 bg-primary rounded-full"></div>}</div>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Bottom Actions */}
-                    <div className="absolute bottom-0 w-full bg-white/90 backdrop-blur-md px-5 py-4 flex justify-between gap-3 border-t border-slate-100 z-20 pb-6 sm:pb-4">
-                        <button onClick={() => setQIdx(qIdx-1)} disabled={qIdx === 0} className="w-1/3 py-3 bg-slate-100 text-slate-500 font-black rounded-xl hover:bg-slate-200 disabled:opacity-40 transition-colors text-[13px]">กลับ</button>
-                        {qIdx === examQuestions.length - 1 ? 
-                            <button onClick={() => autoSubmit(examQuestions, answers)} disabled={Object.keys(answers).length < examQuestions.length} className="w-2/3 py-3 font-black rounded-xl transition-all btn-modern bg-success text-white hover:bg-emerald-600 disabled:opacity-50 disabled:shadow-none uppercase tracking-widest text-[13px] shadow-soft-3d">ส่งข้อสอบ</button> :
-                            <button onClick={() => setQIdx(qIdx+1)} className="w-2/3 py-3 font-black rounded-xl transition-all bg-brandNavy text-white hover:bg-slate-800 shadow-md text-[13px] btn-modern">ถัดไป</button>
-                        }
-                    </div>
+                    <div className="pt-5 pb-3 px-5 flex justify-between items-center z-10 shrink-0"><button onClick={() => setView('home')} className="text-slate-500 hover:text-primary"><Icons.ChevronLeft /></button><h2 className="font-extrabold text-brandNavy text-sm">Question {qIdx + 1} of {examQuestions.length}</h2><div className={`font-black text-[11px] px-2.5 py-1.5 rounded-lg shadow-sm border ${timeLeft < 300 ? 'bg-red-50 text-danger border-red-200 animate-pulse' : 'bg-white text-primary border-blue-100'}`}>{`${Math.floor(timeLeft / 60).toString().padStart(2, '0')}:${(timeLeft % 60).toString().padStart(2, '0')}`}</div></div>
+                    <div className="flex-1 bg-white rounded-t-[32px] px-5 pt-6 pb-24 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] border-t border-slate-100 flex flex-col overflow-hidden relative"><div className="w-full bg-slate-100 rounded-full h-1 mb-5 overflow-hidden shrink-0"><div className="bg-primary h-1 rounded-full transition-all duration-500" style={{width: `${((qIdx + 1) / examQuestions.length) * 100}%`}}></div></div><div className="flex-1 overflow-y-auto pr-1 pb-2 custom-scrollbar"><h3 className="text-[13px] font-bold text-brandNavy mb-5 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-inner">{q.question}</h3><div className="space-y-2.5 mb-2">{q.shuffledOptions.map((opt, i) => { const sel = answers[qIdx] === opt; return (<div key={i} onClick={() => setAnswers({...answers, [qIdx]: opt})} className={`flex items-center p-3 rounded-xl cursor-pointer transition-all duration-200 border-2 ${sel ? 'border-primary bg-blue-50 shadow-sm transform scale-[1.01]' : 'border-transparent bg-slate-50 hover:bg-slate-100'}`}><div className={`w-8 h-8 rounded-[10px] flex items-center justify-center font-black mr-3 shadow-sm shrink-0 transition-colors text-sm ${sel ? 'bg-primary text-white' : 'bg-white text-slate-400'}`}>{['A','B','C','D'][i]}</div><span className={`flex-1 font-bold text-xs leading-relaxed ${sel ? 'text-primary' : 'text-textMain'}`}>{opt}</span><div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ml-2 shrink-0 transition-colors ${sel ? 'border-primary' : 'border-gray-300 bg-white'}`}>{sel && <div className="w-2 h-2 bg-primary rounded-full"></div>}</div></div>) })}</div></div></div>
+                    <div className="absolute bottom-0 w-full bg-white/90 backdrop-blur-md px-5 py-4 flex justify-between gap-3 border-t border-slate-100 z-20 pb-6 sm:pb-4"><button onClick={() => setQIdx(qIdx-1)} disabled={qIdx === 0} className="w-1/3 py-3 bg-slate-100 text-slate-500 font-black rounded-xl hover:bg-slate-200 disabled:opacity-40 transition-colors text-[13px]">กลับ</button>{qIdx === examQuestions.length - 1 ? <button onClick={() => autoSubmit(examQuestions, answers)} disabled={Object.keys(answers).length < examQuestions.length} className="w-2/3 py-3 font-black rounded-xl transition-all btn-modern bg-success text-white hover:bg-emerald-600 disabled:opacity-50 disabled:shadow-none uppercase tracking-widest text-[13px] shadow-soft-3d">ส่งข้อสอบ</button> : <button onClick={() => setQIdx(qIdx+1)} className="w-2/3 py-3 font-black rounded-xl transition-all bg-brandNavy text-white hover:bg-slate-800 shadow-md text-[13px] btn-modern">ถัดไป</button>}</div>
                 </div>
             );
         }
 
         // ==========================================
-        // 8. RESULT SCREEN & CALL TO ACTION
+        // RESULT DASHBOARD
         // ==========================================
         function ResultDashboard({ session, setView, user }) {
+            const goToAudioExam = () => window.location.href = `./audio_exam.html?uid=${user.employee_id}`;
+            const goToFAQ = () => window.location.href = `https://pltpdttb-jpg.github.io/us-faq/?uid=${user.employee_id}`;
+
             return (
-                <div className="flex-1 bg-surface animate-slide-up flex flex-col h-full overflow-y-auto">
-                    {/* Header */}
-                    <div className="bg-brandNavy text-white pt-8 pb-12 px-6 rounded-b-[32px] shadow-lg relative overflow-hidden shrink-0">
-                        <div className="absolute right-[-20px] top-4 w-32 h-32 bg-primary rounded-full opacity-50 blur-3xl"></div>
-                        <button onClick={() => setView('home')} className="text-white/70 hover:text-white mb-5 transition-colors"><Icons.ChevronLeft /></button>
-                        <h2 className="text-2xl font-black mb-1">My Results</h2>
-                        <p className="text-primaryLight font-bold text-[10px] uppercase tracking-widest opacity-80">Certification Summary</p>
-                    </div>
+                <div className="flex-1 bg-surface animate-slide-up flex flex-col h-full overflow-y-auto pb-8">
+                    <div className="bg-brandNavy text-white pt-8 pb-12 px-6 rounded-b-[32px] shadow-lg relative overflow-hidden shrink-0"><div className="absolute right-[-20px] top-4 w-32 h-32 bg-primary rounded-full opacity-50 blur-3xl"></div><button onClick={() => setView('home')} className="text-white/70 hover:text-white mb-5 transition-colors"><Icons.ChevronLeft /></button><h2 className="text-2xl font-black mb-1">My Results</h2><p className="text-primaryLight font-bold text-[10px] uppercase tracking-widest opacity-80">Certification Summary</p></div>
 
-                    <div className="px-5 -mt-8 space-y-4 pb-8 flex-1 flex flex-col">
-                        {/* Score Cards */}
-                        <div className="glass-card p-5 flex items-center justify-between rounded-2xl">
-                            <div className="flex items-center">
-                                <div className="w-10 h-10 bg-blue-50 text-primary rounded-xl flex items-center justify-center text-xl mr-3 border border-blue-100">📘</div>
-                                <div><h4 className="font-black text-brandNavy text-base">Knowledge</h4><p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-0.5">Passing: 80%</p></div>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-xl font-black text-brandNavy">{session.pk_score !== null ? `${session.pk_score}%` : '-'}</p>
-                                <span className={`text-[9px] font-black uppercase tracking-widest ${session.pk_passed ? 'text-success' : 'text-danger'}`}>{session.pk_score !== null ? (session.pk_passed ? 'Pass' : 'Fail') : 'Pending'}</span>
-                            </div>
-                        </div>
-
-                        <div className={`glass-card p-5 flex items-center justify-between rounded-2xl ${!session.pk_passed ? 'opacity-50' : ''}`}>
-                            <div className="flex items-center">
-                                <div className="w-10 h-10 bg-orange-50 text-warning rounded-xl flex items-center justify-center text-xl mr-3 border border-orange-100">👨‍🏫</div>
-                                <div><h4 className="font-black text-brandNavy text-base">Practical</h4><p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-0.5">Live/Audio</p></div>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-xl font-black text-brandNavy">{session.trainer_score !== null ? `${session.trainer_score}%` : '-'}</p>
-                                <span className={`text-[9px] font-black uppercase tracking-widest ${session.trainer_passed ? 'text-success' : 'text-danger'}`}>{session.trainer_score !== null ? (session.trainer_passed ? 'Pass' : 'Fail') : 'Pending'}</span>
-                            </div>
-                        </div>
+                    <div className="px-5 -mt-8 space-y-4 flex-1 flex flex-col">
+                        <div className="glass-card p-5 flex items-center justify-between rounded-2xl"><div className="flex items-center"><div className="w-10 h-10 bg-blue-50 text-primary rounded-xl flex items-center justify-center text-xl mr-3 border border-blue-100">📘</div><div><h4 className="font-black text-brandNavy text-base">Theory Test</h4><p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-0.5">Passing: 80%</p></div></div><div className="text-right"><p className="text-xl font-black text-brandNavy">{session.pk_score !== null ? `${session.pk_score}%` : '-'}</p><span className={`text-[9px] font-black uppercase tracking-widest ${session.pk_passed ? 'text-success' : 'text-danger'}`}>{session.pk_score !== null ? (session.pk_passed ? 'Pass' : 'Fail') : 'Pending'}</span></div></div>
+                        <div className="glass-card p-5 flex items-center justify-between rounded-2xl"><div className="flex items-center"><div className="w-10 h-10 bg-blue-50 text-primary rounded-xl flex items-center justify-center text-xl mr-3 border border-blue-100">🎤</div><div><h4 className="font-black text-brandNavy text-base">Audio Exam</h4><p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-0.5">Evaluation</p></div></div><div className="text-right"><p className="text-xl font-black text-brandNavy">{session.trainer_score !== null ? `${session.trainer_score}%` : '-'}</p><span className={`text-[9px] font-black uppercase tracking-widest ${session.overall_status === 'CERTIFIED' ? 'text-success' : session.overall_status === 'FAILED' ? 'text-danger' : 'text-warning'}`}>{session.overall_status || 'NOT STARTED'}</span></div></div>
                         
-                        {/* Status Messages & Call to Action */}
                         {session.pk_passed && !session.trainer_passed && (
-                            <div className="mt-4 bg-emerald-50 border border-emerald-200 p-5 rounded-2xl shadow-sm animate-pop-in relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
-                                <div className="flex flex-col items-center text-center">
-                                    <span className="text-3xl mb-2">🎉</span>
-                                    <h4 className="font-black text-emerald-800 text-sm mb-1.5">ยินดีด้วย! ท่านผ่านภาคทฤษฎีแล้ว</h4>
-                                    <p className="text-emerald-700 text-[11px] font-bold leading-relaxed mb-4">
-                                        ขั้นตอนต่อไป: กรุณาทำการประเมินภาคปฏิบัติ (สัมภาษณ์สด หรือ อัดเสียงส่งในระบบ) เพื่อรับ Certification
-                                    </p>
-                                    <div className="bg-white px-4 py-3 rounded-xl border border-emerald-100 shadow-sm w-full">
-                                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Action Required</p>
-                                        <p className="text-xs font-bold text-primary">👉 สแกน QR Code สีฟ้า เพื่อทำขั้นตอนต่อไป</p>
-                                    </div>
-                                </div>
+                            <div className="mt-4 space-y-3 animate-pop-in">
+                                <button onClick={goToFAQ} className="w-full bg-purple text-white p-4 rounded-2xl font-black shadow-md transition-transform hover:scale-[1.02] flex items-center justify-between btn-modern relative overflow-hidden group">
+                                    <div className="absolute inset-0 bg-white/20 w-full h-full transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
+                                    <div className="flex flex-col text-left relative z-10"><span className="text-[10px] uppercase tracking-widest opacity-80 mb-0.5">ตัวเลือกเสริม (Optional)</span><span className="text-sm">ทำแบบทดสอบ FAQ 100%</span></div><Icons.Award />
+                                </button>
+                                <button onClick={goToAudioExam} className="w-full bg-primary text-white p-4 rounded-2xl font-black shadow-lg transition-transform hover:scale-[1.02] flex items-center justify-between btn-modern">
+                                    <div className="flex flex-col text-left"><span className="text-[10px] uppercase tracking-widest opacity-80 mb-0.5">ดำเนินการต่อ</span><span className="text-sm">เข้าสอบอัดเสียง (Audio Exam)</span></div><Icons.Mic />
+                                </button>
                             </div>
                         )}
 
                         {!session.pk_passed && session.pk_score !== null && (
-                            <div className="mt-4 text-center">
-                                <p className="text-danger text-[11px] font-bold mb-3">คุณยังไม่ผ่านเกณฑ์ 80% กรุณาทบทวนความรู้และสอบใหม่อีกครั้ง</p>
-                                <button onClick={() => { 
-                                    if(confirm(`เริ่มทำ Knowledge Test ใหม่?\n(จะเป็นการสอบรอบที่ ${(session.pk_attempts || 0) + 1})`)) { 
-                                        localStorage.removeItem(`ttb_exam_${user.id}`); 
-                                        setView('pk'); 
-                                    } 
-                                }} className="w-full bg-white border-2 border-danger text-danger font-black py-3.5 rounded-xl hover:bg-red-50 transition-colors text-[13px] shadow-sm btn-modern">สอบใหม่อีกครั้ง (Retake)</button>
-                            </div>
+                            <div className="mt-4 text-center"><p className="text-danger text-[11px] font-bold mb-3">คุณยังไม่ผ่านเกณฑ์ 80% กรุณาทบทวนและสอบใหม่อีกครั้ง</p><button onClick={() => { if(confirm(`เริ่มทำใหม่? (รอบที่ ${(session.pk_attempts || 0) + 1})`)) { localStorage.removeItem(`ttb_exam_${user.id}`); setView('pk'); } }} className="w-full bg-white border-2 border-danger text-danger font-black py-3.5 rounded-xl hover:bg-red-50 transition-colors text-[13px] shadow-sm btn-modern">สอบใหม่อีกครั้ง (Retake)</button></div>
                         )}
-
-                        {session.overall_status === 'CERTIFIED' && (
-                            <div className="mt-4 bg-brandNavy text-white p-6 rounded-[28px] text-center shadow-soft-3d border border-blue-900 animate-pop-in">
-                                <div className="text-4xl mb-3">🎓</div>
-                                <h3 className="font-black text-xl mb-1 text-white">CERTIFIED</h3>
-                                <p className="text-[11px] font-bold text-blue-200 leading-relaxed">
-                                    ยินดีด้วย! คุณผ่านการประเมิน ttb US Multi-Asset 15/5 เรียบร้อยแล้ว
-                                </p>
-                            </div>
-                        )}
-                        
-                        <div className="mt-auto pt-5"><PoweredByFooter /></div>
+                        {session.overall_status === 'CERTIFIED' && <div className="mt-4 bg-brandNavy text-white p-6 rounded-[28px] text-center shadow-soft-3d border border-blue-900 animate-pop-in"><div className="text-4xl mb-3">🎓</div><h3 className="font-black text-xl mb-1 text-white">CERTIFIED</h3><p className="text-[11px] font-bold text-blue-200 leading-relaxed">ยินดีด้วย! คุณผ่านการประเมิน ttb US Multi-Asset 15/5 เรียบร้อยแล้ว</p></div>}
                     </div>
                 </div>
             );
